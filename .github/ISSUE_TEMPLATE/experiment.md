@@ -1,44 +1,11 @@
 ---
-name: Experiment
-description: Track one research experiment or result
-title: "[Experiment] "
+name: Deprecated — use Experiment Result
+description: Deprecated template. Use Experiment Result instead.
+title: "[Deprecated] "
 labels: []
 assignees: []
 ---
 
-## Goal
+This template is deprecated.
 
-What question does this experiment answer?
-
-## Hypothesis
-
-What do you expect to happen?
-
-## Setup
-
-- Dataset:
-- Model / Method:
-- Baseline:
-- Metric:
-- Code / Run link:
-
-## Result
-
-One-line result.
-
-## Evidence
-
-Link figure, table, notebook, log, or commit.
-
-## Interpretation
-
-What does this result mean?
-
-## Next
-
-What is the next action?
-
-## Advisor Needed
-
-- [ ] No
-- [ ] Yes — specify decision needed:
+Use `.github/ISSUE_TEMPLATE/experiment-result.md` for research results.
