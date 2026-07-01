@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DGCC Research OS · Minimal GitHub Workflow</title>
+<style>
+:root{--primary:#5e6ad2;--primary-hover:#828fff;--ink:#f7f8f8;--ink-muted:#d0d6e0;--ink-subtle:#8a8f98;--ink-tertiary:#62666d;--canvas:#010102;--surface-1:#0f1011;--surface-2:#141516;--surface-3:#18191a;--hairline:#23252a;--hairline-strong:#34343a;--success:#27a644;--warning:#c9a227;--danger:#e5484d;--r-sm:6px;--r-md:8px;--r-lg:12px;--r-xl:16px;--maxw:1180px;--font:Inter,"SF Pro Display",-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",Roboto,Arial,sans-serif;--mono:ui-monospace,"SF Mono",Menlo,Monaco,"Cascadia Code",Consolas,"Liberation Mono",monospace}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--canvas);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.55;letter-spacing:-.05px;-webkit-font-smoothing:antialiased}a{color:var(--ink);text-decoration:none}a:hover{color:var(--primary-hover)}code,pre,kbd{font-family:var(--mono)}.layout{display:grid;grid-template-columns:260px minmax(0,1fr);max-width:var(--maxw);margin:0 auto}.sidebar{position:sticky;top:0;height:100vh;overflow:auto;padding:28px 18px 56px 28px;border-right:1px solid var(--hairline);background:rgba(1,1,2,.96)}.brand{display:flex;align-items:center;gap:10px;margin-bottom:30px}.logo{width:22px;height:22px;border-radius:7px;background:linear-gradient(135deg,var(--primary),var(--primary-hover));box-shadow:0 0 0 1px rgba(255,255,255,.08) inset}.brand b{display:block;font-size:14px;font-weight:600}.brand span{display:block;margin-top:2px;color:var(--ink-subtle);font-size:11px}.nav-group{margin:22px 0 8px;color:var(--ink-tertiary);font-size:11px;letter-spacing:.08em;text-transform:uppercase}.nav a{display:block;padding:7px 10px;border-radius:var(--r-md);color:var(--ink-subtle);font-size:13px;line-height:1.35}.nav a:hover,.nav a.active{background:var(--surface-2);color:var(--ink)}.main{min-width:0;padding:0 36px 100px}.hero{padding:80px 0 56px;border-bottom:1px solid var(--hairline)}.eyebrow{display:inline-flex;align-items:center;gap:8px;color:var(--primary-hover);font-size:13px;font-weight:500;letter-spacing:.4px;margin-bottom:18px}.eyebrow:before{content:"";width:8px;height:8px;border-radius:999px;background:var(--primary);box-shadow:0 0 0 3px rgba(94,106,210,.16)}h1{max-width:840px;margin:0;font-size:clamp(42px,6vw,72px);line-height:1.05;font-weight:600;letter-spacing:-2.4px}.hero p{max-width:760px;margin:24px 0 0;color:var(--ink-muted);font-size:18px;line-height:1.5}.pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px}.pill{display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;background:var(--surface-2);border:1px solid var(--hairline);color:var(--ink-muted);font-size:12px}.pill.current{background:rgba(94,106,210,.14);border-color:rgba(94,106,210,.35);color:#e1e4ff}.pill.done{background:rgba(39,166,68,.08);border-color:rgba(39,166,68,.25);color:#c9f4d2}section{padding:70px 0 0}.kicker{color:var(--primary-hover);font-size:13px;font-weight:500;letter-spacing:.4px}h2{font-size:clamp(30px,4vw,52px);line-height:1.1;font-weight:600;letter-spacing:-1.6px;margin:8px 0 22px}h3{font-size:22px;line-height:1.25;font-weight:600;letter-spacing:-.45px;margin:30px 0 14px}p{color:var(--ink-muted)}.grid{display:grid;gap:16px}.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.card{position:relative;background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--r-lg);padding:24px}.card:before{content:"";position:absolute;left:1px;right:1px;top:0;height:1px;background:rgba(255,255,255,.06);border-radius:var(--r-lg) var(--r-lg) 0 0}.card.lift{background:var(--surface-2);border-color:var(--hairline-strong)}.card h3{margin-top:0}.card p{margin-bottom:0}table{width:100%;border-collapse:separate;border-spacing:0;background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--r-lg);overflow:hidden}th,td{padding:13px 15px;text-align:left;vertical-align:top;border-bottom:1px solid var(--hairline);font-size:14px}th{background:var(--surface-2);color:var(--ink);font-weight:500}td{color:var(--ink-muted)}tr:last-child td{border-bottom:0}td code{font-size:12px;color:var(--ink);background:var(--surface-3);border:1px solid var(--hairline);padding:1px 5px;border-radius:4px}.status{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:var(--surface-2);border:1px solid var(--hairline);color:var(--ink-muted);font-size:12px}.status.done{background:rgba(39,166,68,.08);border-color:rgba(39,166,68,.25);color:#c9f4d2}.status.current{background:rgba(94,106,210,.14);border-color:rgba(94,106,210,.35);color:#e1e4ff}.status.next{background:rgba(201,162,39,.1);border-color:rgba(201,162,39,.25);color:#f0e2a2}.mono-card{background:#08090a;border:1px solid var(--hairline);border-radius:var(--r-xl);padding:18px;overflow:hidden;margin-top:20px}.window{display:flex;gap:7px;padding-bottom:14px;margin-bottom:16px;border-bottom:1px solid var(--hairline)}.dot{width:9px;height:9px;border-radius:50%;background:var(--hairline-strong)}.dot:nth-child(1){background:#ff5f57}.dot:nth-child(2){background:#febc2e}.dot:nth-child(3){background:#28c840}.flow{display:grid;gap:10px}.flow-row{display:grid;grid-template-columns:92px 1fr 86px 110px;gap:12px;align-items:center;padding:11px 12px;background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--r-md)}.flow-row .idx{font-family:var(--mono);font-size:12px;color:var(--ink-tertiary)}.flow-row b{font-size:14px;font-weight:500}.flow-row small{color:var(--ink-subtle);font-size:12px}.callout{margin:22px 0;padding:22px 24px;border-radius:var(--r-xl);background:var(--surface-2);border:1px solid var(--hairline-strong)}.callout p{margin:0}.rules{display:grid;gap:0}.rule{display:grid;grid-template-columns:26px 1fr;gap:12px;padding:13px 0;border-bottom:1px solid var(--hairline)}.rule:last-child{border-bottom:0}.num{width:22px;height:22px;border-radius:6px;background:var(--surface-3);color:var(--primary-hover);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px}.rule b{display:block;font-size:14px;margin-bottom:4px}.rule span{display:block;color:var(--ink-subtle);font-size:14px}.codeblock{position:relative;margin:14px 0 26px}pre{margin:0;padding:18px 18px 20px;background:#08090a;color:var(--ink-muted);border:1px solid var(--hairline);border-radius:var(--r-lg);overflow:auto;font-size:12.5px;line-height:1.55}.copy{position:absolute;top:8px;right:8px;border:1px solid var(--hairline-strong);background:var(--surface-2);color:var(--ink-muted);border-radius:var(--r-md);padding:6px 9px;font-size:12px;cursor:pointer}.copy:hover{color:var(--ink);border-color:var(--primary)}.footer{margin-top:72px;padding-top:26px;border-top:1px solid var(--hairline);color:var(--ink-tertiary);font-size:12px}.mobile-toggle{display:none;position:fixed;top:14px;right:14px;z-index:50;border:1px solid var(--hairline-strong);background:var(--surface-2);color:var(--ink);border-radius:var(--r-md);padding:8px 12px}@media(max-width:980px){.layout{display:block}.sidebar{position:fixed;z-index:40;transform:translateX(-105%);transition:.2s;width:280px}.sidebar.open{transform:translateX(0)}.mobile-toggle{display:block}.main{padding:0 20px 80px}h1{letter-spacing:-1.5px}.grid.two,.grid.three{grid-template-columns:1fr}.flow-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<button class="mobile-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">Menu</button>
+<div class="layout"><aside class="sidebar"><div class="brand"><div class="logo"></div><div><b>DGCC Research OS</b><span>Minimal GitHub workflow</span></div></div><nav class="nav"><div class="nav-group">Core</div><a href="#decision">Final decision</a><a href="#repos">Repos</a><a href="#project">Project</a><div class="nav-group">Issues</div><a href="#issue-types">Issue types</a><a href="#templates">Templates</a><a href="#examples">Filled examples</a><div class="nav-group">Rules</div><a href="#rules">Operating rules</a><a href="#setup">Setup checklist</a></nav></aside><main class="main"><header class="hero"><div class="eyebrow">Milestone-based research management</div><h1>DGCC Research OS</h1><p>DGCC 연구를 GitHub Issues / Projects로 관리하기 위한 최소 운영 기준. Project에는 milestone만 올리고, 문서는 docs에, 구현 증거는 별도 code repo에 둔다.</p><div class="pills"><span class="pill done">Blueprint done</span><span class="pill current">GNG-0 current</span><span class="pill">No Stage field</span><span class="pill">Phase = A/B/C/D/E/F</span><span class="pill">3 issue templates</span></div></header>
+<section id="decision"><div class="kicker">01 · Final Decision</div><h2>최종 구조</h2><div class="grid three"><div class="card lift"><h3>1. Repo는 2개</h3><p><code>research-dashboard</code>는 연구 관리. <code>dgcc</code>는 구현 코드.</p></div><div class="card"><h3>2. Project는 milestone만</h3><p>Task, step, bugfix는 Project에 올리지 않음.</p></div><div class="card"><h3>3. Issue는 상태판</h3><p>긴 plan 복붙 금지. 문서 link, checklist, next, decision만.</p></div></div><div class="callout"><p><strong>핵심:</strong> 문서는 지식, Issue는 상태, Project는 흐름. 이 셋을 섞지 않음.</p></div></section>
+<section id="repos"><div class="kicker">02 · Repositories</div><h2>Repo split</h2><div class="grid two"><div class="card lift"><h3>research-dashboard</h3><p>연구 관리, docs, milestone issues, decisions, reports, references.</p><div class="codeblock"><button class="copy">Copy</button><pre><code>research-dashboard/
+  README.md
+
+  docs/
+    research/
+      DGCC_research_plan.html
+      DGCC_research_plan.md
+
+    implementation/
+      gng/
+        dgcc_gng_implementation_plan_v2.md
+        phase_A_task_spec.md
+
+    reports/
+      gng0_decision.md
+      gng1_decision.md
+
+    references/
+      papers.md
+      related_work.md
+
+  .github/
+    ISSUE_TEMPLATE/
+      milestone.md
+      decision.md
+      experiment-result.md</code></pre></div></div><div class="card"><h3>dgcc</h3><p>구현 코드, branch, PR, configs, outputs, metrics, plots.</p><div class="codeblock"><button class="copy">Copy</button><pre><code>dgcc/
+  README.md
+
+  dgcc_gng/
+    STEP_LOG.md
+    configs/
+    scripts/
+    src/
+    outputs/
+      data/
+      models/
+      metrics/
+      plots/
+      reviews/
+
+  experiments/
+    envs/
+      env_rope_response_probe.py</code></pre></div></div></div></section>
+<section id="project"><div class="kicker">03 · GitHub Project</div><h2>Milestone flow</h2><h3>Project fields</h3><table><thead><tr><th>Field</th><th>Type</th><th>Values</th></tr></thead><tbody><tr><td><code>Status</code></td><td>Single select</td><td>Backlog / Current / Blocked / Done</td></tr><tr><td><code>Phase</code></td><td>Single select</td><td>N/A / A / B / C / D / E / F</td></tr><tr><td><code>Decision</code></td><td>Single select</td><td>Pending / GO / PIVOT / NO-GO / INCONCLUSIVE / N/A</td></tr><tr><td><code>Doc</code></td><td>Text</td><td>대표 문서 링크</td></tr><tr><td><code>Updated</code></td><td>Date</td><td>마지막 의미 있는 갱신일</td></tr></tbody></table><div class="callout"><p><strong>삭제:</strong> <code>Stage</code> field는 쓰지 않음. Project item 자체가 milestone이므로 개념 충돌 발생.</p></div><h3>Current Project items</h3><div class="mono-card"><div class="window"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><div class="flow"><div class="flow-row"><span class="idx">M-01</span><b>[Milestone] DGCC Research Blueprint</b><small>Phase N/A</small><span class="status done">Done</span></div><div class="flow-row"><span class="idx">M-02</span><b>[Milestone] Go/No-Go 0 — Rope Response Probe</b><small>Phase A</small><span class="status current">Current</span></div><div class="flow-row"><span class="idx">M-03</span><b>[Milestone] Go/No-Go 1 — Architecture Constraint</b><small>Phase E</small><span class="status next">Next</span></div><div class="flow-row"><span class="idx">M-04</span><b>[Milestone] Mechanism Validation</b><small>Phase F</small><span class="status">Backlog</span></div><div class="flow-row"><span class="idx">M-05</span><b>[Milestone] Policy Performance</b><small>Phase N/A</small><span class="status">Backlog</span></div><div class="flow-row"><span class="idx">M-06</span><b>[Milestone] OOD Generalization</b><small>Phase N/A</small><span class="status">Backlog</span></div><div class="flow-row"><span class="idx">M-07</span><b>[Milestone] Paper Draft</b><small>Phase N/A</small><span class="status">Backlog</span></div></div></div></section>
+<section id="issue-types"><div class="kicker">04 · Issue Types</div><h2>Issue는 3종류만</h2><div class="grid three"><div class="card lift"><h3>Milestone</h3><p>Project에 올리는 유일한 기본 단위. 연구 흐름 표시용.</p></div><div class="card"><h3>Decision</h3><p>연구 방향이 바뀌거나 GO/PIVOT/NO-GO 판단이 생길 때.</p></div><div class="card"><h3>Experiment Result</h3><p>결과가 milestone decision에 영향을 줄 때만.</p></div></div></section>
+<section id="templates"><div class="kicker">05 · Templates</div><h2>Minimal templates</h2><h3>Milestone</h3><div class="codeblock"><button class="copy">Copy</button><pre><code>## State
+
+## Question
+
+## Phase
+
+## Docs
+
+- Main:
+- Report:
+
+## Code
+
+- Repo:
+- Branch:
+- PR:
+- Output:
+
+## Checklist
+
+- [ ] 
+- [ ] 
+- [ ] 
+
+## Exit
+
+- [ ] 
+- [ ] 
+- [ ] 
+
+## Blocker
+
+None.
+
+## Next
+
+## Decision
+
+Pending.</code></pre></div><h3>Decision</h3><div class="codeblock"><button class="copy">Copy</button><pre><code>## Context
+
+## Decision
+
+## Evidence
+
+- Report:
+- Metrics:
+- Figures:
+- Code:
+
+## Why
+
+## Impact
+
+## Next</code></pre></div><h3>Experiment Result</h3><div class="codeblock"><button class="copy">Copy</button><pre><code>## Question
+
+## Setup
+
+- Task:
+- Model:
+- Metric:
+- Config:
+
+## Result
+
+## Evidence
+
+- Metrics:
+- Figures:
+- Logs:
+- Code:
+
+## Interpretation
+
+## Decision Impact
+
+## Next</code></pre></div></section>
+<section id="examples"><div class="kicker">06 · Filled Examples</div><h2>바로 쓸 예시</h2><h3>Example 1 · Milestone: Research Blueprint</h3><div class="codeblock"><button class="copy">Copy</button><pre><code>Title:
+[Milestone] DGCC Research Blueprint
+
+## State
+
+DGCC research framing is complete.
+
+## Question
+
+How should a Bellman critic represent contact actions for DLO manipulation?
+
+## Phase
+
+N/A
+
+## Docs
+
+- Main: `docs/research/DGCC_research_plan.html`
+- Markdown: `docs/research/DGCC_research_plan.md`
+- References: `docs/references/papers.md`
+
+## Code
+
+- Repo: N/A
+- Branch: N/A
+- PR: N/A
+- Output: N/A
+
+## Checklist
+
+- [x] Research question defined
+- [x] Main hypothesis defined
+- [x] DGCC positioned as critic representation paper
+- [x] Go/No-Go motivation defined
+- [x] Method direction defined
+- [x] Experiment structure drafted
+- [x] References collected
+
+## Exit
+
+- [x] Research blueprint is written
+- [x] Go/No-Go direction is clear
+- [x] References are linked
+
+## Blocker
+
+None.
+
+## Next
+
+Proceed to Go/No-Go 0.
+
+## Decision
+
+N/A</code></pre></div><h3>Example 2 · Milestone: GNG-0</h3><div class="codeblock"><button class="copy">Copy</button><pre><code>Title:
+[Milestone] Go/No-Go 0 — Rope Response Probe
+
+## State
+
+Phase A is active. The current goal is to validate the minimal `rope_response_probe` task before critic probing.
+
+## Question
+
+Does a standard black-box Bellman critic already encode contact-induced deformation response?
+
+## Phase
+
+A — Task Feasibility
+
+## Docs
+
+- Research blueprint: `docs/research/DGCC_research_plan.html`
+- Implementation plan: `docs/implementation/gng/dgcc_gng_implementation_plan_v2.md`
+- Phase A spec: `docs/implementation/gng/phase_A_task_spec.md`
+- Final report: `docs/reports/gng0_decision.md`
+
+## Code
+
+- Repo: `https://github.com/jiminc77/dgcc`
+- Branch: `dgcc-gng-rope-response`
+- PR:
+- Output: `dgcc_gng/outputs/`
+
+## Checklist
+
+- [ ] A — Environment and minimal task feasibility
+- [ ] B — Latent extraction and response dataset
+- [ ] C — Response space and probe test
+- [ ] D — Go/No-Go decision
+
+## Exit
+
+- [ ] `rope_response_probe` runs without benchmark task usage
+- [ ] Baseline critic is nontrivial
+- [ ] Critic latents are extracted
+- [ ] Response targets are built
+- [ ] Probe and controls are evaluated
+- [ ] Reward-target separation is checked
+- [ ] GNG-0 decision is written
+
+## Blocker
+
+None.
+
+## Next
+
+Finish Phase A task specification and implementation gate.
+
+## Decision
+
+Pending.</code></pre></div><h3>Example 3 · Decision</h3><div class="codeblock"><button class="copy">Copy</button><pre><code>Title:
+[Decision] Use minimal rope_response_probe for GNG-0
+
+## Context
+
+Benchmark tasks add object/task complexity that can confound contact-induced rope response analysis.
+
+## Decision
+
+Use a new minimal `rope_response_probe` task for Go/No-Go 0.
+
+## Evidence
+
+- Plan: `docs/implementation/gng/dgcc_gng_implementation_plan_v2.md`
+- Related milestone: `[Milestone] Go/No-Go 0 — Rope Response Probe`
+
+## Why
+
+The Go/No-Go test should isolate contact action → rope shape response.
+
+Benchmark tasks such as coiling, wrapping, lifting, or obstacle-based tasks introduce task-object effects that are not necessary for the first critic latent probe.
+
+## Impact
+
+- Do not use DLO-Lab benchmark tasks for GNG-0.
+- Create one minimal task.
+- Reward trains a nontrivial Bellman critic but must not equal the probe target.
+- Probe target remains contact-induced deformation response.
+
+## Next
+
+Complete Phase A task specification.</code></pre></div><h3>Example 4 · Experiment Result</h3><div class="codeblock"><button class="copy">Copy</button><pre><code>Title:
+[Result] C2 Baseline Critic Latent Probe
+
+## Question
+
+Does the baseline Bellman critic latent linearly encode contact-induced deformation response?
+
+## Setup
+
+- Task: `rope_response_probe`
+- Model: baseline Bellman critic
+- Metric: average R², per-mode R², normalized MSE
+- Config: `dgcc_gng/configs/gng0_probe.yaml`
+
+## Result
+
+Pending.
+
+## Evidence
+
+- Metrics: `dgcc_gng/outputs/metrics/C2_probe_metrics.json`
+- Figures:
+  - `dgcc_gng/outputs/plots/C2_probe_bar_average_r2.png`
+  - `dgcc_gng/outputs/plots/C2_probe_per_mode_r2.png`
+- Logs:
+- Code:
+
+## Interpretation
+
+Pending.
+
+## Decision Impact
+
+Low critic-latent probe R² with strong raw state-action or MLP upper-bound supports continuing DGCC.
+
+High critic-latent probe R² with strong transfer weakens the hard bottleneck story.
+
+## Next
+
+Run C3 probe transfer or write D0 decision.</code></pre></div></section>
+<section id="rules"><div class="kicker">07 · Rules</div><h2>운영 규칙</h2><div class="grid two"><div class="card lift"><h3>Project에 넣기</h3><div class="rules"><div class="rule"><div class="num">1</div><div><b>Milestone Issue</b><span>Blueprint, GNG-0, GNG-1, OOD, Paper Draft.</span></div></div><div class="rule"><div class="num">2</div><div><b>현재 milestone 1개</b><span>Current column에는 하나만 유지.</span></div></div><div class="rule"><div class="num">3</div><div><b>Done 전 link 확인</b><span>Doc, report, evidence가 연결된 뒤 close.</span></div></div></div></div><div class="card"><h3>Project에 넣지 않기</h3><div class="rules"><div class="rule"><div class="num">A</div><div><b>세부 step</b><span>A0, A1, file 생성, script 수정.</span></div></div><div class="rule"><div class="num">B</div><div><b>작은 bugfix</b><span>code repo issue/PR에서 처리.</span></div></div><div class="rule"><div class="num">C</div><div><b>Weekly update</b><span>Archive 용도. Milestone issue에 link만.</span></div></div></div></div></div><div class="callout"><p><strong>Weekly update는 세 줄만:</strong> State / Blocker / Next. 나머지는 docs와 code repo에 남김.</p></div></section>
+<section id="setup"><div class="kicker">08 · Setup</div><h2>설정 체크리스트</h2><table><thead><tr><th>#</th><th>Action</th><th>Location</th></tr></thead><tbody><tr><td>1</td><td><code>dgcc</code> repo 생성</td><td>GitHub</td></tr><tr><td>2</td><td>research docs 이동</td><td><code>research-dashboard/docs/</code></td></tr><tr><td>3</td><td>3개 Issue template 추가</td><td><code>.github/ISSUE_TEMPLATE/</code></td></tr><tr><td>4</td><td>Project 생성</td><td><code>DGCC Research</code></td></tr><tr><td>5</td><td>Project fields 생성</td><td><code>Status / Phase / Decision / Doc / Updated</code></td></tr><tr><td>6</td><td>Milestone Issue 2개 생성</td><td><code>Blueprint</code>, <code>GNG-0</code></td></tr><tr><td>7</td><td>GNG-0를 Current로 설정</td><td>Project Board</td></tr></tbody></table><div class="footer">DGCC Research OS · Clean minimal version · Milestone-based GitHub workflow</div></section></main></div>
+<script>document.querySelectorAll('.copy').forEach(btn=>{btn.addEventListener('click',async()=>{const pre=btn.parentElement.querySelector('pre');if(!pre)return;await navigator.clipboard.writeText(pre.innerText);const old=btn.textContent;btn.textContent='Copied';setTimeout(()=>btn.textContent=old,900)})});const links=[...document.querySelectorAll('.nav a')];const sections=links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.classList.remove('active'));const active=document.querySelector('.nav a[href="#'+e.target.id+'"]');if(active)active.classList.add('active')}})},{rootMargin:'-20% 0px -70% 0px'});sections.forEach(s=>obs.observe(s));document.querySelectorAll('.nav a').forEach(a=>a.addEventListener('click',()=>{document.querySelector('.sidebar').classList.remove('open')}));</script>
+</body>
+</html>
