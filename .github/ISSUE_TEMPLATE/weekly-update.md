@@ -1,32 +1,19 @@
 ---
-name: Weekly Update
-description: One short weekly or biweekly research update
-title: "[Weekly] YYYY-MM-DD"
+name: Deprecated — weekly updates are comments
+description: Deprecated template. Use milestone issue comments for weekly updates.
+title: "[Deprecated] "
 labels: []
 assignees: []
 ---
 
-## Summary
+This template is deprecated.
 
-One to three sentences.
+Weekly updates should be short comments inside the active milestone issue.
 
-## Done
+Use only:
 
-- 
-
-## Learned
-
-- 
-
-## Blocker
-
-- 
-
-## Next
-
-- 
-
-## Need Advisor
-
-- [ ] No
-- [ ] Yes — specify:
+```text
+State:
+Blocker:
+Next:
+```
