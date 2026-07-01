@@ -1,8 +1,15 @@
-# Research Dashboard
+# DGCC Research OS
 
-A minimal research progress tracking system for advisor review.
+Minimal GitHub-based research management workspace for DGCC.
 
-Goal: let an advisor understand the current state of the research in 1–3 minutes.
+This repository tracks **research state**, not implementation tasks.
+
+```text
+Docs = Knowledge
+Issues = State
+Project = Flow
+Code repo = Evidence
+```
 
 ---
 
@@ -10,65 +17,84 @@ Goal: let an advisor understand the current state of the research in 1–3 minut
 
 | Field | Current |
 |---|---|
-| Research Question | _What is the central question right now?_ |
-| Current Stage | `Planning / Experiment / Analysis / Writing / Review` |
-| Status | `On Track / At Risk / Blocked` |
-| Latest Evidence | _Figure, result, issue, or notebook link_ |
-| Main Blocker | _What prevents progress?_ |
-| Next Objective | _What happens next?_ |
-| Advisor Decision Needed | _Yes / No — specific decision if needed_ |
-| Last Updated | YYYY-MM-DD |
+| Current Milestone | [Go/No-Go 0 — Rope Response Probe](https://github.com/jiminc77/research-dashboard/issues/5) |
+| Phase | A — Task Feasibility |
+| Decision | Pending |
+| Main Question | Does a standard black-box Bellman critic already encode contact-induced deformation response? |
+| Next | Finish Phase A task specification and implementation gate |
+| Manual | [`docs/research_ops_manual.html`](docs/research_ops_manual.html) |
 
 ---
 
-## Current Flow
+## Repository Split
 
-```text
-Idea → Experiment → Result → Decision → Paper
-```
+Use two repositories.
 
-Only track items that affect the research story. Avoid task clutter.
+| Repo | Purpose |
+|---|---|
+| `research-dashboard` | Research management, docs, milestone issues, decisions, reports, references |
+| `dgcc` | Implementation code, configs, branches, PRs, outputs, metrics, plots |
+
+This repo should not contain main implementation code.
 
 ---
 
-## Minimal GitHub Project Setup
+## Project Setup
 
-Create one GitHub Project and add issues from this repository.
-
-Recommended columns:
+Create one GitHub Project named:
 
 ```text
-Ideas → Current → Need Advisor → Done
+DGCC Research
 ```
 
-Keep `Current` to 1–3 items max.
+Columns:
 
-Recommended views:
+```text
+Backlog → Current → Blocked → Done
+```
 
-1. **Advisor View** — filter open issues, show only current work and advisor-needed items.
-2. **Timeline View** — group by research stage or milestone.
-3. **Archive View** — closed issues only.
+Fields:
+
+```text
+Status
+Phase
+Decision
+Doc
+Updated
+```
+
+Do not use a `Stage` field. The Project item itself is the milestone.
+
+---
+
+## Milestone Issues
+
+| Issue | Status |
+|---|---|
+| [DGCC Research Blueprint](https://github.com/jiminc77/research-dashboard/issues/4) | Done |
+| [Go/No-Go 0 — Rope Response Probe](https://github.com/jiminc77/research-dashboard/issues/5) | Current |
+| [Go/No-Go 1 — Architecture Constraint](https://github.com/jiminc77/research-dashboard/issues/6) | Backlog |
+
+Decision record:
+
+- [Use minimal rope_response_probe for GNG-0](https://github.com/jiminc77/research-dashboard/issues/7)
 
 ---
 
 ## Issue Types
 
-Use only three issue types:
+Use only three active templates:
 
-| Type | Purpose |
+| Type | Use when |
 |---|---|
-| Experiment | Track one research test or result |
-| Weekly Update | Summarize weekly/biweekly progress |
-| Decision | Record why the direction changed |
+| Milestone | Tracking one major research milestone |
+| Decision | Recording a research direction decision |
+| Experiment Result | Recording a result that affects a decision |
 
----
+Weekly updates should be comments inside the active milestone issue, not separate Project items.
 
-## Operating Rule
-
-Every week, update only three things:
-
-1. Current result
-2. Current blocker
-3. Next objective
-
-If a PI opens this repo, the README should explain the current state immediately. Issues provide the evidence trail.
+```text
+State:
+Blocker:
+Next:
+```
