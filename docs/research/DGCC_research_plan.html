@@ -1,23 +1,1710 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>DGCC Research Blueprint</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DGCC — Deformation-Grounded Contact Critic · 연구계획서</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
 <style>
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;max-width:860px;margin:64px auto;padding:0 24px;line-height:1.6;background:#010102;color:#f7f8f8}a{color:#828fff}code{background:#141516;padding:2px 6px;border-radius:6px}p,li{color:#d0d6e0}.card{border:1px solid #23252a;border-radius:12px;background:#0f1011;padding:24px;margin:24px 0}
+  :root {
+    --primary: #000000;
+    --primary-active: #1a1a1a;
+    --text-link: #0d74ce;
+    --ink: #171717;
+    --body: #60646c;
+    --muted: #999999;
+    --muted-soft: #cccccc;
+    --hairline: #f0f0f3;
+    --hairline-soft: #f5f5f7;
+    --hairline-strong: #dcdee0;
+    --canvas: #ffffff;
+    --canvas-soft: #fafafa;
+    --surface-card: #ffffff;
+    --surface-strong: #f0f0f3;
+    --surface-dark: #171717;
+    --surface-dark-elevated: #1a1a1a;
+    --on-primary: #ffffff;
+    --on-dark: #ffffff;
+    --on-dark-soft: #b0b4ba;
+    --sky-light: #cfe7ff;
+    --sky-mid: #a8c8e8;
+    --accent-warning: #ab6400;
+    --sans: 'Inter', -apple-system, system-ui, sans-serif;
+    --mono: 'JetBrains Mono', 'Fira Code', monospace;
+    --maxw: 920px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--canvas);
+    color: var(--body);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Korean readability */
+  p, li, td, th, dd, dt, .kr { word-break: keep-all; }
+
+  a { color: var(--text-link); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ---------- Top nav ---------- */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    height: 64px;
+    background: rgba(255,255,255,0.88);
+    backdrop-filter: saturate(180%) blur(12px);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid var(--hairline);
+    display: flex;
+    align-items: center;
+  }
+  .nav-inner {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .wordmark {
+    font-weight: 600;
+    font-size: 17px;
+    letter-spacing: -0.3px;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .wordmark:hover { text-decoration: none; }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .nav-links a {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--body);
+    letter-spacing: 0;
+  }
+  .nav-links a:hover { color: var(--ink); text-decoration: none; }
+  .nav-print {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--on-primary);
+    background: var(--primary);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: var(--sans);
+  }
+  .nav-print:hover { background: var(--primary-active); }
+
+  /* ---------- Layout ---------- */
+  .wrap {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  section.major {
+    padding: 96px 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+  section.major:last-of-type { border-bottom: none; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding: 104px 0 88px;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(1100px 620px at 50% -8%, var(--sky-light) 0%, rgba(207,231,255,0.55) 34%, rgba(168,200,232,0.28) 55%, rgba(255,255,255,0) 78%),
+      linear-gradient(180deg, rgba(168,200,232,0.30) 0%, rgba(207,231,255,0.14) 30%, rgba(255,255,255,0) 62%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .hero .wrap { position: relative; z-index: 1; }
+
+  .hero h1 {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 52px;
+    line-height: 1.08;
+    letter-spacing: -1.56px;
+    color: var(--ink);
+    margin: 22px 0 0;
+    max-width: 18ch;
+  }
+  .hero .subtitle {
+    font-size: 20px;
+    line-height: 1.6;
+    color: var(--body);
+    margin: 20px 0 0;
+    max-width: 60ch;
+    font-weight: 400;
+  }
+  .hero .meta {
+    margin-top: 28px;
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.7;
+    letter-spacing: 0;
+  }
+  .hero .meta strong { color: var(--body); font-weight: 500; }
+
+  /* ---------- Badge pills ---------- */
+  .badge {
+    display: inline-block;
+    background: var(--surface-strong);
+    color: var(--ink);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.88px;
+    text-transform: uppercase;
+    border-radius: 9999px;
+    padding: 5px 12px;
+  }
+  .badge.dot::before {
+    content: "";
+    display: inline-block;
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--ink);
+    margin-right: 7px;
+    vertical-align: middle;
+    margin-top: -2px;
+  }
+  .tag {
+    display: inline-block;
+    background: var(--surface-strong);
+    color: var(--ink);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    border-radius: 9999px;
+    padding: 3px 10px;
+    vertical-align: middle;
+  }
+  .eyebrow {
+    display: inline-block;
+    background: var(--surface-strong);
+    color: var(--ink);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.88px;
+    text-transform: uppercase;
+    border-radius: 9999px;
+    padding: 5px 12px;
+    margin-bottom: 22px;
+  }
+  /* Appendix eyebrow — visually distinct (dark inversion) to signal deferred material */
+  .eyebrow.appendix {
+    background: var(--surface-dark);
+    color: var(--on-dark);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ---------- Headings ---------- */
+  h2.section-head {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 36px;
+    line-height: 1.15;
+    letter-spacing: -1.08px;
+    color: var(--ink);
+    margin: 0 0 8px;
+  }
+  h3.sub {
+    font-weight: 600;
+    font-size: 28px;
+    line-height: 1.2;
+    letter-spacing: -0.84px;
+    color: var(--ink);
+    margin: 48px 0 16px;
+  }
+  h4.subsub {
+    font-weight: 600;
+    font-size: 22px;
+    line-height: 1.25;
+    letter-spacing: -0.5px;
+    color: var(--ink);
+    margin: 36px 0 14px;
+  }
+  h5.mini {
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 1.4;
+    letter-spacing: 0;
+    color: var(--ink);
+    margin: 28px 0 10px;
+  }
+
+  /* ---------- Body text ---------- */
+  p { margin: 0 0 18px; line-height: 1.7; }
+  .major p, .major li { color: var(--body); }
+  strong { color: var(--ink); font-weight: 600; }
+  em { font-style: italic; }
+
+  ul, ol { margin: 0 0 18px; padding-left: 22px; line-height: 1.7; }
+  li { margin: 0 0 8px; }
+  li::marker { color: var(--muted); }
+
+  .lead {
+    font-size: 17px;
+    line-height: 1.75;
+    color: var(--body);
+  }
+
+  /* ---------- Citations ---------- */
+  sup.cite {
+    font-size: 11px;
+    line-height: 0;
+    vertical-align: super;
+    font-weight: 500;
+  }
+  sup.cite a { color: var(--text-link); }
+  sup.cite a:hover { text-decoration: underline; }
+
+  /* ---------- Code blocks ---------- */
+  pre.code {
+    background: var(--surface-dark);
+    color: var(--on-dark-soft);
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.65;
+    border-radius: 12px;
+    padding: 20px 22px;
+    overflow-x: auto;
+    margin: 0 0 20px;
+    white-space: pre;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  pre.code .hl { color: var(--on-dark); }
+  code.inline {
+    font-family: var(--mono);
+    font-size: 0.88em;
+    background: var(--surface-strong);
+    color: var(--ink);
+    padding: 1px 6px;
+    border-radius: 5px;
+  }
+
+  /* dark hero card code */
+  .hero-card {
+    margin-top: 34px;
+    background: var(--surface-dark);
+    border-radius: 12px;
+    padding: 22px 24px;
+    max-width: 760px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .hero-card .obs-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.88px;
+    text-transform: uppercase;
+    color: var(--on-dark-soft);
+    margin-bottom: 12px;
+  }
+  .hero-card pre {
+    margin: 0;
+    background: transparent;
+    color: var(--on-dark);
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: normal;
+  }
+
+  /* ---------- Cards ---------- */
+  .card {
+    background: var(--surface-card);
+    border: 1px solid var(--hairline-strong);
+    border-radius: 12px;
+    padding: 24px;
+    transition: box-shadow 0.18s ease;
+  }
+  .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
+  .card-soft {
+    background: var(--surface-card);
+    border: 1px solid var(--hairline);
+    border-radius: 12px;
+    padding: 24px;
+    transition: box-shadow 0.18s ease;
+  }
+  .card-soft:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
+
+  .card h5, .card-soft h5 { margin-top: 0; }
+  .card p:last-child, .card-soft p:last-child { margin-bottom: 0; }
+  .card ul:last-child, .card-soft ul:last-child { margin-bottom: 0; }
+
+  .grid { display: grid; gap: 16px; }
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+  .card .card-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.7px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .card .card-title {
+    font-weight: 600;
+    font-size: 17px;
+    color: var(--ink);
+    letter-spacing: -0.2px;
+    margin: 0 0 10px;
+    line-height: 1.35;
+  }
+  .card .card-body { font-size: 14.5px; line-height: 1.65; color: var(--body); }
+  .card .card-body p { margin: 0 0 10px; }
+
+  /* ---------- Feature (dark) card ---------- */
+  .feature-dark {
+    background: var(--surface-dark);
+    color: var(--on-dark);
+    border-radius: 12px;
+    padding: 28px 30px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .feature-dark .fd-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.88px;
+    text-transform: uppercase;
+    color: var(--on-dark-soft);
+    margin-bottom: 14px;
+  }
+  .feature-dark h4 {
+    color: var(--on-dark);
+    font-weight: 600;
+    font-size: 20px;
+    letter-spacing: -0.4px;
+    margin: 0 0 16px;
+  }
+  .feature-dark p { color: var(--on-dark-soft); }
+  .feature-dark p:last-child { margin-bottom: 0; }
+  .feature-dark pre.code {
+    background: var(--surface-dark-elevated);
+    margin: 14px 0;
+  }
+  .feature-dark pre.code:last-child { margin-bottom: 0; }
+  .feature-dark strong { color: var(--on-dark); }
+
+  /* ---------- Tables ---------- */
+  .table-scroll {
+    overflow-x: auto;
+    margin: 0 0 20px;
+    border-radius: 8px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    line-height: 1.55;
+  }
+  thead th {
+    text-align: left;
+    font-weight: 600;
+    color: var(--ink);
+    border-bottom: 1.5px solid var(--hairline-strong);
+    padding: 12px 16px;
+    vertical-align: bottom;
+    white-space: nowrap;
+  }
+  tbody td {
+    border-bottom: 1px solid var(--hairline);
+    padding: 12px 16px;
+    color: var(--body);
+    vertical-align: top;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody td strong { color: var(--ink); }
+  table code.inline { font-size: 0.85em; white-space: nowrap; }
+  .table-caption {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0 0 12px;
+    letter-spacing: 0;
+  }
+
+  /* ---------- TOC ---------- */
+  .toc {
+    background: var(--surface-card);
+    border: 1px solid var(--hairline-strong);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-top: -44px;
+    position: relative;
+    z-index: 2;
+  }
+  .toc .toc-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.88px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 18px;
+  }
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px 40px;
+  }
+  .toc-item {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--hairline-soft);
+  }
+  .toc-item .num {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    min-width: 22px;
+  }
+  .toc-item a {
+    color: var(--ink);
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .toc-item a:hover { color: var(--text-link); text-decoration: none; }
+  .toc-item .ko-sub { color: var(--muted); font-size: 13px; font-weight: 400; margin-left: auto; }
+
+  /* ---------- Callout / note ---------- */
+  .note {
+    border-left: 3px solid var(--hairline-strong);
+    padding: 4px 0 4px 20px;
+    margin: 0 0 20px;
+    color: var(--body);
+  }
+  .definition {
+    border-left: 3px solid var(--ink);
+    padding: 8px 0 8px 22px;
+    margin: 0 0 22px;
+  }
+  .definition .def-term { font-weight: 600; color: var(--ink); }
+
+  .divider {
+    height: 1px;
+    background: var(--hairline);
+    border: none;
+    margin: 40px 0;
+  }
+
+  .section-intro { margin-bottom: 8px; }
+
+  /* label chips inside body */
+  .chip {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 12px;
+    background: var(--surface-strong);
+    color: var(--ink);
+    padding: 1px 8px;
+    border-radius: 6px;
+    font-weight: 400;
+  }
+
+  /* ---------- Appendix wrapper — slightly muted deferred material ---------- */
+  .appendix-section .lead,
+  .appendix-section > .wrap > p { color: var(--body); }
+  .appendix-note {
+    font-size: 13.5px;
+    color: var(--muted);
+    margin: 6px 0 22px;
+    letter-spacing: 0;
+  }
+
+  /* ---------- References ---------- */
+  .ref-group-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.88px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 40px 0 6px;
+  }
+  h4.ref-group {
+    font-weight: 600;
+    font-size: 20px;
+    letter-spacing: -0.4px;
+    color: var(--ink);
+    margin: 4px 0 20px;
+    line-height: 1.3;
+  }
+  .ref-list { display: flex; flex-direction: column; }
+  .ref-row {
+    display: grid;
+    grid-template-columns: 42px 1fr;
+    gap: 6px 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--hairline);
+    scroll-margin-top: 80px;
+  }
+  .ref-row:target {
+    background: var(--surface-strong);
+    border-radius: 8px;
+    padding: 14px 16px;
+    grid-template-columns: 42px 1fr;
+    border-bottom: 1px solid transparent;
+  }
+  .ref-num {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--muted);
+    padding-top: 1px;
+  }
+  .ref-body { font-size: 14.5px; line-height: 1.55; }
+  .ref-title { font-weight: 600; color: var(--ink); }
+  .ref-venue { color: var(--body); }
+  .ref-arxiv {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .ref-note { color: var(--body); display: block; margin-top: 3px; font-size: 14px; }
+  .ref-note.flag { color: var(--ink); }
+  /* Novelty-threat reference flag */
+  .ref-row.threat {
+    border-left: 3px solid var(--ink);
+    padding-left: 14px;
+  }
+  .ref-row.threat:target { padding-left: 14px; }
+  .threat-badge {
+    display: inline-block;
+    background: var(--surface-dark);
+    color: var(--on-dark);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.7px;
+    text-transform: uppercase;
+    border-radius: 9999px;
+    padding: 2px 8px;
+    margin-left: 8px;
+    vertical-align: middle;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    border-top: 1px solid var(--hairline-strong);
+    padding: 56px 0 64px;
+    background: var(--canvas);
+  }
+  footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 20px; align-items: flex-start; }
+  footer .f-brand { font-weight: 600; color: var(--ink); font-size: 16px; letter-spacing: -0.2px; }
+  footer .f-meta { font-size: 14px; color: var(--body); line-height: 1.7; }
+  footer .f-meta div { color: var(--muted); }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 900px) {
+    .toc-grid { grid-template-columns: 1fr; }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 768px) {
+    .wrap { padding: 0 20px; }
+    .nav-inner { padding: 0 20px; }
+    .nav-links { display: none; }
+    section.major { padding: 56px 0; }
+    .hero { padding: 64px 0 56px; }
+    .hero h1 { font-size: 32px; letter-spacing: -0.96px; }
+    .hero .subtitle { font-size: 17px; }
+    h2.section-head { font-size: 28px; letter-spacing: -0.84px; }
+    h3.sub { font-size: 23px; letter-spacing: -0.6px; }
+    h4.subsub { font-size: 19px; }
+    .toc { padding: 22px; margin-top: -32px; }
+    .feature-dark { padding: 22px; }
+    .card, .card-soft { padding: 20px; }
+  }
+  @media (max-width: 480px) {
+    .hero h1 { font-size: 28px; }
+  }
+
+  /* ---------- Print ---------- */
+  @media print {
+    .nav { display: none; }
+    .nav-print { display: none; }
+    html { scroll-behavior: auto; }
+    body { font-size: 11pt; }
+    section.major { padding: 28px 0; page-break-inside: auto; }
+    .hero { padding: 24px 0; }
+    .hero::before { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    pre.code, .hero-card, .feature-dark, .eyebrow.appendix, .threat-badge {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .card:hover, .card-soft:hover { box-shadow: none; }
+    h2.section-head, h3.sub, h4.subsub { page-break-after: avoid; }
+    pre.code, table, .card, .feature-dark { page-break-inside: avoid; }
+    a { color: var(--ink); }
+    sup.cite a { color: var(--ink); }
+  }
 </style>
 </head>
 <body>
-<h1>DGCC Research Blueprint</h1>
-<div class="card">
-<p>This is the canonical location for the full <code>DGCC_research_plan.html</code>.</p>
-<p>The full source document should replace this placeholder when committed.</p>
+
+<!-- ============ NAV ============ -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#top" class="wordmark">DGCC</a>
+    <div class="nav-links">
+      <a href="#s1">개요</a>
+      <a href="#s2">배경</a>
+      <a href="#s3">가설</a>
+      <a href="#s6">방법</a>
+      <a href="#s7">실험</a>
+      <a href="#s8">해석</a>
+      <a href="#s10">일정</a>
+      <a href="#appendix-a">부록</a>
+      <a href="#s12">참고문헌</a>
+    </div>
+    <button class="nav-print" onclick="window.print()">PDF로 인쇄</button>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<header class="hero" id="top">
+  <div class="wrap">
+    <span class="badge dot">연구계획서 · LOCUS-VLA</span>
+    <h1>Deformation-Grounded Contact Critics</h1>
+    <p class="subtitle">How Should Value Functions Represent Contact Actions for Deformable Linear Object Manipulation?</p>
+    <p class="subtitle" style="font-size:18px; color:var(--body); margin-top:14px;">가치 함수는 변형 선형 물체(DLO) 조작에서 접촉 행동을 어떻게 표현해야 하는가 — 접촉이 유발하는 변형 반응에 근거한 contact critic 설계에 대한 통제 연구.</p>
+    <p class="meta">
+      작성일 <strong>2026-07-02</strong> &nbsp;·&nbsp; 프로젝트 <strong>Locus-VLA / DLO Contact Representation</strong> &nbsp;·&nbsp; 상태 <strong>실행 계획 확정본</strong>
+    </p>
+    <div class="hero-card">
+      <div class="obs-label">Core observation</div>
+      <pre>Bellman supervision tells the critic which action is valuable,
+but not the physical mechanism by which the action becomes valuable.</pre>
+    </div>
+  </div>
+</header>
+
+<!-- ============ TOC ============ -->
+<div class="wrap">
+  <div class="toc">
+    <div class="toc-label">목차 · Table of Contents</div>
+    <div class="toc-grid">
+      <div class="toc-item"><span class="num">01</span><a href="#s1">연구 개요</a></div>
+      <div class="toc-item"><span class="num">02</span><a href="#s2">배경과 문제 정의</a></div>
+      <div class="toc-item"><span class="num">03</span><a href="#s3">가설 도출</a></div>
+      <div class="toc-item"><span class="num">04</span><a href="#s4">연구 질문과 검증 가능한 주장</a></div>
+      <div class="toc-item"><span class="num">05</span><a href="#s5">이론적 전제와 적용 범위</a></div>
+      <div class="toc-item"><span class="num">06</span><a href="#s6">제안 방법</a></div>
+      <div class="toc-item"><span class="num">07</span><a href="#s7">실험 계획</a></div>
+      <div class="toc-item"><span class="num">08</span><a href="#s8">결과 해석 프레임워크</a></div>
+      <div class="toc-item"><span class="num">09</span><a href="#s9">위험 관리</a></div>
+      <div class="toc-item"><span class="num">10</span><a href="#s10">일정과 산출물</a></div>
+      <div class="toc-item"><span class="num">11</span><a href="#s11">논문화 전략</a></div>
+      <div class="toc-item"><span class="num">A</span><a href="#appendix-a">부록 A · 예상 반론과 대응</a></div>
+      <div class="toc-item"><span class="num">B</span><a href="#appendix-b">부록 B · 확장 위험 목록</a></div>
+      <div class="toc-item"><span class="num">12</span><a href="#s12">Related Works</a></div>
+    </div>
+  </div>
 </div>
-<ul>
-<li>Current status: research framing complete.</li>
-<li>Active milestone: Go/No-Go 0 — Rope Response Probe.</li>
-<li>Related issue: <a href="https://github.com/jiminc77/research-dashboard/issues/4">[Milestone] DGCC Research Blueprint</a></li>
-</ul>
+
+<main>
+
+<!-- ==================== SECTION 01 ==================== -->
+<section class="major" id="s1">
+  <div class="wrap">
+    <span class="eyebrow">Section 01 — 연구 개요</span>
+    <h2 class="section-head">연구 개요</h2>
+
+    <p class="lead" style="margin-top:22px;">Deformable Linear Object(DLO; rope, cable, wire)의 조작에서는 <strong>어느 점을 잡고(contact) 어떻게 움직이는가(motion)</strong>가 성패를 지배한다. 본 연구는 HACMan-style hybrid actor-critic<sup class="cite"><a href="#ref-1">[1]</a></sup> — action을 (contact point p, motion parameter u)로 분해하고 point cloud 위 per-point Q map으로 contact를 선택하는 구조 — 을 DLO로 가져오되, 그 critic이 <strong>접촉이 유발하는 변형 반응(contact-induced deformation response)</strong>이라는 물리적 기제를 명시적으로 표현하도록 구조화한다.</p>
+
+    <p>핵심 관찰은 다음 한 문장이다.</p>
+
+    <pre class="code"><span class="hl">Bellman supervision tells the critic which action is valuable,
+but not the physical mechanism by which the action becomes valuable.</span></pre>
+
+    <p>우리는 critic이 contact action의 가치를 추정하기 전에, 그 action이 만들어낼 저차원 변형 반응 <code class="inline">δm̂</code> 을 먼저 예측하도록 하고(supervised, self-labeled), 가치 추정이 이 반응 표현을 경유하도록 하는 세 가지 강도의 구조(auxiliary / soft bottleneck / hard bottleneck)를 체계적으로 비교한다. 주 가설은 다음과 같다: <strong>contact value의 물리 성분은 task 성분보다 정상성(stationarity)이 높으므로, 물리 성분을 명시적으로 분리·supervise한 critic은 black-box critic보다 DLO geometry(길이·강성·마찰)와 task(초기·목표 형상, 장애물) 변화에 더 잘 전이된다.</strong></p>
+
+    <p>이 연구는 단일 방법 제안이 아니라 <strong>"DLO contact critic은 무엇을 표현해야 하는가"에 대한 통제된 연구(study)이며, 그 결과로 가장 강한 형태의 방법(DGCC)을 도출</strong>한다. 최종 연구 질문:</p>
+
+    <pre class="code"><span class="hl">How should a Bellman critic represent contact actions for DLO manipulation —
+and how much architectural commitment to the physical deformation response is optimal?</span></pre>
+
+    <p>기대 기여는 세 가지다.</p>
+
+    <div class="grid grid-3" style="margin-top:8px; margin-bottom:8px;">
+      <div class="card">
+        <span class="card-tag">기여 01 · 방법</span>
+        <div class="card-title">방법</div>
+        <div class="card-body"><p>Bellman value learning을 보존하면서 critic을 deformation response로 ground하는 DGCC 계열 아키텍처와, per-point contact 선택·action 생성으로의 통합.</p></div>
+      </div>
+      <div class="card">
+        <span class="card-tag">기여 02 · 과학</span>
+        <div class="card-title">과학적 결과</div>
+        <div class="card-body"><p>black-box critic latent의 response 표현 결핍·goal 얽힘(entanglement)을 probing으로 진단하고, "표현 정렬 → OOD 성능"의 기제 수준 연결을 최초로 통제 실험으로 제시.</p></div>
+      </div>
+      <div class="card">
+        <span class="card-tag">기여 03 · 실용</span>
+        <div class="card-title">실용적 강점</div>
+        <div class="card-body"><p>response label이 transition만으로 얻어지는 self-supervised 신호라는 점을 이용한 <strong>reward-free 도메인 적응</strong> — 새 rope에서 보상 신호 없이 물리 head만 적응.</p></div>
+      </div>
+    </div>
+
+    <p>문서 원칙: 본 계획서는 <strong>실행에 필요한 핵심 사슬만</strong> 본문에 담는다. 선제 방어 논리의 전문(예상 반론 상세, 확장 위험 목록, abstract 초안)은 진단 실험 결과가 나오기 전에는 재작성될 수밖에 없으므로 부록으로 분리하고, 게이트 판정 임계와 사전 예측은 결과 확인 전에 고정한다(사전 등록 원칙).</p>
+  </div>
+</section>
+
+<!-- ==================== SECTION 02 ==================== -->
+<section class="major" id="s2">
+  <div class="wrap">
+    <span class="eyebrow">Section 02 — 배경과 문제 정의</span>
+    <h2 class="section-head">배경과 문제 정의</h2>
+
+    <h3 class="sub">2.1 DLO 조작에서 contact 선택 문제</h3>
+    <p>DLO는 국소적으로 순응(compliant)하는 물체다. 동일한 motion이라도 어느 점에 접촉하는가에 따라 질적으로 다른 변형이 발생하고, 잘못된 grasp point는 목표 형상을 kinematically 도달 불가능하게 만든다 — 최신 DLO 벤치마크 연구가 이를 명시적으로 지적한다<sup class="cite"><a href="#ref-23">[23]</a></sup>. 그럼에도 기존 DLO 연구에서 "어디를 잡을 것인가"는 geometric keypoint 예측<sup class="cite"><a href="#ref-18">[18]</a><a href="#ref-19">, 19</a><a href="#ref-20">, 20</a></sup>, dense descriptor 대응<sup class="cite"><a href="#ref-19">[19]</a></sup>, 최근에는 VLM의 상식적 제안<sup class="cite"><a href="#ref-23">[23]</a></sup>으로 해결되어 왔다. 즉 <strong>접촉점을 그 물리적 효과로 평가하는 방법은 존재하지 않는다.</strong></p>
+
+    <h3 class="sub">2.2 Hybrid actor-critic과 black-box critic의 한계</h3>
+    <p>Rigid object 조작에서 HACMan<sup class="cite"><a href="#ref-1">[1]</a></sup>과 그 확장<sup class="cite"><a href="#ref-2">[2]</a></sup>은 per-point Q map이 object-centric 일반화를 제공함을 보였다. 이 구조는 DLO에 자연스럽게 이식될 수 있다 — action이 정확히 (어디를, 어떻게)로 분해되기 때문이다. 그러나 확인 결과 <strong>HACMan 계열의 DLO 적용은 존재하지 않으며</strong> (HACMan++<sup class="cite"><a href="#ref-2">[2]</a></sup>의 task suite에도 deformable 없음), 이 이식은 본 연구가 직접 수행해야 하는 작업이자 부분적 기여다.</p>
+
+    <p>더 근본적인 한계는 supervision에 있다. Bellman target은 스칼라 value 하나로 "어느 action이 좋은가"만 전달한다. 그 값 안에는 서로 다른 두 요인이 얽혀 있다:</p>
+
+    <pre class="code"><span class="hl">(i)  physics:</span> 이 contact action이 물리적으로 어떤 변형을 만드는가 — task 무관, 국소적
+<span class="hl">(ii) task:</span>    그 변형이 현재 goal에 유용한가 — task/goal 종속</pre>
+
+    <p>스칼라 supervision은 이 인수분해를 학습할 유인을 주지 않는다. 따라서 black-box critic의 내부 표현은 두 요인이 얽힌, 도메인 특이적 표현이 될 것으로 예측된다 — 이것이 본 연구가 probing으로 직접 검증할 첫 번째 대상이다.</p>
+
+    <h3 class="sub">2.3 연구 공백</h3>
+    <p>문헌 조사(세 트랙: rigid affordance/contact 예측, DLO manipulation, RL representation)의 교차 검증 결과, 다음 공백이 확인되었다.</p>
+
+    <pre class="code"><span class="hl">G1.</span> 물리적 response에 ground된 per-contact-point critic은 DLO에 존재하지 않는다.
+    - deformable per-point value map은 존재하나 task value로만 supervise됨 [17]
+    - DLO effect 예측 모델은 존재하나 object-global rollout으로 MPC에 쓰임 [24, 27]
+<span class="hl">G2.</span> DLO grasp 선택은 전부 geometric/semantic이다 — effect 기반 평가 부재 [18-23]
+<span class="hl">G3.</span> 저차원 modal shape feature는 single-grasp 연속 servoing에만 쓰였고 [31, 32],
+    discrete contact 선택이나 RL critic에 쓰인 적 없다
+<span class="hl">G4.</span> cross-DLO-geometry transfer의 "원인"을 표현 수준에서 분리한 통제 연구가 없다 [29, 30]
+<span class="hl">G5.</span> RL 이론에서 1-step action-effect feature의 dynamics-변화 transfer 축은 미점유
+    (successor features는 reward-변화 축만 다룸 [44, 45])</pre>
+    <p class="table-caption" style="margin-top:-8px;">참조: [17] · [24, 27] · [18–23] · [31, 32] · [29, 30] · [44, 45] — §12 참고문헌.</p>
+  </div>
+</section>
+
+<!-- ==================== SECTION 03 ==================== -->
+<section class="major" id="s3">
+  <div class="wrap">
+    <span class="eyebrow">Section 03 — 가설 도출</span>
+    <h2 class="section-head">가설 도출</h2>
+
+    <p class="lead" style="margin-top:22px;">가설은 선언이 아니라 다음 네 가지 관찰로부터 유도되며, 각 관찰은 독립적으로 검증 가능한 실험에 대응한다.</p>
+
+    <h4 class="subsub">관찰 1 — Contact 선택이 성패를 지배한다</h4>
+    <p>DLO의 국소 순응성 때문에 contact point 선택이 결과를 질적으로 바꾼다<sup class="cite"><a href="#ref-18">[18]</a><a href="#ref-23">, 23</a></sup>. 그러나 기존 방법은 접촉점의 물리적 효과를 평가하지 않는다 (§2.1).</p>
+    <div class="note"><strong>→ 대응 실험:</strong> contact-criticality를 계층화한 task suite (§7.2), keypoint류 방식 대비 성능.</div>
+
+    <h4 class="subsub">관찰 2 — Bellman label은 물리와 task를 분해하지 못한다</h4>
+    <p>스칼라 value target은 physics 성분과 task 성분의 분해를 유도하지 않는다 (§2.2).</p>
+    <div class="note"><strong>→ 대응 실험:</strong> black-box critic latent의 frozen probing과 goal-entanglement 측정 (§7.4).</div>
+
+    <h4 class="subsub">관찰 3 — 물리 성분은 task 성분보다 <em>서수적으로(ordinally)</em> 정상적이다</h4>
+    <p>contact→변형의 국소 물리는 goal이 바뀌어도 동일하고, rope geometry가 바뀌면 절대 반응값은 달라지지만 <strong>contact 후보 간 반응의 순서·방향 구조는 보존</strong>된다 — 처음부터 정상성을 이 서수적 의미로 정의한다 (절대 예측값의 불변을 주장하지 않는다). DLO 제어 문헌은 저차원 modal feature와 로봇 motion 사이에 규칙적이고 매끄러운 관계가 존재함을 확립했다<sup class="cite"><a href="#ref-31">[31]</a><a href="#ref-32">, 32</a></sup>. 반면 value label은 goal이 바뀌는 순간 후보 간 순서까지 통째로 바뀐다.</p>
+    <div class="note"><strong>→ 대응 실험:</strong> <strong>상대적 정상성의 직접 측정</strong> — 동일 (s,p,u) 집합에 goal 섭동과 geometry 섭동을 각각 가해, 두 성분의 변동성을 동일 정규화로 대조 (§7.6-0). 이 실험이 없으면 main hypothesis의 because절("physics가 더 정상적")은 downstream 성능으로만 간접 확인되어 인과 사슬이 끊긴다. 보조: probe transfer, ordinal 보존 분석 (§7.6).</div>
+
+    <h4 class="subsub">관찰 4 — Effect 표현의 전이성에 대한 외부 증거가 축적되어 있다</h4>
+    <p>Object flow 같은 physical-effect 표현은 embodiment와 domain을 가로질러 재사용된다<sup class="cite"><a href="#ref-11">[11]</a><a href="#ref-13">, 13</a><a href="#ref-15">, 15</a><a href="#ref-16">, 16</a></sup>. 반대로 value-equivalent latent(모델이 return 예측에만 최적화된 표현)는 in-distribution 정확도에 특화되어 reward/dynamics 변화에 취약함이 알려져 있다<sup class="cite"><a href="#ref-42">[42]</a><a href="#ref-43">, 43</a></sup>.</p>
+    <div class="note"><strong>→ 대응 실험:</strong> 동일 차원의 value-equivalent latent bottleneck 대조군 (§7.5).</div>
+
+    <h4 class="subsub">추론 — Main Hypothesis</h4>
+    <div class="feature-dark">
+      <div class="fd-eyebrow">Main Hypothesis</div>
+      <pre class="code" style="background:var(--surface-dark-elevated);">critic을 physics 성분(deformation response)과 task 성분(goal conditioning)으로
+인수분해하고 physics 성분에 직접 supervision을 주면,
+(a) physics 성분은 OOD geometry/task에서 재사용되고
+(b) task 성분만 재적응하면 되므로,
+black-box value estimation보다 transfer가 우수한 contact representation을 얻는다.</pre>
+    </div>
+
+    <p style="margin-top:22px;">겨냥하는 OOD 축: unseen rope length / stiffness / friction / initial shape / goal shape / obstacle layout.</p>
+
+    <p>부수 강점: response target은 transition <code class="inline">(X_t, a_t, X_{t+1})</code>만으로 계산되는 <strong>self-supervised label</strong>이다. 따라서 새 도메인에서 <strong>보상 신호 없이</strong> physics head를 적응시킬 수 있다 — value-only critic이나 successor feature(w 회귀에 reward 필요<sup class="cite"><a href="#ref-44">[44]</a></sup>)가 갖지 못하는 성질이다.</p>
+
+    <h4 class="subsub">전이가 기대되는 인과 경로 <span class="tag">사전 등록</span></h4>
+    <p>OOD stiffness에서는 <code class="inline">f_resp</code>의 절대 예측도 부정확해진다. 그럼에도 이득을 기대하는 세 경로를 사전 등록하고 각각 검증한다.</p>
+
+    <pre class="code"><span class="hl">E1. 오류의 국소화</span> — geometry 변화의 영향이 f_resp에 국한되고,
+    response→value 매핑 F_Q는 근사 불변이다.
+    검증: f_resp만 few-shot 적응 vs 전체 fine-tune (§7.6)
+<span class="hl">E2. Ordinal 보존</span> — 절대 response는 틀려도 contact 후보 간 상대 순서·방향은 보존된다.
+    검증: OOD에서 δm̂ 방향 cosine, 후보 ranking 보존율 (§7.6)
+<span class="hl">E3. Shortcut 차단</span> — bottleneck이 도메인 특이적 value shortcut 학습을 방지한다.
+    검증: probe transfer + matched-dim 대조군 (§7.5, §7.6)</pre>
+
+    <h4 class="subsub">용어의 조작적 정의 <span class="tag">1회 고정</span></h4>
+    <p>본 계획서 전체에서 아래 정의를 1회 고정하여 사용한다.</p>
+    <pre class="code"><span class="hl">transfer / generalization</span>   학습 분포 밖 도메인에서의 zero-shot 평가 성능 (두 용어는 동의어로 사용)
+<span class="hl">adaptation</span>                  새 도메인의 데이터 k개로 일부 모듈을 갱신한 후의 평가 성능
+<span class="hl">reward-free adaptation</span>      위 갱신에서 reward 신호를 사용하지 않는 경우 (transition만 사용)
+<span class="hl">정상성(stationarity)</span>        도메인 섭동 하에서 contact 후보 간 순서·방향 구조의 보존 (서수적 정의)</pre>
+  </div>
+</section>
+
+<!-- ==================== SECTION 04 ==================== -->
+<section class="major" id="s4">
+  <div class="wrap">
+    <span class="eyebrow">Section 04 — 연구 질문과 검증 가능한 주장</span>
+    <h2 class="section-head">연구 질문과 검증 가능한 주장</h2>
+
+    <h3 class="sub">4.1 핵심 용어</h3>
+    <div class="definition">
+      <span class="def-term">Deformation response</span> — 현재 상태에서 contact action을 실행했을 때 유발되는 quasi-static DLO shape의 저차원 변화.
+    </div>
+
+    <pre class="code">transition τ_t = (s_t, a_t, s_{t+1}),  a_t = (p_t, u_t)
+δm_t = R(X_t, X_{t+1}) = Φ(X_{t+1}) − Φ(X_t)</pre>
+
+    <p><code class="inline">X_t</code>: DLO centerline shape · <code class="inline">p_t</code>: contact/grasp point · <code class="inline">u_t</code>: motion parameter · <code class="inline">Φ</code>: shape → 저차원 response 좌표 map (§6.2). <strong>Φ와 R은 기여(contribution)가 아니라 구현 요소다.</strong> 기여는 critic representation 구조에 있다.</p>
+
+    <p>표현 원칙: "contact value는 deformation response에 의해 강하게 <strong>매개된다</strong>(mediated)"로 쓴다. "response가 value를 결정한다" 같은 강한 인과 주장은 하지 않는다. 또한 <code class="inline">f_resp</code>를 "world model / dynamics model"로 지칭하지 않는다 — <code class="inline">f_resp</code>는 rollout이 불가능한 1-step response head이며, 이 구분이 value-through-model 계열<sup class="cite"><a href="#ref-39">[39]</a><a href="#ref-40">, 40</a><a href="#ref-41">, 41</a></sup>과의 경계다. Control-theoretic 주장(controllability 추정, Jacobian 학습)은 하지 않되, modal 표현과 motion의 규칙적 관계가 선행연구에서 확립되었다는 사실<sup class="cite"><a href="#ref-31">[31]</a></sup>은 동기 근거로 인용한다.</p>
+
+    <h3 class="sub">4.2 Claims</h3>
+
+    <div class="grid grid-2">
+      <div class="card">
+        <span class="card-tag">Claim 1 · 결핍 진단 (Deficiency)</span>
+        <div class="card-body">
+          <pre class="code" style="margin-bottom:14px;"><span class="hl">Black-box Bellman critic latents encode
+deformation response poorly, in a
+goal-entangled and domain-specific way.</span></pre>
+          <p><strong>측정:</strong> frozen-latent probe (in-domain / transfer), goal-entanglement (부분공간 분리도), transfer degradation ratio.</p>
+          <p><strong>주의</strong> — DGCC 자신의 <code class="inline">z_resp</code>가 response와 정렬됨은 supervise했으므로 자명하며, claim이 아니라 sanity check로만 보고한다.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="card-tag">Claim 2 · 개입 효과 (Intervention)</span>
+        <div class="card-body">
+          <pre class="code" style="margin-bottom:14px;"><span class="hl">Response grounding (auxiliary / soft /
+hard) improves OOD transfer and sample
+efficiency over black-box critics; the
+optimal degree of architectural commitment
+depends on the task regime (§5).</span></pre>
+          <p><strong>측정:</strong> training/OOD 성공률, return, final shape error, sample efficiency, variant × task-regime 상호작용.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="card-tag">Claim 3 · 기제 연결 (Mechanism Link)</span>
+        <div class="card-body">
+          <pre class="code" style="margin-bottom:14px;"><span class="hl">Holding the architecture fixed,
+response-probe transfer quality predicts
+OOD manipulation performance.</span></pre>
+          <p><strong>교란 통제 — 2단계로 설계한다.</strong> (1) variant 종류는 probe 품질과 OOD 성능의 공통 원인이므로 between-variant 상관은 증거에서 배제한다. (2) 그러나 within-variant 안에서도 λ/response-dim/checkpoint-step 자체가 양쪽의 공통 원인이 될 수 있으므로, 단순 within-variant 상관도 불충분하다. 따라서 주 지표는 <strong>공변량 회귀 후 partial correlation</strong>이다: probe-transfer 점수와 OOD 성능 각각에서 λ, response-dim, checkpoint-step, 학습 진행도의 효과를 회귀로 제거한 잔차 간 Spearman ρ (cluster-robust, seed 단위 클러스터). 보조 지표로 checkpoint-trajectory 상관(단일 run 내 동반 상승)을 본다.</p>
+          <p><strong>검정력 확보:</strong> seed-only 변이(5–10점)로는 검정력이 부족하므로, 사전 검정력 분석으로 필요 표본 수를 산출해 등록한다 — 목표 효과크기 ρ = 0.5, power 0.8, α = 0.05 기준 약 30개 독립 관측점이 필요하며, variant당 (seed × 저장 checkpoint) 조합으로 충족하되 seed 클러스터를 통계에 반영한다.</p>
+          <p><strong>반증 조건 (사전 등록):</strong> partial correlation이 유의하지 않으면 Claim 3은 기각하고 Claim 2로 흡수한다.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="card-tag">Claim 4 · Reward-free 적응 (고유 강점)</span>
+        <div class="card-body">
+          <pre class="code" style="margin-bottom:14px;"><span class="hl">Adapting only f_resp on unlabeled
+transitions from a new DLO domain recovers
+most of the OOD performance drop — without
+any reward signal, and better than reward-
+free adaptation of ungrounded representations.</span></pre>
+          <p><strong>공정성 원칙 두 가지.</strong> 첫째, 모든 대조군이 동일하게 reward-free 조건에서 비교된다. 둘째, <strong>각 대조군에는 "행동에 영향을 줄 수 있는 최대 범위"의 적응을 허용한다</strong> — 사후 head만 갱신하면 Q 경로가 바뀌지 않아 행동이 변하지 않는 허수아비 대조가 되기 때문이다.</p>
+        </div>
+      </div>
+    </div>
+
+    <pre class="code" style="margin-top:20px;"><span class="hl">(i)   DGCC:</span> f_resp를 새 도메인 transition k개로 적응 (reward 마스킹)
+      → δm̂이 바뀌므로 Q 입력과 행동이 실제로 변한다
+<span class="hl">(ii)  black-box:</span> δm-prediction head를 사후 부착하되, head + encoder(표현 경로 전체,
+      Q-head 제외)를 공동 업데이트 → encoder feature가 바뀌어 Q와 행동이 실제로 변한다
+<span class="hl">(iii) matched-dim:</span> latent-consistency loss로 encoder + latent 공동 적응 → 동일하게 행동 변화 가능
+<span class="hl">(iv)  참조점:</span> zero-shot / full fine-tune (reward 사용 — 상한 참조)
+적응 후 평가는 전 대조군 동일하게 정책 재실행으로 수행한다.</pre>
+
+    <div class="note"><strong>성립 조건:</strong> (i)이 (ii)와 (iii)를 이겨야 한다. zero-shot만 이기는 것은 기여가 아니다. (ii)(iii)가 행동 변화 경로를 갖지 못하는 설계라면 이 비교는 무효로 간주한다.</div>
+  </div>
+</section>
+
+<!-- ==================== SECTION 05 ==================== -->
+<section class="major" id="s5">
+  <div class="wrap">
+    <span class="eyebrow">Section 05 — 이론적 전제와 적용 범위</span>
+    <h2 class="section-head">이론적 전제와 적용 범위</h2>
+
+    <p class="lead" style="margin-top:22px;"><code class="inline">Q(s,a)</code>는 일반적으로 discounted 미래 전체에 의존하므로, <strong>1-step response + goal residual은 일반 MDP에서 Q의 충분통계가 아니다.</strong> Hard bottleneck <code class="inline">Q = F_Q(δm̂, c_g, η)</code>가 근사적으로 유효하기 위한 가정을 명시한다 (state abstraction 이론<sup class="cite"><a href="#ref-50">[50]</a></sup>의 shape-공간 적용).</p>
+
+    <pre class="code"><span class="hl">A1 (Reward shape-sufficiency)</span>   reward가 shape feature와 goal의 함수다:
+                                r_t ≈ ρ(Φ(X_t), Φ(X_{t+1}), Φ(G))
+<span class="hl">A2 (Approximate shape-Markov)</span>   Φ(X)가 controlled dynamics에 대해 근사 Markov다 —
+                                텐션 이력·속도 등 비관측 내부 상태의 영향이 작다
+                                (quasi-static regime)
+<span class="hl">A3 (Response regularity)</span>        response가 point estimate 또는 저차 분포로
+                                표현 가능할 만큼 규칙적이다</pre>
+
+    <h5 class="mini">깨지는 경우와 대응</h5>
+    <pre class="code"><span class="hl">장애물/환경 접촉 (A1 위반)</span>   → 저차원 scene feature c_env 추가(§6.4) +
+                              "obstacle task에서는 soft가 hard를 역전한다"를 사전 예측으로 등록
+<span class="hl">텐션·속도·소성 이력 (A2 위반)</span> → quasi-static primitive로 scope 한정, dynamic task는 future work
+<span class="hl">자기가림·부분관측 (A2 위반)</span>   → 본 연구는 sim state 기반; 인식(perception)은 scope 밖 [21, 26]</pre>
+
+    <p>이 assumption stack은 약점이 아니라 연구 질문의 일부다: <strong>"architectural constraint의 최적 강도는 A1–A3의 성립 정도에 따라 달라진다"</strong>가 본 연구가 검증하는 regime 구조이며, 실험 설계(§7)가 A1이 성립하는 영역과 깨지는 영역을 모두 포함하는 이유다.</p>
+
+    <p>이론적 포지셔닝 두 가지를 명시한다. 첫째, auxiliary variant(V1)의 이론적 보증 — latent self-prediction + TD가 value-optimal 해를 보존한다는 결과 — 은 선행연구<sup class="cite"><a href="#ref-35">[35]</a></sup>의 것이며 본 연구의 정리가 아니다. 둘째, 본 연구는 value-equivalence 원리<sup class="cite"><a href="#ref-42">[42]</a><a href="#ref-43">, 43</a></sup> ("value에 필요한 것만 모델링하라")로부터의 <strong>의도적 이탈</strong>이다 — in-distribution value 정확도 일부를 희생하고 OOD transfer를 얻는 교환이며, 이 트레이드오프 자체가 실험 대상이다.</p>
+  </div>
+</section>
+
+<!-- ==================== SECTION 06 ==================== -->
+<section class="major" id="s6">
+  <div class="wrap">
+    <span class="eyebrow">Section 06 — 제안 방법</span>
+    <h2 class="section-head">제안 방법</h2>
+
+    <h3 class="sub">6.1 문제 정식화</h3>
+    <p>Goal-conditioned MDP로 정식화한다.</p>
+    <pre class="code"><span class="hl">state</span>    s_t = (X_t, scene)   X_t: centerline K=32점 (arc-length 재표본, task frame)
+<span class="hl">goal</span>     g = (shape template, anchor)                        (§6.2 이원화)
+<span class="hl">action</span>   a_t = (p_t, u_t)     p_t ∈ {1..K} contact node index
+                              u_t = (Δ ∈ R³, h ∈ {low, high})  변위 + 들어올림 높이
+<span class="hl">primitive:</span> grasp(p) → move(Δ, h) → release → settle   (quasi-static)
+<span class="hl">episode</span>  최대 T = 10 primitive steps</pre>
+
+    <p>Reward는 <strong>point-space에서 정의</strong>한다 — critic 내부 표현(Φ)과 보상의 좌표계를 분리해, "표현이 보상의 충분통계라서 잘 되는" 순환 구조를 차단하기 위함이다.</p>
+
+    <pre class="code">r_t = α [D(X_t, G) − D(X_{t+1}, G)] − c_step + 1{D(X_{t+1}, G) < ε_succ} · R_succ
+<span class="hl">D</span>   = 길이 정규화 bidirectional Chamfer distance (또는 correspondence L2)
+<span class="hl">기본값:</span> α = 10, c_step = 0.1, R_succ = 5, ε_succ = 0.05·L (파일럿에서 최종 고정)</pre>
+
+    <p>파지 현실성: 파지점 실행 노이즈(±1 node 및 위치 오차)와 확률적 파지 실패(5%)를 기본 포함하고 robustness를 함께 보고한다. 저난도 task군에는 HACMan 계보<sup class="cite"><a href="#ref-1">[1]</a></sup>와의 연속성을 위해 비파지 poke/push primitive 버전을 병행 옵션으로 둔다.</p>
+
+    <h3 class="sub">6.2 Response 표현 Φ — geometry-invariant 설계</h3>
+    <p>Transfer 실험이 성립하려면 Φ가 rope 길이·이산화가 달라져도 동일하게 정의되어야 한다. 도메인별 data-PCA는 점 개수가 바뀌면 정의조차 되지 않으므로 배제하고, 다음과 같이 설계한다.</p>
+
+    <pre class="code"><span class="hl">Step 1</span>  Arc-length 재표본: 임의 N점 centerline → 정규화 호길이 σ∈[0,1] 위 고정 K=32점
+<span class="hl">Step 2</span>  좌표 프레임: task frame 유지 (회전 canonicalization 없음)
+<span class="hl">Step 3</span>  Φ_DCT: 각 축(x,y,z)의 K점 신호에 DCT-II 적용, 저차 M=8 mode 보존
+        Φ(X) ∈ R^{3M=24} — mode 0 = centroid(강체 이동), 저차 mode = 저주파 굽힘
+<span class="hl">Step 4</span>  δm 정규화: 학습 도메인 δm의 채널별 표준편차로 정규화 (mode-0 제외 — 절대 위치 보존)</pre>
+
+    <p>DCT를 기본값으로 하는 이유: (1) 데이터에 fit하지 않으므로 모든 길이/도메인에서 동일하게 정의됨, (2) modal analysis 문헌<sup class="cite"><a href="#ref-31">[31]</a></sup>의 mode shape와 직접 연결되는 물리적 정당성, (3) deterministic·재현 가능·해석 가능. 대안 space(pooled PCA, AE latent, geometric feature, raw displacement)는 ablation으로 다룬다.</p>
+
+    <p><strong>Goal의 이원화 — 서로 다른 길이에서 "같은 goal"의 정의.</strong> DCT는 표현 차원을 통일할 뿐, 다른 길이의 rope에서 동일 goal이 무엇인지는 별도로 정의해야 한다 (0.5 m rope용 절대 좌표 goal 곡선을 1.6 m rope는 덮을 수 없다). 아래는 <strong>G2 게이트의 검증 대상인 후보 설계</strong>이며, 게이트 통과 후 확정한다:</p>
+
+    <pre class="code"><span class="hl">shape 성분</span>   정규화 호길이 위 형상 템플릿 (mode ≥ 1, scale-normalized) — 길이 불변
+<span class="hl">anchor 성분</span>  절대 위치 목표 (한 끝점 또는 centroid의 task-frame 좌표) — mode-0 대응
+<span class="hl">goal residual:</span> c_g = [Φ_shape(G) − Φ_shape(X_t),  anchor(G) − anchor(X_t)]
+<span class="hl">성공 판정:</span> 길이 정규화 Chamfer + ε_succ 길이별 보정</pre>
+
+    <div class="note"><strong>Sanity check:</strong> 동일 물리 shape를 서로 다른 이산화(N=25/50/100)로 인코딩했을 때 Φ 일치를 실행 전 검증한다.</div>
+
+    <h3 class="sub">6.3 Response Head</h3>
+    <pre class="code"><span class="hl">deterministic (기본):</span>  δm̂_t = f_resp(s_t, p_t, u_t),  L_resp = Huber(δm̂_t − δm_t)
+<span class="hl">uncertainty (옵션):</span>    μ_t, log σ_t = f_resp(·),  L_resp = −log N(δm_t | μ_t, diag σ_t²)
+                       log σ clipping + variance floor. σ가 크면 Q를 낮추는 hard rule은
+                       넣지 않는다 — risk 처리는 Bellman이 학습하게 둔다.</pre>
+
+    <p><code class="inline">f_resp</code>는 <strong>goal을 입력받지 않는다</strong> — 이것이 physics/task 인수분해의 구조적 구현이다. 표현 붕괴(collapse)는 supervised target 덕에 위험이 낮지만, 표현 rank·분산을 학습 내내 로깅한다<sup class="cite"><a href="#ref-38">[38]</a></sup>.</p>
+
+    <h3 class="sub">6.4 Critic 구조 — 세 가지 강도의 grounding</h3>
+
+    <div class="grid grid-3">
+      <div class="card">
+        <span class="card-tag">V1 · Auxiliary-only</span>
+        <div class="card-body">
+          <pre class="code" style="margin-bottom:10px;">h = Enc(s,g,p,u)
+Q = F_Q(h)
+δm̂ = F_resp(h)
+L = L_Q + λ L_resp</pre>
+          <p>Q는 response 표현을 경유하지 않음.</p>
+        </div>
+      </div>
+      <div class="card">
+        <span class="card-tag">V2 · Soft bottleneck</span>
+        <div class="card-body">
+          <pre class="code" style="margin-bottom:10px;">Q = F_Q(δm̂, h_limited,
+        c_g, c_env, η)</pre>
+          <p><code class="inline">h_limited</code>: 저차원 context (전체 bypass 금지).</p>
+        </div>
+      </div>
+      <div class="card">
+        <span class="card-tag">V3 · Hard bottleneck</span>
+        <div class="card-body">
+          <pre class="code" style="margin-bottom:10px;">Q = F_Q(δm̂, c_g, c_env, η)</pre>
+          <p>Q가 접근 가능한 정보 = 예측 response + goal residual + 저차원 feature.</p>
+        </div>
+      </div>
+    </div>
+
+    <h5 class="mini">보조 feature의 역할과 제약</h5>
+    <pre class="code"><span class="hl">c_g</span>    goal conditioning (§6.2 이원화 형태)
+<span class="hl">c_env</span>  장애물 상대 좌표 등 저차원 scene feature (obstacle task에서만 활성, ≤ 8-dim)
+<span class="hl">η</span>      실행 가능성/비용: ‖u‖, reachability, collision risk, local curvature (≤ 8-dim)
+<span class="hl">제약</span>   c_env·η가 full state bypass가 되지 않도록 차원 상한 + full-bypass ablation으로 감시</pre>
+
+    <p>구조적 함의를 투명하게 명시한다: <code class="inline">c_g − δm̂ = Φ(G) − Φ(X_{t+1})</code> 이므로 V3는 본질적으로 "행동 후 shape의 goal residual"에 대한 학습된 value다. 이것이 §5의 A1–A3가 필요한 이유이고, greedy 대조군(§7.5)이 필수인 이유다.</p>
+
+    <h3 class="sub">6.5 Actor와 Action 생성</h3>
+    <pre class="code"><span class="hl">per-point actor</span>   u_θ(s, p): 각 후보 node의 motion 제안 (DPG-style로 Q 최대화 학습)
+<span class="hl">contact 선택</span>      per-point Q의 argmax (평가) / softmax·ε-greedy (탐험)
+<span class="hl">tie-breaking</span>      DLO 대칭성(양 끝점 등가 등)으로 Q-landscape가 multimodal일 수 있음 —
+                  top-k 동률 규칙과 softmax 온도를 명시해 argmax 불안정을 관리
+<span class="hl">정성 산출물</span>       top-k contact 후보 + 각각의 예측 δm̂ 시각화
+                  → "상호작용 예측을 조건으로 한 action 생성"의 직접적 데모</pre>
+
+    <h3 class="sub">6.6 학습 목적함수와 안정화</h3>
+    <pre class="code">L_total = L_Q + λ L_resp,   λ = 1.0 (기본, {0.1, 1, 10} sweep)
+L_Q: y_t = r_t + γ Q_target(s_{t+1}, g, a'_{t+1}),  L_Q = ‖Q − y_t‖²
+ranking / contrastive / retrieval / successor loss는 넣지 않는다 — 기여는 loss가 아니라 구조다.</pre>
+
+    <p><strong>Actor 학습식</strong> — 이산 contact index p는 미분 불가능하므로 gradient 경로를 명시한다 (HACMan<sup class="cite"><a href="#ref-1">[1]</a></sup>의 per-point actor 방식):</p>
+
+    <div class="feature-dark">
+      <div class="fd-eyebrow">Actor objective · L_actor</div>
+      <pre class="code" style="background:var(--surface-dark-elevated);">L_actor = − E_s [ (1/K) Σ_{p=1..K} Q_min(s, g, p, u_θ(s, p)) ]
+- p 선택에는 gradient가 필요 없다 — contact 선택은 critic의 per-point argmax가 담당
+- u_θ 갱신은 deterministic policy gradient: 모든 후보 node p에 대해 ∂Q/∂u를
+  병렬로 backprop (전-후보 갱신이 기본; 선택된 p만 갱신하는 변형은 ablation)
+- Q_min = twin critic의 최솟값 (TD3 관례), target policy smoothing on u 적용
+- target action a'_{t+1}: 각 node의 u_target = u_θ'(s_{t+1}, p) 계산 후
+  double-Q decoupling으로 p' 선택 (§6.6-1)</pre>
+    </div>
+
+    <p style="margin-top:22px;">이 정식화가 §1의 "critic 개선 → action 생성 개선" 연결의 구체적 근거다: actor는 per-point Q를 통해서만 학습되므로, critic 표현의 개선이 곧 motion 제안 u_θ의 개선으로 전파된다.</p>
+
+    <p>이산 contact 선택이 만드는 고유 문제를 관리한다:</p>
+    <pre class="code"><span class="hl">1. 이산 argmax 과대추정:</span> target의 max over 32 nodes는 twin-critic만으로 부족 —
+   후보 선택(critic 1)과 평가(critic 2)를 분리하는 double-Q decoupling을 전 모델 동일 적용
+<span class="hl">2. HER:</span> 초기에는 미사용. 도입 시 relabeling을 명시 정의 — 최종 X_T를 G로 relabel,
+   reward는 point-space D로 재계산, c_g도 일관 재계산 (좌표계 불일치 주의)
+<span class="hl">3. 안정성 로깅 (전 모델 공통 보고):</span> Q-value 통계, 과대추정 갭(Q vs 실현 return),
+   gradient norm, argmax 후보 entropy — "grounding이 성능을 올렸다"와
+   "학습을 안정화했다"를 분리 해석하기 위한 필수 계측</pre>
+
+    <h3 class="sub">6.7 구현 세부 사양</h3>
+    <p>네트워크 (state 기반, 총 ~1–2M params; larger-critic 대조군은 파라미터 일치):</p>
+    <pre class="code"><span class="hl">node feature</span>     (x_i ∈ R³, 호길이 좌표 σ_i, goal 대응점 잔차) → shared MLP(64)
+<span class="hl">chain encoder</span>    1D CNN 3층 (kernel 5, dilation 1/2/4, d=128) + global max-pool broadcast
+                 → per-node embedding h_i ∈ R^128 (국소+전역 문맥)
+<span class="hl">f_resp</span>           MLP(256, 256): [h_p, global, u] → δm̂ ∈ R^24 (또는 μ, log σ)
+<span class="hl">F_Q</span>              MLP(256, 256): variant별 입력(§6.4) → per-point Q
+<span class="hl">actor</span>            MLP(256, 128): h_i → u_i (tanh 스케일링, ‖Δ‖ ≤ u_max)</pre>
+
+    <p>RL 하이퍼파라미터 기본값 (파일럿에서 조정 후 전 모델 고정):</p>
+    <pre class="code">γ = 0.95 (T=10 단기 horizon) · τ = 0.005 · lr = 3e-4 (Adam) · batch 256
+replay 1M · UTD 1 · warmup 5k random steps
+탐험: ε-greedy over p (1.0 → 0.1 anneal, 200k steps) + Gaussian noise on u (σ = 0.2·u_max)
+target policy smoothing on u · 평가: deterministic, 25k step마다 task당 100 episodes
+checkpoint 선택: in-distribution validation task 성능 기준 (OOD 결과에 비접근 — leakage 차단)</pre>
+  </div>
+</section>
+
+<!-- ==================== SECTION 07 ==================== -->
+<section class="major" id="s7">
+  <div class="wrap">
+    <span class="eyebrow">Section 07 — 실험 계획</span>
+    <h2 class="section-head">실험 계획</h2>
+
+    <p class="lead" style="margin-top:22px;">실험은 5개 층으로 구성된다: (0) 실행 전 파일럿 게이트 → (1) 기제 검증(probing) → (2) 구조 검증(variant 비교) → (3) 정책 성능 → (4) OOD 일반화 + 적응. <strong>성공률보다 표현 검증이 먼저다</strong> — 이 논문은 critic representation 연구이기 때문이다.</p>
+
+    <h3 class="sub">7.1 실험 환경</h3>
+    <pre class="code"><span class="hl">결정 절차 (Phase 0 내):</span>
+  후보 primary: DLO-Lab [23] — centerline state, 강성/소성/마찰/신축 파라미터화,
+                grasp-point action 내장, differentiable. 단 2026-06 공개로 성숙도 미검증
+  fallback:     MuJoCo cable composite — 성숙·고속·재현성, bend/twist stiffness 파라미터화
+  절차: 두 sim에 동일 T1 task를 실제 구동·비교 후 primary 확정 (문서 게이트가 아닌 실구동 게이트)
+  secondary:    DaXBench [53] 또는 SoftGym [52] rope — 기존 문헌과의 접점 확보,
+                핵심 OOD 결론 중 최소 1축(length)을 secondary에서 재현해 sim-artifact 여부 검증
+<span class="hl">state:</span> sim ground-truth centerline (N=50) → K=32 재표본. 인식은 scope 밖 [21, 26]</pre>
+
+    <h3 class="sub">7.2 Task Suite — contact-criticality 계층화</h3>
+    <pre class="code"><span class="hl">T1  Local shaping (criticality 低, A1–A3 성립)</span>
+    straighten / single bend / endpoint reposition — 3 tasks
+    목적: response-contact 연결 검증, greedy 등가 영역 확인
+<span class="hl">T2  Global shape matching (中)</span>
+    절차 생성 goal (S/U/L/zigzag 계열): train 500 / held-out eval 100
+    비대칭 goal 포함 — 잘못된 contact 선택 시 1-step 도달 불가하게 설계
+    목적: contact 선택의 가치가 드러나는 주 무대
+<span class="hl">T3  Long-horizon (高) — 두 성질을 분리해 별도 무대를 둔다</span>
+    T3c 비단조 · A1 성립 (장애물 없음):
+        crossing-order / fold-reversal task — 목표와의 point-distance는 작지만
+        위상(교차 순서, 접힘 방향)이 달라, 일시적으로 distance를 크게 늘려야만
+        도달 가능. 장애물이 없어 A1이 성립하는 상태에서 비단조성만 요구한다.
+        instance: train 30 / unseen eval 15
+        → hard vs GreedyResp의 결정 무대. Bellman의 기여가 A1 위반과 얽히지 않고
+          단독으로 발현되는 유일한 영역이므로 이 분리가 없으면 hard의 승부 무대가
+          "hard가 지도록 설계된 무대(A1 위반)"와 겹치는 자기모순이 생긴다
+    T3a peg routing (2–3 pegs): 비단조 + A1 부분 위반 (환경 접촉)
+        layout: train 20 / unseen eval 10
+    T3b obstacle-aware placement: A1 위반 — c_env 필요성 검증
+    목적: Bellman 필요성(T3c)과 regime 교차(T3a/b)를 분리 검증
+<span class="hl">평가:</span> task/seed당 100 episodes, deterministic policy</pre>
+
+    <h3 class="sub">7.3 실행 전 파일럿 게이트</h3>
+    <p>본 실험 전 반드시 통과해야 하는 두 게이트를 정의한다. 통과 실패 시 실험 축을 재구성한다.</p>
+
+    <div class="grid grid-2">
+      <div class="card">
+        <span class="card-tag">G1 · Stiffness 유효성 게이트</span>
+        <div class="card-body">
+          <p><strong>문제의식:</strong> quasi-static grasp-move-release-settle에서 최종 배치는 기하·마찰·중력이 지배하고, 탄성 강성은 release 시 springback에만 남을 수 있다 — 그 경우 stiffness OOD는 격차 자체가 없어 검증 불능(vacuous)이 된다.</p>
+          <p><strong>절차:</strong> 동일 (p,u) 시퀀스를 강성만 바꿔 실행, 최종 shape 분포의 효과크기 측정.</p>
+          <p><strong>판정:</strong> 효과크기 작음 → (a) stiffness를 주 OOD 축에서 강등하고 length/friction/goal 중심 재편, 또는 (b) springback이 결과를 좌우하는 task(장력 하 routing, 곡률 정착 shaping) 추가, 또는 (c) 부분 소성 활성화 — 단 (c)는 A2를 약화시키므로 hard variant 적용 범위와의 상충을 명시하고 선택.</p>
+        </div>
+      </div>
+      <div class="card">
+        <span class="card-tag">G2 · Length-goal 정의 게이트</span>
+        <div class="card-body">
+          <p>§6.2의 이원 goal 정의(shape 템플릿 + anchor)가 구현·검증된 후에만 length OOD 실행.</p>
+          <p><strong>검증 1:</strong> 서로 다른 길이 rope에서 동일 goal 템플릿의 성공 판정 일관성 수동 확인.</p>
+          <p><strong>검증 2 (정량):</strong> reward 좌표계(point-space D)와 critic goal 좌표계(Φ-space c_g)의 방향 정합 — 무작위 transition 표본에서 ΔD와 Δ‖c_g‖의 Spearman 상관 <strong>ρ ≥ 0.9</strong> 요구. "D 감소 ⇔ Φ-residual 감소"가 보장되지 않으면 critic이 보상과 다른 방향을 최적화하게 되므로, 미달 시 mode 수 M 또는 D의 정의를 조정 후 재검증.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="sub">7.4 검증 게이트 1 — Black-box Critic Latent Probing</h3>
+    <p><strong>질문: 표준 black-box contact critic은 이미 deformation response를 (transferable하게) 인코딩하는가?</strong> 본 연구의 동기가 실측으로 성립하는지 확인하는 Go/No-Go 실험이다. 방법론은 RL 표현 probing의 표준 프로토콜<sup class="cite"><a href="#ref-47">[47]</a></sup>을 따른다.</p>
+
+    <pre class="code"><span class="hl">절차:</span> baseline 학습 → critic freeze → probe 학습 → in-domain 평가 → probe transfer
+      (domain A에서 학습한 probe를 domain B latent에 그대로 적용)
+<span class="hl">데이터:</span> 도메인당 200k transitions (학습 정책 replay 50% + uniform random 정책 50%),
+       80/10/10 split. linear probe = ridge (α는 CV), nonlinear = MLP(128) 2층
+<span class="hl">지표:</span> R² (전체/mode별), transfer degradation ratio = 1 − R²_B/R²_A</pre>
+
+    <h5 class="mini">Controls — 각각이 배제하는 대안 가설을 명시한다</h5>
+    <pre class="code"><span class="hl">A</span>  raw (s,p,u) probe          response가 애초에 예측 가능한 target인가
+<span class="hl">B</span>  random frozen latent       latent가 random feature보다 나은가
+<span class="hl">C</span>  nonlinear upper-bound      정보가 있으나 linear 접근 불가한 경우의 구분
+<span class="hl">D</span>  shuffled target            probe가 dataset shortcut으로 맞추는가
+<span class="hl">E</span>  transfer control           degradation이 표현 문제인가 target 분포 이동인가
+   (B에서 직접 학습한 probe와 비교)
+<span class="hl">F</span>  goal-entanglement          latent가 goal에 따라 변하는 것 자체는 정상이다 (Q는 goal의
+   함수여야 하므로). 측정 대상은 "response-예측 성분과 goal-예측 성분의 선형 분리 가능성":
+   F-1 두 성분의 예측 방향 간 principal angles
+   F-2 goal 성분을 회귀로 제거한 잔차에서 response probe R²의 하락량
+   → 분리 불가능(entangled)하면 관찰 2의 직접 증거</pre>
+
+    <p>판정 기준 — <strong>지금 이 문서에서 사전 고정한다.</strong> "파일럿 후 임계 설정"은 사전 등록 원칙과 상충하므로, 파일럿의 용도는 측정 분산·실행 가능성 추정으로 한정하고 임계 자체는 아래 수치로 확정한다:</p>
+    <pre class="code"><span class="hl">확정 임계:</span>
+  linear R² < 0.5 ∧ raw-input probe 대비 ΔR² > 0.2      → Go (결핍 확인)
+  in-domain R² ≥ 0.7 ∧ transfer degradation ≥ 40%       → Go (OOD-motivated)
+  in-domain·transfer 모두 높음 (R² ≥ 0.7, degradation < 40%) → §8 Decision 1의 pivot 분기
+  모두 낮음 (raw-input probe R² < 0.3 포함)                → No-Go 절차 ↓
+
+<span class="hl">No-Go stopping rule (실질적 중단 규칙 — "무한 재시도" 방지):</span>
+  response 정의 수정은 사전 명시된 대안 집합(§6.2의 ablation space) 안에서 1회만 허용.
+  재시도에서도 raw-input probe가 임계 미달이면 "response는 이 세팅에서 예측 불가능한
+  target"으로 결론짓고 연구를 중단 또는 전면 재설계한다.</pre>
+
+    <h3 class="sub">7.5 검증 게이트 2 — 구조 비교와 대조군 체계</h3>
+    <p>V1/V2/V3와 대조군들을 소규모 suite(T1 + T2 부분 + T3a 1개)에서 비교한 후 상위 2–3개 variant로 본 실험을 진행한다. <strong>비교는 성공률만으로 하지 않는다</strong> — representation 지표(probe, transfer)와 OOD 지표를 함께 본다.</p>
+
+    <h5 class="mini">필수 최소 집합 — 5종 (Phase 3에서 전부 실행)</h5>
+    <p>이 5종만으로 연구의 핵심 질문이 전부 판정된다.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th style="width:34px;">#</th><th style="width:34%;">모델</th><th>배제하는 대안 가설</th><th style="width:76px;">Phase</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Black-box critic (HACMan-style DLO port)</td><td>— 진단 대상이자 주 대조군</td><td>P1–P3</td></tr>
+          <tr><td>2</td><td><strong>Matched-dim value-equivalent latent</strong> — V3와 완전 동형 아키텍처·동일 차원에서 supervision target만 교체 (physical δm → next-latent-consistency). 1-요인 대조</td><td><strong>"물리 grounding이 아니라 저차원 bottleneck이면 뭐든 좋은 것 아닌가"</strong> — 최중요 단일 대조군 (Kill criterion의 K1)</td><td>P3–</td></tr>
+          <tr><td>3</td><td><strong>GreedyResp</strong> — f_resp로 1-step residual descent, Bellman 없음. node별 u 후보 64개 샘플링(+CEM 2회 정제) 후 예측 residual 감소 최대 (p,u) 선택</td><td><strong>"RL이 필요 없는 것 아닌가"</strong> — T3c(비단조·A1 성립)가 판정 무대</td><td>P3–</td></tr>
+          <tr><td>4</td><td>V1 / V2 / V3</td><td>grounding 강도 축 (study의 축)</td><td>P3–</td></tr>
+          <tr><td>5</td><td>Value-only per-point map — auxiliary 제거 + long-horizon value target (dense affordance 방식<sup class="cite"><a href="#ref-17">[17]</a></sup>의 동일 코드베이스 구현)</td><td>"per-point value map은 이미 있다<sup class="cite"><a href="#ref-17">[17]</a></sup>" — 최대 novelty 위협</td><td>P3–</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note"><strong>GreedyResp의 f_resp 데이터 출처 (공정성 고정):</strong> <strong>공통 off-policy 데이터셋</strong> (warmup random + baseline replay 혼합, 총 예산 동일)으로 <strong>1회 학습 후 공유</strong>하고, selection 방식만 분기한다. DGCC의 f_resp(RL 공동 학습)와의 차이는 명시 보고.</div>
+
+    <h5 class="mini">후순위 ablation (GNG1 프루닝 후, Phase 4–6에서 상위 variant에만 적용)</h5>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th style="width:44%;">모델/조작</th><th>목적</th><th style="width:96px;">Phase</th></tr></thead>
+        <tbody>
+          <tr><td>+ larger critic (파라미터 일치)</td><td>"파라미터가 많아서" 배제</td><td>P4</td></tr>
+          <tr><td>Reward-prediction bottleneck</td><td>"reward 정보면 충분한가" 분리</td><td>P4–P6</td></tr>
+          <tr><td>Shuffled target / random frozen bottleneck / full bypass</td><td>target 의미 / 구조 효과 / bypass 붕괴</td><td>P6</td></tr>
+          <tr><td>deterministic vs uncertainty / λ sweep / dim sweep {12, 24, 48} / DCT vs pooled-PCA vs AE</td><td>구현 선택 민감도</td><td>P6</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h5 class="mini">외부 비교 (setting 차이는 "동일 데이터 예산" 조건으로 관리, 한계 명시)</h5>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th style="width:52%;">모델</th><th>목적</th><th style="width:76px;">Phase</th></tr></thead>
+        <tbody>
+          <tr><td>Goal-conditioned Transporter (cable)<sup class="cite"><a href="#ref-9">[9]</a></sup></td><td>supervised pick-place value map 계열 대비</td><td>P6</td></tr>
+          <tr><td>(여력 시) GenDOM식 param-conditioned policy<sup class="cite"><a href="#ref-29">[29]</a></sup> 또는 HEPi<sup class="cite"><a href="#ref-30">[30]</a></sup></td><td>일반화 경쟁 진영 대비</td><td>P6</td></tr>
+          <tr><td>(appendix) dense affordance 원 구현 재현<sup class="cite"><a href="#ref-17">[17]</a></sup></td><td>내부 구현 비교의 보조 — 부실 재현 리스크 격리</td><td>P6+</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h5 class="mini">사전 예측 등록 — 결과 확인 전 고정하여 어느 방향의 결과든 정보가 되게 한다</h5>
+    <pre class="code"><span class="hl">P1</span>  A1–A3 성립 영역(T1, T2 무장애물)에서 hard ≥ soft ≥ aux > black-box
+<span class="hl">P2</span>  A1 위반 영역(T3b)에서 soft > hard (c_env 제거 시 hard 열세 심화)
+<span class="hl">P3</span>  OOD geometry에서 grounding variant와 black-box의 격차가 in-domain보다 확대
+<span class="hl">P4</span>  GreedyResp는 T1에서 경쟁적, T3c(비단조·A1 성립)에서 큰 격차로 실패 —
+    hard vs greedy의 분리 판정은 A1 위반과 얽히지 않는 T3c에서만 내린다</pre>
+
+    <h3 class="sub">7.6 기제·표현 분석</h3>
+    <pre class="code"><span class="hl">0</span>  상대적 정상성의 직접 측정 (main hypothesis의 because절 검증 — 가장 우선)
+   고정된 (s,p,u) 표본 집합에 대해 두 종류의 섭동을 독립적으로 가한다:
+   - task 섭동: goal만 변경 (geometry 고정) → Q-target(및 학습된 Q)의 변동
+   - physics 섭동: geometry(길이/강성)만 변경 (goal 고정) → δm_gt의 변동
+   두 변동을 동일 정규화(각자의 in-domain 표준편차)로 스케일 후 직접 대조:
+   - 분산비 (physics 성분 변동 / task 성분 변동)
+   - 서수 지표: 각 섭동 하에서 contact 후보 ranking 보존율 (관찰 3의 서수적 정의와 정합)
+   기대: δm의 ranking 보존율 ≫ Q-target의 ranking 보존율
+   → 이 실험이 "physics가 task보다 정상적"을 downstream 성능이 아닌 직접 측정으로 검증한다
+<span class="hl">1</span>  Linear probe 비교 — black-box / V1 / V2 / V3의 latent에서 response decode (§7.4 프로토콜)
+<span class="hl">2</span>  Probe transfer across domains + ordinal 보존 분석:
+   OOD에서 δm̂ 방향 cosine similarity, top-k contact ranking 보존율 (경로 E2 검증)
+<span class="hl">3</span>  Reward-free 적응 (Claim 4): 새 도메인 transition k ∈ {0, 64, 256, 1024} (reward 마스킹)
+   (i) f_resp-only vs (ii) black-box+사후 δm-head vs (iii) matched-dim latent-consistency
+   vs (iv) full fine-tune 참조 (경로 E1 검증)
+<span class="hl">4</span>  Alignment-performance 상관 (Claim 3): within-variant Spearman ρ (주 지표) +
+   checkpoint-trajectory 상관 (보조). between-variant 상관은 교란으로 배제
+<span class="hl">5</span>  Goal-entanglement 분석 (§7.4 Control F를 전 variant로 확장)
+<span class="hl">6</span>  NN response consistency (Recall@K, silhouette by response cluster), UMAP/t-SNE (보조 시각화)</pre>
+
+    <h3 class="sub">7.7 OOD Generalization Suite</h3>
+    <p>축의 위계를 정직하게 고정한다. 가정을 깨지 않는 깨끗한 physics-OOD 축은 사실상 <strong>length(+discretization)</strong> 하나로 수렴하므로, length를 <strong>primary 축</strong>으로 명시 승격하고 논문의 "across geometries" 표방 범위도 이에 맞춰 기술한다. stiffness/friction은 G1 게이트 결과에 따르는 조건부 보조축이다.</p>
+
+    <pre class="code"><span class="hl">primary</span>   length          L ∈ [0.8, 1.2] m → {0.5, 0.6, 1.4, 1.6} m  (goal은 §6.2 이원 정의)
+          discretization  N ∈ {25, 100} (학습 N=50과 상이 — Φ 불변성 검증)
+<span class="hl">보조</span>      initial/goal    분포 shift (held-out 형상군) — task 성분 transfer
+<span class="hl">조건부</span>    stiffness       k × {0.5, 2.0}   (G1 통과 시에만 주장에 포함)
+          friction        μ × {0.5, 2.0}   (A2 부분 위반 명시)
+<span class="hl">regime</span>    obstacle        unseen layout (T3) — P2 검증용
+주: 구체 split 수치는 G1/G2 게이트 통과 후 확정하는 잠정값이다.
+<span class="hl">보고:</span> 축별 분해 + zero-shot / few-shot(reward-free) / full fine-tune 3단계</pre>
+
+    <p>각 OOD 축이 어느 가정을 건드리는지의 대응을 명시한다 — "가정을 지키는 축은 효과가 작고, 효과가 큰 축은 가정을 깬다"는 긴장이 존재하며, 이를 숨기지 않고 축 선택의 근거로 삼는다.</p>
+
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>OOD 축</th><th>위반 가정</th><th>함의</th></tr></thead>
+        <tbody>
+          <tr><td><strong>length</strong></td><td>없음 (이원 goal 정의 후)</td><td>grounding transfer의 가장 깨끗한 검증 축</td></tr>
+          <tr><td><strong>stiffness</strong></td><td>없음 (준정적 유지 시)</td><td>단 G1 게이트로 유효성 선확인</td></tr>
+          <tr><td><strong>friction</strong></td><td>A2 부분 위반 (정지마찰 이력)</td><td>response 노이즈 증가 — uncertainty head의 활약 지점, hard 열화를 사전 예측에 포함</td></tr>
+          <tr><td><strong>initial/goal shape</strong></td><td>없음</td><td>task 성분 transfer 검증 (physics 성분 고정)</td></tr>
+          <tr><td><strong>obstacle layout</strong></td><td>A1 위반</td><td>사전 예측 P2의 검증 축</td></tr>
+          <tr><td><strong>discretization</strong></td><td>없음</td><td>Φ 불변성의 순수 sanity 축</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="sub">7.8 평가 프로토콜과 통계</h3>
+    <pre class="code">seed ≥ 5 (최종 표 8–10) · rliable IQM + 95% stratified bootstrap CI [55]
+per-task · per-OOD-axis 분해 보고 · 학습 곡선 AUC · 안정성 지표 동시 보고 (§6.6)
+판정 기준·사전 예측(P1–P4)·반증 조건은 결과 확인 전 문서로 고정
+코드·설정·데이터 생성 스크립트 공개 전제</pre>
+
+    <h3 class="sub">7.9 계산 예산</h3>
+    <pre class="code"><span class="hl">가정:</span> state-based 1 run ≈ 1–2 GPU-day (병렬 env), 2–5M env-steps/run
+<span class="hl">게이트 2 (§7.5 필수 집합):</span> RL 학습 6 모델(black-box, V1–V3, matched-dim, value-only)
+  × 3 task × 3 seed ≈ 54 runs ≈ ~110 GPU-day (달력 3주, 병렬)
+  + GreedyResp는 f_resp 1회 학습(공통 데이터셋) + 평가만 (미미)
+<span class="hl">본 실험:</span> 프루닝 후 3–4 모델 × 전체 task × 8 seed + 후순위 ablation ≈ 250–350 runs
+<span class="hl">총 상한:</span> ~600 GPU-day — 8-GPU 노드 기준 달력 2–3개월 내 소화 가능
+<span class="hl">probe/분석/정상성 측정:</span> 단일 GPU 수준 (병목 아님)</pre>
+  </div>
+</section>
+
+<!-- ==================== SECTION 08 ==================== -->
+<section class="major" id="s8">
+  <div class="wrap">
+    <span class="eyebrow">Section 08 — 결과 해석 프레임워크</span>
+    <h2 class="section-head">결과 해석 프레임워크</h2>
+
+    <p class="lead" style="margin-top:22px;">어느 결과가 나와도 다음 단계가 정의되어 있도록, 그리고 <strong>어떤 결과가 나오면 가설을 버릴 것인지</strong>까지 사전에 고정한다.</p>
+
+    <h4 class="subsub">Decision 1 — Probing 게이트 (§7.4) 이후</h4>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th style="width:40%;">결과</th><th>결정</th></tr></thead>
+        <tbody>
+          <tr><td>결핍 확인 (probe 낮음)</td><td>이상적 Go — Claim 1 그대로 진행</td></tr>
+          <tr><td>in-domain 높음 + transfer 낮음</td><td>Go — OOD transfer 중심 서사로 강화 (스토리 정합)</td></tr>
+          <tr><td>모두 높음</td><td>bottleneck 필요성 약화 → pivot: sample efficiency / reward-free 적응(Claim 4) / uncertainty 중심 재구성. Claim 4는 이 경우에도 독립적으로 성립 가능</td></tr>
+          <tr><td>모두 낮음</td><td>response 정의 수정 (대안 space, dim 조정, transition averaging) 후 재시도</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4 class="subsub">Decision 2 — 구조 비교 (§7.5) 이후</h4>
+    <p>판정 규칙만 사전 등록한다 (시나리오별 논문 서사는 결과 이후의 일이므로 여기서 확정하지 않는다):</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th style="width:32%;">결과</th><th>허용되는 결론</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Hard (V3) 최선</strong></td><td>"Q를 response 경유로 제약"하는 강한 구조 claim 허용 — 단 적용 범위는 A1 성립 regime으로 한정</td></tr>
+          <tr><td><strong>Soft (V2) 최선</strong></td><td>grounding claim은 유지, "bottleneck" 표현은 약화</td></tr>
+          <tr><td><strong>Auxiliary (V1) 최선/동률</strong></td><td>구조 제약 claim 폐기 — 알려진 auxiliary 이론<sup class="cite"><a href="#ref-35">[35]</a></sup>의 인스턴스임을 인정하고, 신규성은 기제 분석·cross-geometry·reward-free 적응으로 재배치</td></tr>
+          <tr><td><strong>Regime 교차</strong> (P1+P2 동시 확인)</td><td>"constraint의 최적 강도는 A1–A3 성립도가 결정한다" — 본 study가 목표하는 완결형 결론</td></tr>
+          <tr><td>전부 무효과</td><td>task 난이도·OOD split·response 정의 재검토 (G 게이트로 회귀)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4 class="subsub">Decision 3 — GreedyResp 대비 <span class="tag">판정 무대: T3c</span></h4>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th style="width:34%;">결과</th><th>해석</th></tr></thead>
+        <tbody>
+          <tr><td>DGCC &gt; Greedy (T2, T3c)</td><td>Bellman + grounding 시너지 입증</td></tr>
+          <tr><td>T1–T2 동률, T3c만 우위</td><td>사전 예측 P4와 일치 — claim 범위를 "비단조(Bellman-necessary) regime"으로 한정. T3c 인스턴스 수(45개)로 검정력 담보</td></tr>
+          <tr><td>T3c 포함 전 구간 동률</td><td>RL 성분 무의미 → "predictive response model + greedy selection"으로 연구 재정의</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4 class="subsub">Kill Criterion — 가설 기각 조건</h4>
+    <p>세 조건의 동시 성립을 요구하면 K2·K3의 측정 특성상 사실상 발동 불가능한 기준이 되므로, <strong>K1 단독을 1차 기각 조건</strong>으로 한다.</p>
+    <div class="feature-dark">
+      <div class="fd-eyebrow">Kill Criterion · K1 단독 주 기준</div>
+      <pre class="code" style="background:var(--surface-dark-elevated);"><span class="hl">K1 (주 기준, 단독 발동):</span> matched-dim value-equivalent 대조군이 primary OOD 축(length)을
+   포함한 전 축에서 DGCC와 통계적 동률
+   → "physical grounding은 저차원 bottleneck의 일반 효과 이상을 제공하지 않는다"로
+     grounding 고유 기여를 기각. negative result로 처리하고 다른 포장을 하지 않는다.
+<span class="hl">K2 (보조 진단):</span> reward-free 적응의 공정 대조 (i) vs (ii)(iii)에서 우위 소멸
+<span class="hl">K3 (보조 진단):</span> partial correlation (Claim 3) 유의하지 않음
+   → K2·K3는 K1 성립 시 기각의 견고성 확인 및 부분 기각(어느 claim이 살아남는지)의
+     판정에 사용한다.</pre>
+    </div>
+
+    <h4 class="subsub">Claims → Evidence Map</h4>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Claim</th><th>실험</th><th>성공 조건</th></tr></thead>
+        <tbody>
+          <tr><td><strong>가설 전제</strong> (상대적 정상성)</td><td>§7.6-0 직접 측정</td><td>physics 섭동 하 δm ranking 보존율 ≫ task 섭동 하 Q-target ranking 보존율</td></tr>
+          <tr><td><strong>C1</strong> 결핍</td><td>§7.4 probe + Control F</td><td>black-box: 낮은 probe transfer, 높은 entanglement</td></tr>
+          <tr><td><strong>C2</strong> 개입 효과</td><td>§7.2 성능 + §7.7 OOD</td><td>grounding variant가 black-box·matched-dim·GreedyResp를 각각 격파</td></tr>
+          <tr><td><strong>C3</strong> 기제 연결</td><td>§7.6-4 상관</td><td>공변량 회귀 후 partial correlation 유의 + 양(+)</td></tr>
+          <tr><td><strong>C4</strong> reward-free 적응</td><td>§7.6-3</td><td>f_resp-only가 공정 대조 (ii)(iii) 대비 우위</td></tr>
+          <tr><td>(조건부) regime 구조</td><td>§7.5 P1/P2</td><td>variant × regime 상호작용 확인</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SECTION 09 ==================== -->
+<section class="major" id="s9">
+  <div class="wrap">
+    <span class="eyebrow">Section 09 — 위험 관리</span>
+    <h2 class="section-head">위험 관리</h2>
+
+    <p class="lead" style="margin-top:22px;">실행을 실제로 좌우하는 핵심 위험 5건만 본문에 둔다 (확장 목록은 <a href="#appendix-b">부록 B</a>):</p>
+
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th style="width:30%;">위험</th><th style="width:24%;">영향</th><th>완화</th></tr></thead>
+        <tbody>
+          <tr><td>stiffness OOD가 준정적에서 vacuous</td><td>main hypothesis의 OOD 축 일부 검증 불능</td><td>G1 게이트 — 본 실험 전 효과크기 확인 필수, 미달 시 length 중심 재편</td></tr>
+          <tr><td>length OOD의 goal 정의 불명확</td><td>transfer 실험 전체 해석 불능</td><td>§6.2 이원 goal 후보 설계 + G2 게이트 (방향 정합 정량 검증 포함)</td></tr>
+          <tr><td>matched-dim 대조군 동률</td><td>grounding 고유 기여 기각</td><td>Kill criterion K1으로 정직 처리 — negative result 전환 경로 사전 확정</td></tr>
+          <tr><td>이산 argmax 과대추정으로 baseline 불안정</td><td>모든 비교의 기저선 오염</td><td>double-Q decoupling + 안정성 로깅 분리 보고 (§6.6)</td></tr>
+          <tr><td>DLO-Lab 미성숙</td><td>인프라 단일 실패점</td><td>2-sim 실구동 비교 후 확정 + secondary sim에서 핵심 결론 1축 재현</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SECTION 10 ==================== -->
+<section class="major" id="s10">
+  <div class="wrap">
+    <span class="eyebrow">Section 10 — 일정과 산출물</span>
+    <h2 class="section-head">일정과 산출물</h2>
+
+    <div class="table-scroll" style="margin-top:22px;">
+      <table>
+        <thead><tr><th style="width:20%;">단계</th><th style="width:16%;">기간</th><th>산출물 (게이트)</th></tr></thead>
+        <tbody>
+          <tr><td><strong>P0</strong> 환경·파일럿</td><td>4주 (~8월 초)</td><td>2-sim 실구동 비교 → primary 확정 · δm 파이프라인(재표본+DCT+이원 goal) · <strong>G1·G2 게이트 통과</strong> · reward/OOD split 수치 고정</td></tr>
+          <tr><td><strong>P1</strong> Baseline 구축</td><td>5주 (~9월 중순)</td><td>HACMan-style DLO port + 이산 argmax 안정화 · 안정성 로깅 · latent 추출 API · T1–T2 기준 성능</td></tr>
+          <tr><td><strong>P2</strong> Probing 게이트</td><td>2주 (~9월 말)</td><td>probe suite + Controls A–F · <strong>§7.4에 사전 고정된 임계로 Go/Pivot 판정</strong> (파일럿은 분산 추정용으로만 사용)</td></tr>
+          <tr><td><strong>P3</strong> 구조 비교 게이트</td><td>3주 (~10월 말)</td><td>V1/V2/V3 + GreedyResp + matched-dim + value-only map 소규모 비교 · P1–P4 대조 · <strong>variant 프루닝 (상위 2–3개)</strong></td></tr>
+          <tr><td><strong>P4</strong> 본 학습</td><td>5주 (~12월 초)</td><td>선택 variant 본 학습 · T1–T3 전체 · uncertainty 옵션</td></tr>
+          <tr><td><strong>P5</strong> 기제 분석</td><td>3주 (~12월 말)</td><td>probe/transfer/ordinal/상관/entanglement/reward-free 적응 (공정 대조 포함)</td></tr>
+          <tr><td><strong>P6</strong> OOD·ablation</td><td>5주 (~2월 초)</td><td>OOD 전 축 · ablation 전체 · secondary sim 재현 1축</td></tr>
+          <tr><td><strong>P7</strong> 집필</td><td>6주 (~3월 중순)</td><td>논문 초고 → 내부 리뷰 → 투고</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p style="margin-top:22px;">투고 전략: <strong>CoRL 2027 (1순위)</strong>. RSS 2027(1월 마감)은 P4까지 조기 수렴 시에만 검토. 백업: ICLR 2028 / ICRA 2028. ICLR 계열 제출 시 study 프레이밍(기제 분석·regime 구조·사전 등록) 전면화, CoRL/ICRA 제출 시 성능·시스템 결과 전면화 + 실로봇 1-task validation을 stretch goal로 (perception은 tracking 선행연구<sup class="cite"><a href="#ref-21">[21]</a><a href="#ref-26">, 26</a></sup> 활용).</p>
+  </div>
+</section>
+
+<!-- ==================== SECTION 11 ==================== -->
+<section class="major" id="s11">
+  <div class="wrap">
+    <span class="eyebrow">Section 11 — 논문화 전략</span>
+    <h2 class="section-head">논문화 전략</h2>
+
+    <p class="lead" style="margin-top:22px;">선제 방어의 전문은 진단 실험(§7.4–7.5) 결과가 나오면 다시 쓰게 되므로, 본문에는 논문 골격과 novelty 경계선만 두고 상세 반론 대응·abstract 초안은 <a href="#appendix-a">부록 A</a>(Phase 7 집필 자료)로 분리한다.</p>
+
+    <h3 class="sub">11.1 본문 구성</h3>
+    <pre class="code"><span class="hl">Introduction</span>   관찰 1→4 (§3의 사슬) → 가설 → contributions (method + study + adaptation)
+<span class="hl">Method</span>         정식화 → assumption stack → DGCC variants → 구현
+<span class="hl">Experiments</span>    1) mechanism validation (§7.6-0 정상성 직접 측정 포함)
+               2) architecture comparison  3) policy performance (+GreedyResp)
+               4) OOD + reward-free adaptation  5) ablation·failure 분석
+<span class="hl">Discussion</span>     regime-dependence · one-step response의 한계 · 실로봇 확장</pre>
+
+    <h3 class="sub">11.2 Novelty 경계선 — 핵심 3건</h3>
+    <p>본문 Related Work에서 반드시 그어야 할 경계는 세 건이며, 각각 실험적 방어선이 지정되어 있다:</p>
+    <pre class="code"><span class="hl">1. Foresightful dense affordance [17]</span> — deformable per-point "value" map은 이미 존재.
+   경계: 우리는 value가 아니라 물리 반응으로 ground한다.
+   방어선: value-only per-point map ablation (§7.5 필수 5종의 #5)
+<span class="hl">2. TD-MPC/VPN/MuZero [39-41]</span> — value-through-latent-model은 성숙한 패러다임.
+   경계: 우리의 bottleneck은 물리량에 supervise된 1-step 표현이며 rollout 불가.
+   방어선: matched-dim value-equivalent 대조군 (§7.5 필수 5종의 #2)
+<span class="hl">3. Flow 계열 [11, 15, 16]</span> — effect 표현의 전이성은 이미 입증됨.
+   경계: 그들은 effect를 policy/greedy selector에 공급, 우리는 Bellman critic에 결합.
+   방어선: GreedyResp 대조 (§7.5 필수 5종의 #3, 판정 무대 T3c)</pre>
+
+    <p>나머지 반론(auxiliary 표준론<sup class="cite"><a href="#ref-33">[33]</a><a href="#ref-35">, 35</a></sup>, successor features<sup class="cite"><a href="#ref-44">[44]</a></sup>, 충분성, 실로봇)에 대한 대응 초안은 <a href="#appendix-a">부록 A</a>.</p>
+
+    <h3 class="sub">11.3 최종 포지셔닝</h3>
+    <pre class="code">We study how Bellman critics should represent contact actions when action values
+are strongly mediated by deformation responses — and we show that grounding the
+critic in the response yields contact representations that transfer across DLO
+geometries and adapt without reward.</pre>
+
+    <p><strong>하지 않을 주장:</strong> controllability 추정 · Jacobian 학습 · Φ(DCT/PCA)가 기여라는 주장 · world model 학습 (1-step, rollout 불가) · response가 value를 완전 결정한다는 주장 · auxiliary loss 자체가 novelty라는 주장.</p>
+  </div>
+</section>
+
+<!-- ==================== APPENDIX A ==================== -->
+<section class="major appendix-section" id="appendix-a">
+  <div class="wrap">
+    <span class="eyebrow appendix">Appendix A</span>
+    <h2 class="section-head">예상 반론과 대응</h2>
+    <p class="appendix-note">Phase 7 집필 자료 — 결과 확정 후 재작성 전제. 본문(§11)에서 분리한 선제 방어 논리의 전문.</p>
+
+    <div class="card-soft" style="margin-bottom:16px;">
+      <div class="card-title" style="font-size:16px;">"TD-MPC/MuZero/VPN<sup class="cite"><a href="#ref-39">[39]</a><a href="#ref-41">–41</a></sup>과 뭐가 다른가?"</div>
+      <p style="margin-bottom:0;">그들의 latent는 return 최적화에만 맞춰진 value-equivalent 표현이고 multi-step rollout에 쓰인다. DGCC의 bottleneck은 (i) 물리적으로 정의된 shape-change 공간에 supervise되고, (ii) 엄격히 1-step이며 rollout 불가능하고, (iii) 순수하게 critic 표현 제약이다. 실험적으로는 matched-dim 대조군이 직접 방어선이다.</p>
+    </div>
+
+    <div class="card-soft" style="margin-bottom:16px;">
+      <div class="card-title" style="font-size:16px;">"Forward-dynamics auxiliary는 UNREAL<sup class="cite"><a href="#ref-33">[33]</a></sup> 이래 표준 아닌가?"</div>
+      <p style="margin-bottom:0;">맞다. V1이 정확히 그 알려진 아이디어의 인스턴스이며, 언제 돕는지의 이론도 존재한다<sup class="cite"><a href="#ref-35">[35]</a></sup>. 기여는 auxiliary loss가 아니라 (i) 구조적 개입 강도의 통제 비교, (ii) cross-geometry transfer 축 (<sup class="cite"><a href="#ref-35">[35]</a></sup>는 distractor robustness), (iii) probe 기반 기제 증거, (iv) reward-free 적응이다.</p>
+    </div>
+
+    <div class="card-soft" style="margin-bottom:16px;">
+      <div class="card-title" style="font-size:16px;">"Transfer가 목적이면 왜 successor features<sup class="cite"><a href="#ref-44">[44]</a></sup>가 아닌가?"</div>
+      <p style="margin-bottom:0;">SF는 dynamics 고정 하에 reward 변화를 전이한다 (Q = ψ·w). 우리의 표적은 정반대 축인 dynamics/geometry 변화다. 한계도 명시한다: δm̂에는 SF의 closed-form task 재조합성이 없고, 전이는 f_resp의 reward-free 적응으로 매개된다.</p>
+    </div>
+
+    <div class="card-soft" style="margin-bottom:16px;">
+      <div class="card-title" style="font-size:16px;">"δm̂은 결국 coarse flow 아닌가<sup class="cite"><a href="#ref-11">[11]</a><a href="#ref-15">, 15</a><a href="#ref-16">, 16</a></sup>?"</div>
+      <p style="margin-bottom:0;">Flow 계열은 dense effect field를 policy에 공급하거나 greedy selector로 소비한다. 우리는 compact response를 Bellman critic에 결합해 장기 가치를 보존한다. GreedyResp가 T3c에서 실패하는 것이 이 구분의 실증이다.</p>
+    </div>
+
+    <div class="card-soft" style="margin-bottom:16px;">
+      <div class="card-title" style="font-size:16px;">"Per-point value map은 deformable에 이미 있다<sup class="cite"><a href="#ref-17">[17]</a></sup>."</div>
+      <p style="margin-bottom:0;">그들의 per-point score는 추정된 장기 task value로 supervise된다 — black-box critic의 deformable 유사체다. 우리는 물리 반응 예측으로 critic을 ground하고, 그것이 transfer의 원인임을 probe·상관·동일 코드베이스 ablation으로 보인다.</p>
+    </div>
+
+    <div class="card-soft" style="margin-bottom:16px;">
+      <div class="card-title" style="font-size:16px;">"1-step response + goal residual이 Q에 충분한가?"</div>
+      <p style="margin-bottom:0;">일반적으로 불충분하다. 충분해지는 가정(A1–A3)을 명시했고, 가정이 깨지는 영역에서 soft가 이긴다는 예측(P2)을 사전 등록했다. Regime-dependence는 결함이 아니라 발견 대상이다.</p>
+    </div>
+
+    <div class="card-soft" style="margin-bottom:24px;">
+      <div class="card-title" style="font-size:16px;">"실로봇 검증은?"</div>
+      <p style="margin-bottom:0;">CoRL/ICRA 제출 시 T1/T2에서 single real-rope validation (tracking은<sup class="cite"><a href="#ref-21">[21]</a><a href="#ref-26">, 26</a></sup>). ICLR 계열 제출 시 표현 연구로 scope 한정.</p>
+    </div>
+
+    <h5 class="mini">Abstract 초안 (결과 확정 전 — 구조 참고용)</h5>
+    <pre class="code">Bellman critics learn which contact actions are valuable, but not the physical
+mechanism by which an action becomes valuable. In deformable linear object
+manipulation, contact value is strongly mediated by the deformation response
+induced by contact actions. We study how contact critics should represent this
+mechanism: we propose deformation-grounded contact critics (DGCC), which preserve
+hybrid actor-critic value learning while structuring the critic around a predicted
+low-dimensional deformation response, and we compare auxiliary, soft-, and
+hard-bottleneck instantiations. Because response labels are self-supervised,
+DGCC additionally enables reward-free adaptation to unseen DLO geometries.
+Across [tasks], grounding improves OOD transfer across rope length [and further
+axes pending gate G1]; probe analyses show black-box critics encode deformation
+response in a goal-entangled, domain-specific way, and response-probe transfer
+predicts OOD performance within architectures.</pre>
+  </div>
+</section>
+
+<!-- ==================== APPENDIX B ==================== -->
+<section class="major appendix-section" id="appendix-b">
+  <div class="wrap">
+    <span class="eyebrow appendix">Appendix B</span>
+    <h2 class="section-head">확장 위험 목록</h2>
+    <p class="appendix-note">본문 §9의 핵심 5건에서 확장한 전체 위험 목록. 실행 우선순위가 낮거나 게이트로 이미 관리되는 항목을 포함한다.</p>
+
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th style="width:32%;">위험</th><th style="width:22%;">영향</th><th>완화</th></tr></thead>
+        <tbody>
+          <tr><td>black-box latent가 이미 transferable response 인코딩</td><td>동기 약화</td><td>§7.4 게이트 선판정 + Decision 1 pivot 경로</td></tr>
+          <tr><td>hard variant의 정보 부족 (A1 위반 task)</td><td>대표 task 실패</td><td>c_env 설계 + 사전 예측 P2로 등록 (실패 → 발견 전환)</td></tr>
+          <tr><td>Φ의 도메인 간 불일치</td><td>probe transfer 해석 불능</td><td>DCT 기본값 + 재표본 불변성 sanity check</td></tr>
+          <tr><td>GreedyResp 전 구간 동률</td><td>Bellman 성분 무의미</td><td>T3c 설계로 사전 차단 + Decision 3 전환 경로</td></tr>
+          <tr><td>response 노이즈/확률성</td><td>학습 불안정</td><td>Huber/NLL, δm 정규화, settle 대기</td></tr>
+          <tr><td>외부 baseline 재현 품질</td><td>비교 무효</td><td>주 비교를 동일 코드베이스 ablation으로 설계</td></tr>
+          <tr><td>계산 폭발</td><td>일정 지연</td><td>게이트 프루닝, 순차 확장, §7.9 예산 상한</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SECTION 12 ==================== -->
+<section class="major" id="s12">
+  <div class="wrap">
+    <span class="eyebrow">Section 12 — Related Works</span>
+    <h2 class="section-head">Related Works</h2>
+    <p class="lead" style="margin-top:22px;">본문에서 인용한 문헌을 주제별로 정리한다.</p>
+
+    <div class="ref-group-label">Group A</div>
+    <h4 class="ref-group">Hybrid actor-critic과 per-point affordance (rigid/articulated)</h4>
+    <div class="ref-list">
+      <div class="ref-row threat" id="ref-1"><div class="ref-num">[1]</div><div class="ref-body">Zhou et al., <span class="ref-title">HACMan: Learning Hybrid Actor-Critic Maps for 6D Non-Prehensile Manipulation</span>, <span class="ref-venue">CoRL 2023.</span> <span class="ref-arxiv">arXiv:2305.03942</span><span class="threat-badge">Novelty 경계</span><span class="ref-note flag">per-point Q map + motion parameter의 hybrid action. 본 연구의 architectural parent. DLO 적용 부재.</span></div></div>
+      <div class="ref-row" id="ref-2"><div class="ref-num">[2]</div><div class="ref-body">Jiang et al., <span class="ref-title">HACMan++: Spatially-Grounded Motion Primitives for Manipulation</span>, <span class="ref-venue">RSS 2024.</span> <span class="ref-arxiv">arXiv:2407.08585</span><span class="ref-note">primitive 선택으로 확장. task suite에 deformable 없음 (전문 확인).</span></div></div>
+      <div class="ref-row" id="ref-3"><div class="ref-num">[3]</div><div class="ref-body">Mo et al., <span class="ref-title">Where2Act</span>, <span class="ref-venue">ICCV 2021.</span> <span class="ref-arxiv">arXiv:2101.02692</span><span class="ref-note">per-point actionability와 action score의 분리 설계. "value vs mechanism" 두-head 분리의 선례.</span></div></div>
+      <div class="ref-row" id="ref-4"><div class="ref-num">[4]</div><div class="ref-body">Jiang et al., <span class="ref-title">GIGA: Synergies Between Affordance and Geometry</span>, <span class="ref-venue">RSS 2021.</span> <span class="ref-arxiv">arXiv:2104.01542</span><span class="ref-note">affordance head + auxiliary geometry head 공동 학습이 transferable feature를 만든다는 구조적 유추의 근거.</span></div></div>
+      <div class="ref-row" id="ref-5"><div class="ref-num">[5]</div><div class="ref-body">Ning et al., <span class="ref-title">Where2Explore</span>, <span class="ref-venue">NeurIPS 2023</span><span class="ref-note">local geometry의 cross-category 공유가 transfer의 단위라는 증거.</span></div></div>
+      <div class="ref-row" id="ref-6"><div class="ref-num">[6]</div><div class="ref-body">Wang et al., <span class="ref-title">AdaAfford</span>, <span class="ref-venue">ECCV 2022.</span> <span class="ref-arxiv">arXiv:2112.00246</span><span class="ref-note">시각만으로 안 보이는 물리 파라미터는 상호작용으로 회복해야 함 — 물리 grounding 동기.</span></div></div>
+      <div class="ref-row" id="ref-7"><div class="ref-num">[7]</div><div class="ref-body">Geng et al., <span class="ref-title">RLAfford</span>, <span class="ref-venue">ICRA 2023</span><span class="ref-note">affordance map과 RL의 co-training 안정성 선례.</span></div></div>
+      <div class="ref-row" id="ref-8"><div class="ref-num">[8]</div><div class="ref-body">Zeng et al., <span class="ref-title">Transporter Networks</span>, <span class="ref-venue">CoRL 2020.</span> <span class="ref-arxiv">arXiv:2010.14406</span><span class="ref-note">pick-conditioned place value map.</span></div></div>
+      <div class="ref-row" id="ref-9"><div class="ref-num">[9]</div><div class="ref-body">Seita et al., <span class="ref-title">Learning to Rearrange Deformable Cables, Fabrics, and Bags with Goal-Conditioned Transporter Networks</span>, <span class="ref-venue">ICRA 2021.</span> <span class="ref-arxiv">arXiv:2012.03385</span><span class="ref-note">cable 포함 deformable의 goal-conditioned pick-place map. supervised·image-space·deformation grounding 없음 — 핵심 대조군.</span></div></div>
+      <div class="ref-row" id="ref-10"><div class="ref-num">[10]</div><div class="ref-body">Sundermeyer et al., <span class="ref-title">Contact-GraspNet</span>, <span class="ref-venue">ICRA 2021.</span> <span class="ref-arxiv">arXiv:2103.14127</span><span class="ref-note">관측점에 action을 root시키는 per-point contact 파라미터화.</span></div></div>
+    </div>
+
+    <div class="ref-group-label">Group B</div>
+    <h4 class="ref-group">Effect/flow 기반 action 선택</h4>
+    <div class="ref-list">
+      <div class="ref-row" id="ref-11"><div class="ref-num">[11]</div><div class="ref-body">Eisner, Zhang, Held, <span class="ref-title">FlowBot3D</span>, <span class="ref-venue">RSS 2022.</span> <span class="ref-arxiv">arXiv:2205.04382</span><span class="ref-note">per-point articulation flow 예측 → argmax 선택. effect 예측은 있으나 learned critic 없음.</span></div></div>
+      <div class="ref-row" id="ref-12"><div class="ref-num">[12]</div><div class="ref-body">Zhang, Eisner, Held, <span class="ref-title">FlowBot++</span>, <span class="ref-venue">CoRL 2023.</span> <span class="ref-arxiv">arXiv:2306.12893</span><span class="ref-note">compact articulation descriptor 병행 예측.</span></div></div>
+      <div class="ref-row" id="ref-13"><div class="ref-num">[13]</div><div class="ref-body">Weng et al., <span class="ref-title">FabricFlowNet</span>, <span class="ref-venue">CoRL 2021.</span> <span class="ref-arxiv">arXiv:2111.05623</span><span class="ref-note">deformable(cloth)에서 flow 기반 pick/place. supervised IL.</span></div></div>
+      <div class="ref-row" id="ref-14"><div class="ref-num">[14]</div><div class="ref-body">Seita et al., <span class="ref-title">ToolFlowNet</span>, <span class="ref-venue">CoRL 2022.</span> <span class="ref-arxiv">arXiv:2211.09006</span><span class="ref-note">tool flow → action 회귀.</span></div></div>
+      <div class="ref-row" id="ref-15"><div class="ref-num">[15]</div><div class="ref-body">Yuan et al., <span class="ref-title">General Flow as Foundation Affordance</span>, <span class="ref-venue">CoRL 2024.</span> <span class="ref-arxiv">arXiv:2401.11439</span><span class="ref-note">flow 표현의 cross-embodiment 전이.</span></div></div>
+      <div class="ref-row" id="ref-16"><div class="ref-num">[16]</div><div class="ref-body">Xu et al., <span class="ref-title">Im2Flow2Act</span>, <span class="ref-venue">CoRL 2024.</span> <span class="ref-arxiv">arXiv:2407.15208</span><span class="ref-note">flow를 embodiment-bridging interface로 사용.</span></div></div>
+      <div class="ref-row threat" id="ref-17"><div class="ref-num">[17]</div><div class="ref-body">Wu, Ning, Dong, <span class="ref-title">Learning Foresightful Dense Visual Affordance for Deformable Object Manipulation</span>, <span class="ref-venue">ICCV 2023.</span> <span class="ref-arxiv">arXiv:2303.11057</span><span class="threat-badge">최대 Novelty 위협</span><span class="ref-note flag">rope 포함 deformable 위 per-point long-horizon value map. <strong>최근접 선행연구이자 최대 novelty 위협</strong> — task value로만 supervise되며 물리 반응 grounding 없음. 동일 코드베이스 ablation으로 직접 비교.</span></div></div>
+    </div>
+
+    <div class="ref-group-label">Group C</div>
+    <h4 class="ref-group">DLO manipulation</h4>
+    <div class="ref-list">
+      <div class="ref-row" id="ref-18"><div class="ref-num">[18]</div><div class="ref-body">Grannen, Sundaresan et al., <span class="ref-title">Untangling Dense Knots by Learning Task-Relevant Keypoints</span>, <span class="ref-venue">CoRL 2020.</span> <span class="ref-arxiv">arXiv:2011.04999</span><span class="ref-note">keypoint 기반 grasp 선택의 대표.</span></div></div>
+      <div class="ref-row" id="ref-19"><div class="ref-num">[19]</div><div class="ref-body">Sundaresan et al., <span class="ref-title">Learning Rope Manipulation Policies Using Dense Object Descriptors</span>, <span class="ref-venue">ICRA 2020.</span> <span class="ref-arxiv">arXiv:2003.01835</span></div></div>
+      <div class="ref-row" id="ref-20"><div class="ref-num">[20]</div><div class="ref-body">Viswanath et al., <span class="ref-title">Autonomously Untangling Long Cables</span>, <span class="ref-venue">RSS 2022.</span> <span class="ref-arxiv">arXiv:2207.07813</span></div></div>
+      <div class="ref-row threat" id="ref-23"><div class="ref-num">[23]</div><div class="ref-body">Cao et al., <span class="ref-title">DLO-Lab</span>, <span class="ref-venue">2026.</span> <span class="ref-arxiv">arXiv:2606.04206</span><span class="threat-badge">Novelty 경계 · Primary sim</span><span class="ref-note flag">DLO 특화 벤치마크. VLM grasp 제안. "suboptimal grasp는 목표를 kinematically unsolvable하게 만든다" — contact 선택 중요성의 최신 근거.</span></div></div>
+      <div class="ref-row" id="ref-21"><div class="ref-num">[21]</div><div class="ref-body"><span class="ref-title">HANDLOOM</span>, <span class="ref-venue">CoRL 2023.</span> <span class="ref-arxiv">arXiv:2303.08975</span><span class="ref-note">cable centerline tracing (실로봇 확장 시 인식 제공자).</span></div></div>
+      <div class="ref-row" id="ref-22"><div class="ref-num">[22]</div><div class="ref-body">Luo et al., <span class="ref-title">Multi-Stage Cable Routing</span>, <span class="ref-venue">2023.</span> <span class="ref-arxiv">arXiv:2307.08927</span><span class="ref-note">계층적 IL.</span></div></div>
+      <div class="ref-row" id="ref-24"><div class="ref-num">[24]</div><div class="ref-body">Ma et al., <span class="ref-title">G-DOOM (Latent Graph Dynamics)</span>, <span class="ref-venue">ICRA 2022.</span> <span class="ref-arxiv">arXiv:2104.12149</span><span class="ref-note">keypoint GNN dynamics + per-keypoint MPC.</span></div></div>
+      <div class="ref-row" id="ref-25"><div class="ref-num">[25]</div><div class="ref-body">Lin et al., <span class="ref-title">VCD (Visible Connectivity Dynamics)</span>, <span class="ref-venue">CoRL 2021.</span> <span class="ref-arxiv">arXiv:2105.10389</span></div></div>
+      <div class="ref-row" id="ref-26"><div class="ref-num">[26]</div><div class="ref-body">Chen et al., <span class="ref-title">DEFORM (Differentiable Discrete Elastic Rods)</span>, <span class="ref-venue">CoRL 2024.</span> <span class="ref-arxiv">arXiv:2406.05931</span><span class="ref-note">DER 기반 실시간 모델링·추적.</span></div></div>
+      <div class="ref-row" id="ref-27"><div class="ref-num">[27]</div><div class="ref-body"><span class="ref-title">DeformNet</span>, <span class="ref-venue">2024.</span> <span class="ref-arxiv">arXiv:2402.07648</span><span class="ref-note">action-conditioned latent deformation 예측 → MPC. object-global이며 per-contact critic 아님.</span></div></div>
+      <div class="ref-row" id="ref-28"><div class="ref-num">[28]</div><div class="ref-body">Chi et al., <span class="ref-title">Iterative Residual Policy (IRP)</span>, <span class="ref-venue">RSS 2022.</span> <span class="ref-arxiv">arXiv:2203.00663</span><span class="ref-note">delta-action → delta-effect 학습. effect 조건화의 방증.</span></div></div>
+      <div class="ref-row" id="ref-29"><div class="ref-num">[29]</div><div class="ref-body">Kuroki et al., <span class="ref-title">GenORM / GenDOM</span>, <span class="ref-venue">2023.</span> <span class="ref-arxiv">arXiv:2306.09872 / 2309.09051</span><span class="ref-note">물리 파라미터 조건화 + test-time 추정으로 cross-rope 일반화. 경쟁 baseline.</span></div></div>
+      <div class="ref-row" id="ref-30"><div class="ref-num">[30]</div><div class="ref-body"><span class="ref-title">HEPi</span>, <span class="ref-venue">2025.</span> <span class="ref-arxiv">arXiv:2502.07005</span><span class="ref-note">SE(3)-equivariant GNN policy의 unseen object 일반화.</span></div></div>
+      <div class="ref-row" id="ref-54"><div class="ref-num">[54]</div><div class="ref-body">Caporali et al., <span class="ref-title">DLO perception and manipulation survey</span>, <span class="ref-venue">IJRR 2026</span><span class="ref-note">per-point RL critic + deformation grounding의 부재 확인.</span></div></div>
+    </div>
+
+    <div class="ref-group-label">Group D</div>
+    <h4 class="ref-group">Modal/저차원 shape 표현 (Φ의 정당화)</h4>
+    <div class="ref-list">
+      <div class="ref-row" id="ref-31"><div class="ref-num">[31]</div><div class="ref-body">Yang et al., <span class="ref-title">Model-Free 3-D Shape Control Using Modal Analysis Features</span>, <span class="ref-venue">T-RO 2023.</span> <span class="ref-arxiv">arXiv:2207.01249</span><span class="ref-note">저주파 mode feature와 motion의 analytic 관계. Φ 선택의 물리적 근거. 단 single-grasp servoing에 한정 — discrete contact 선택·critic에는 미사용.</span></div></div>
+      <div class="ref-row" id="ref-32"><div class="ref-num">[32]</div><div class="ref-body">Navarro-Alarcon et al., <span class="ref-title">Uncalibrated Visual Deformation Servoing</span>, <span class="ref-venue">IJRR 2014</span><span class="ref-note">deformation feature 기반 제어의 원조.</span></div></div>
+    </div>
+
+    <div class="ref-group-label">Group E</div>
+    <h4 class="ref-group">RL representation: auxiliary · model-based value · transfer · probing</h4>
+    <div class="ref-list">
+      <div class="ref-row" id="ref-33"><div class="ref-num">[33]</div><div class="ref-body">Jaderberg et al., <span class="ref-title">UNREAL</span>, <span class="ref-venue">ICLR 2017.</span> <span class="ref-arxiv">arXiv:1611.05397</span><span class="ref-note">auxiliary task의 원조.</span></div></div>
+      <div class="ref-row" id="ref-34"><div class="ref-num">[34]</div><div class="ref-body">Schwarzer et al., <span class="ref-title">SPR</span>, <span class="ref-venue">ICLR 2021.</span> <span class="ref-arxiv">arXiv:2007.05929</span><span class="ref-note">latent self-prediction auxiliary의 표준.</span></div></div>
+      <div class="ref-row" id="ref-35"><div class="ref-num">[35]</div><div class="ref-body">Voelcker et al., <span class="ref-title">When does Self-Prediction help?</span>, <span class="ref-venue">RLC 2024.</span> <span class="ref-arxiv">arXiv:2406.17718</span><span class="ref-note">latent self-prediction + TD의 value-optimality 보존. V1의 이론적 배경 (본 연구의 정리가 아님).</span></div></div>
+      <div class="ref-row" id="ref-36"><div class="ref-num">[36]</div><div class="ref-body"><span class="ref-title">BYOL-AC</span>, <span class="ref-venue">2024.</span> <span class="ref-arxiv">arXiv:2406.02035</span><span class="ref-note">action-conditional self-prediction과 Q/advantage 구조의 이론.</span></div></div>
+      <div class="ref-row" id="ref-37"><div class="ref-num">[37]</div><div class="ref-body">Ni et al., <span class="ref-title">Bridging State and History Representations</span>, <span class="ref-venue">ICLR 2024.</span> <span class="ref-arxiv">arXiv:2401.08898</span></div></div>
+      <div class="ref-row" id="ref-38"><div class="ref-num">[38]</div><div class="ref-body">Tang et al., <span class="ref-title">Understanding Self-Predictive Learning for RL</span>, <span class="ref-venue">ICML 2023.</span> <span class="ref-arxiv">arXiv:2212.03319</span><span class="ref-note">collapse 방지 조건.</span></div></div>
+      <div class="ref-row" id="ref-39"><div class="ref-num">[39]</div><div class="ref-body">Oh et al., <span class="ref-title">Value Prediction Network</span>, <span class="ref-venue">NeurIPS 2017.</span> <span class="ref-arxiv">arXiv:1707.03497</span></div></div>
+      <div class="ref-row" id="ref-40"><div class="ref-num">[40]</div><div class="ref-body">Schrittwieser et al., <span class="ref-title">MuZero</span>, <span class="ref-venue">Nature 2020.</span> <span class="ref-arxiv">arXiv:1911.08265</span></div></div>
+      <div class="ref-row" id="ref-41"><div class="ref-num">[41]</div><div class="ref-body">Hansen et al., <span class="ref-title">TD-MPC2</span>, <span class="ref-venue">ICLR 2024.</span> <span class="ref-arxiv">arXiv:2310.16828</span><span class="ref-note">value-equivalent latent + planning. matched-dim 대조군의 배경.</span></div></div>
+      <div class="ref-row" id="ref-42"><div class="ref-num">[42]</div><div class="ref-body">Farahmand et al., <span class="ref-title">VAML / IterVAML</span>, <span class="ref-venue">AISTATS 2017 / NeurIPS 2018</span><span class="ref-note">decision-aware model learning. 본 연구는 이 원리로부터의 의도적 이탈.</span></div></div>
+      <div class="ref-row" id="ref-43"><div class="ref-num">[43]</div><div class="ref-body">Grimm et al., <span class="ref-title">The Value Equivalence Principle</span>, <span class="ref-venue">NeurIPS 2020.</span></div></div>
+      <div class="ref-row" id="ref-44"><div class="ref-num">[44]</div><div class="ref-body">Barreto et al., <span class="ref-title">Successor Features for Transfer in RL</span>, <span class="ref-venue">NeurIPS 2017.</span> <span class="ref-arxiv">arXiv:1606.05312</span><span class="ref-note">reward-변화 transfer. 본 연구의 dynamics-변화 축과 상보적 대비.</span></div></div>
+      <div class="ref-row" id="ref-45"><div class="ref-num">[45]</div><div class="ref-body">Touati, Ollivier, <span class="ref-title">Forward-Backward Representations</span>, <span class="ref-venue">NeurIPS 2021.</span> <span class="ref-arxiv">arXiv:2110.15701</span></div></div>
+      <div class="ref-row" id="ref-46"><div class="ref-num">[46]</div><div class="ref-body"><span class="ref-title">TD-JEPA</span>, <span class="ref-venue">2025.</span> <span class="ref-arxiv">arXiv:2510.00739</span><span class="ref-note">최신 zero-shot RL 계열.</span></div></div>
+      <div class="ref-row" id="ref-47"><div class="ref-num">[47]</div><div class="ref-body">Anand et al., <span class="ref-title">Unsupervised State Representation Learning in Atari (AtariARI)</span>, <span class="ref-venue">NeurIPS 2019.</span> <span class="ref-arxiv">arXiv:1906.08226</span><span class="ref-note">frozen-representation linear probing의 표준 프로토콜.</span></div></div>
+      <div class="ref-row" id="ref-48"><div class="ref-num">[48]</div><div class="ref-body">Zhang et al., <span class="ref-title">DBC</span>, <span class="ref-venue">ICLR 2021.</span> <span class="ref-arxiv">arXiv:2006.10742</span><span class="ref-note">bisimulation 기반 표현 (implicit metric 대안).</span></div></div>
+      <div class="ref-row" id="ref-49"><div class="ref-num">[49]</div><div class="ref-body">Castro et al., <span class="ref-title">MICo</span>, <span class="ref-venue">NeurIPS 2021.</span></div></div>
+      <div class="ref-row" id="ref-50"><div class="ref-num">[50]</div><div class="ref-body">Li, Walsh, Littman, <span class="ref-title">Towards a Unified Theory of State Abstraction for MDPs</span>, <span class="ref-venue">ISAIM 2006</span><span class="ref-note">assumption stack의 이론적 기반 (model-irrelevance abstraction).</span></div></div>
+      <div class="ref-row" id="ref-51"><div class="ref-num">[51]</div><div class="ref-body"><span class="ref-title">UniIntervene</span>, <span class="ref-venue">2026.</span> <span class="ref-arxiv">arXiv:2606.12372</span><span class="ref-note">action-conditioned consequence 예측 → value head. 구조적 최근접 이웃이나 consequence가 unsupervised VLA latent이며 기제 분석 없음 — 인용·구분 필수.</span></div></div>
+    </div>
+
+    <div class="ref-group-label">Group F</div>
+    <h4 class="ref-group">벤치마크 · 시뮬레이터 · 평가</h4>
+    <div class="ref-list">
+      <div class="ref-row" id="ref-52"><div class="ref-num">[52]</div><div class="ref-body">Lin et al., <span class="ref-title">SoftGym</span>, <span class="ref-venue">CoRL 2020.</span> <span class="ref-arxiv">arXiv:2011.07215</span></div></div>
+      <div class="ref-row" id="ref-53"><div class="ref-num">[53]</div><div class="ref-body">Chen et al., <span class="ref-title">DaXBench</span>, <span class="ref-venue">ICLR 2023.</span> <span class="ref-arxiv">arXiv:2210.13066</span><span class="ref-note">differentiable rope 벤치마크.</span></div></div>
+      <div class="ref-row" id="ref-55"><div class="ref-num">[55]</div><div class="ref-body">Agarwal et al., <span class="ref-title">Deep RL at the Edge of the Statistical Precipice (rliable)</span>, <span class="ref-venue">NeurIPS 2021</span><span class="ref-note">IQM·stratified bootstrap CI 평가 표준.</span></div></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div>
+      <div class="f-brand">DGCC — Deformation-Grounded Contact Critic</div>
+      <div class="f-meta" style="margin-top:8px;">가치 함수는 접촉 행동을 어떻게 표현해야 하는가에 대한 통제 연구.</div>
+    </div>
+    <div class="f-meta" style="text-align:right;">
+      <div>작성일 2026-07-02</div>
+      <div>Locus-VLA / DLO Contact Representation</div>
+    </div>
+  </div>
+</footer>
+
 </body>
 </html>
