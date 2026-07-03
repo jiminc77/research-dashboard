@@ -1,5 +1,7 @@
 # P0 — 환경·파일럿 명세 (요약)
 
+> **상태: 완료 (2026-07-03, HUMAN SIGN-OFF — DGCC issue #8).** 판정·확정 수치: [`docs/reports/P0_pilot_gates.md`](../reports/P0_pilot_gates.md) · 최종 보고: [`DGCC/outputs/reports/p0_final_report.md`](https://github.com/jiminc77/DGCC/blob/main/outputs/reports/p0_final_report.md). §8의 G2 정의는 게이트 중 사람 승인으로 **성분 분해 + correspondence L2**로 개정됨 (dashboard issue #17).
+
 **Canonical 명세: [`DGCC/P0.md`](https://github.com/jiminc77/DGCC/blob/main/P0.md)** — gjc(gajae-code)가 ralplan → ultragoal로 실행하는 brief. 이 문서는 대시보드용 요약이며, 충돌 시 canonical이 우선한다.
 
 ## 목적
