@@ -37,8 +37,10 @@
   body{
     margin:0; background:var(--canvas); color:var(--body);
     font-family:var(--sans); font-size:14px; font-weight:400; line-height:1.5;
-    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
-  }
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
   a{color:var(--text-link); text-decoration:none}
   a:hover{text-decoration:underline}
 
@@ -336,6 +338,8 @@ function phaseOf(issue){
 function isGateWaiting(issue){
   if(issue.state!=="open") return false;
   if(hasLabel(issue,"state:blocked-human")) return true;
+  // state 라벨이 하나라도 있으면 라벨을 신뢰 (텍스트 추정은 라벨 없는 구형 이슈 전용)
+  if((issue.labels||[]).some(x=>String(typeof x==="string"?x:x.name).startsWith("state:"))) return false;
   const hay = ((issue.title||"")+" "+(issue.body||"")).toLowerCase();
   return hay.includes("human_blocked") || hay.includes("human gate") || hay.includes("### gate request");
 }
