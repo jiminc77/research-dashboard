@@ -39,7 +39,7 @@ run() { # dry-run 지원 래퍼
 }
 
 # gh label create --force 는 존재 시 갱신(멱등). 실패해도 부트스트랩 계속.
-mklabel() { # repo name color desc
+mklabel() { # repo name color desc  (2026-07-06: 라이브 DGCC/RD 라벨 taxonomy와 정렬 — 재실행 시 --force가 라이브를 덮어써도 무손실)
   local repo="$1" name="$2" color="$3" desc="$4"
   if [[ "$DRY_RUN" == 1 ]]; then
     echo "  [dry-run] gh label create '$name' -R $repo --color $color --description '$desc' --force"
@@ -58,21 +58,21 @@ create_all_labels() {
   mklabel "$repo" "state:ready"          "cccccc" "착수 대기"
   mklabel "$repo" "state:running"        "1d76db" "gjc 구현 중"
   mklabel "$repo" "state:verify"         "8250df" "EVIDENCE 게시, CI 검증 대기"
-  mklabel "$repo" "state:done"           "0e8a16" "CI VERIFIED 후 완료"
+  mklabel "$repo" "state:done"           "0e8a16" "CI VERIFIED 후 close"
   mklabel "$repo" "state:blocked-human"  "d73a4a" "HUMAN GATE 대기"
   mklabel "$repo" "state:blocked-tech"   "d93f0b" "기술 블로커/3-strike/CI 실패"
   # type
-  mklabel "$repo" "type:dev"       "0052cc" "개발 작업 이슈"
-  mklabel "$repo" "type:gate"      "b60205" "HUMAN GATE 이슈"
-  mklabel "$repo" "type:decision"  "5319e7" "방향 전환 기록(사후 기준 변경 포함)"
-  mklabel "$repo" "type:milestone" "006b75" "단계 milestone 이슈"
+  mklabel "$repo" "type:dev"       "bfd4f2" "구현 이슈"
+  mklabel "$repo" "type:gate"      "e99695" "HUMAN GATE 이슈"
+  mklabel "$repo" "type:decision"  "fbca04" "기준 변경 등 결정 기록"
+  mklabel "$repo" "type:milestone" "c2e0c6" "단계 관리 이슈"
   # phase P0..P7
   local p
   for p in 0 1 2 3 4 5 6 7; do
-    mklabel "$repo" "phase:P${p}" "fbca04" "단계 P${p}"
+    mklabel "$repo" "phase:P${p}" "c5def5" "단계 P${p}"
   done
   # proj (공용 MGMT 구분)
-  mklabel "$repo" "proj:${PROJECT}" "c5def5" "프로젝트 ${PROJECT}"
+  mklabel "$repo" "proj:${PROJECT}" "d4c5f9" "프로젝트 ${PROJECT}"
 }
 
 create_all_labels "$MGMT"
