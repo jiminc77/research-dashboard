@@ -1,0 +1,13 @@
+# research-ops 프로젝트 설정 — 세션 A/B와 단계 전환이 읽는 진실
+project: "{PROJECT}"
+owner: "{OWNER}"
+mgmt_repo: "{MGMT_REPO}"
+code_repo: "{CODE_REPO}"
+phases: "{P0:이름,P1:이름,...}"
+ssh_host: "{SSH_HOST}"
+workdir: "{WORKDIR}"
+gjc:
+  main_models: "{MODEL_MAIN}"    # default/planner/architect
+  exec_models: "{MODEL_EXEC}"    # executor/critic
+ntfy_topic_name: "NTFY_TOPIC"    # 값은 secret에만 둔다 — 여기엔 적지 않는다
+dashboard_title_prefix: "[{PROJECT}] "
