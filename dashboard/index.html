@@ -4,96 +4,260 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>research-ops · live dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  /* self-contained, 외부 의존 없음, 시스템 폰트 */
+  /* ===== Anthropic "warm editorial" design system — visual only ===== */
   :root{
-    --bg:#0d1117; --panel:#161b22; --panel2:#1c2230; --border:#30363d;
-    --fg:#e6edf3; --muted:#8b949e; --dim:#6e7681;
-    --ready:#8b949e; --running:#3b82f6; --verify:#a371f7; --done:#3fb950;
-    --human:#f85149; --tech:#d29922; --bar:#238636; --barbg:#21262d;
-    --chip:#21262d;
+    /* surfaces */
+    --canvas:#faf9f5; --surface-soft:#f5f0e8; --surface-card:#efe9de; --surface-cream-strong:#e8e0d2;
+    --surface-dark:#181715; --surface-dark-elevated:#252320; --surface-dark-soft:#1f1e1b;
+    /* text */
+    --ink:#141413; --body:#3d3d3a; --body-strong:#252523; --muted:#6c6a64; --muted-soft:#8e8b82;
+    --on-dark:#faf9f5; --on-dark-soft:#a09d96; --on-primary:#ffffff;
+    /* lines */
+    --hairline:#e6dfd8; --hairline-soft:#ebe6df; --hairline-dark:#2f2c28;
+    /* brand + accents */
+    --coral:#cc785c; --coral-active:#a9583e; --coral-disabled:#e6dfd8;
+    --teal:#5db8a6; --amber:#e8a55a;
+    /* semantic */
+    --success:#5db872; --warning:#d4a017; --error:#c64545;
+    /* status dots (mapped to editorial palette) */
+    --st-human:#c64545; --st-tech:#d4a017; --st-running:#e8a55a; --st-verify:#5db8a6; --st-done:#5db872;
+    /* fonts */
+    --serif:"Cormorant Garamond", "Tiempos Headline", Garamond, "Times New Roman", serif;
+    --sans:"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    --mono:"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--fg);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
-    font-size:14px;line-height:1.5}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(13,17,23,.85));
-    border-bottom:1px solid var(--border);padding:14px 20px;backdrop-filter:blur(6px)}
-  .top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-  h1{font-size:16px;margin:0;font-weight:650;letter-spacing:.2px}
-  h1 .v{color:var(--dim);font-weight:400;font-size:12px}
-  select,button{background:var(--panel2);color:var(--fg);border:1px solid var(--border);
-    border-radius:7px;padding:6px 10px;font:inherit;cursor:pointer}
-  button:hover,select:hover{border-color:#484f58}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--canvas); color:var(--body);
+    font-family:var(--sans); font-size:14px; line-height:1.55;
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  }
+
+  /* ===== Header ===== */
+  header{
+    position:sticky; top:0; z-index:5;
+    background:var(--canvas); border-bottom:1px solid var(--hairline);
+    padding:18px 32px 20px;
+  }
+  .top{display:flex; align-items:center; gap:16px; flex-wrap:wrap}
+  .brand{display:flex; align-items:center; gap:10px; min-width:0}
+  .spike{width:20px; height:20px; flex:none; color:var(--coral)}
+  .wordmark{font-family:var(--sans); font-size:15px; font-weight:600; letter-spacing:-.01em; color:var(--ink); white-space:nowrap}
+  .wordmark .sub{color:var(--muted-soft); font-weight:500; margin-left:8px; font-size:12px; letter-spacing:.02em}
   .spacer{flex:1}
-  .badge{font-size:11px;color:var(--muted);padding:3px 8px;border:1px solid var(--border);
-    border-radius:999px;background:var(--chip)}
-  .badge.warn{color:#f0b429;border-color:#5c4813}
-  .badge.err{color:var(--human);border-color:#5c1a1a}
-  main{max-width:1080px;margin:0 auto;padding:18px 20px 60px}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+  select{
+    background:var(--canvas); color:var(--ink); border:1px solid var(--hairline);
+    border-radius:8px; padding:8px 32px 8px 12px; font:inherit; font-weight:500; cursor:pointer;
+    appearance:none; -webkit-appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%236c6a64' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-repeat:no-repeat; background-position:right 12px center;
+  }
+  select:hover{border-color:var(--muted-soft)}
+  select:focus-visible{outline:none; border-color:var(--coral); box-shadow:0 0 0 3px rgba(204,120,92,.15)}
+
+  .guide-link{
+    font-size:14px; font-weight:500; color:var(--coral); text-decoration:none; white-space:nowrap;
+  }
+  .guide-link:hover{text-decoration:underline}
+
+  button#refreshBtn{
+    background:var(--coral); color:var(--on-primary); border:none;
+    border-radius:8px; padding:9px 18px; font:inherit; font-weight:500; cursor:pointer;
+    letter-spacing:.01em; line-height:1;
+  }
+  button#refreshBtn:hover{background:var(--coral-active)}
+  button#refreshBtn:active{background:var(--coral-active)}
+  button#refreshBtn:focus-visible{outline:none; box-shadow:0 0 0 3px rgba(204,120,92,.3)}
+
+  .badge{
+    font-family:var(--mono); font-size:11px; color:var(--muted); padding:4px 10px;
+    border:1px solid var(--hairline); border-radius:9999px; background:var(--surface-card);
+    white-space:nowrap; letter-spacing:.01em;
+  }
+  .badge.warn{color:var(--warning); border-color:#e5d3a0; background:#f6efdc}
+  .badge.err{color:var(--error); border-color:#e5bcbc; background:#f6e5e5}
+
+  /* Big serif title + overall progress band */
+  .titleband{margin-top:18px; max-width:1120px}
+  h1.display{
+    font-family:var(--serif); font-weight:600; font-size:40px; line-height:1.08;
+    letter-spacing:-.02em; color:var(--ink); margin:0;
+  }
+  h1.display .accent{color:var(--coral)}
+  .hprog{display:flex; align-items:center; gap:14px; margin-top:16px; max-width:560px; flex-wrap:wrap}
+  .hprog .phaseNow{
+    font-family:var(--mono); font-size:12px; font-weight:500; color:var(--ink);
+    background:var(--surface-card); border:1px solid var(--hairline); border-radius:9999px;
+    padding:4px 12px; white-space:nowrap;
+  }
+  .hprog .pbar{height:10px; flex:1; min-width:160px}
+  .hprog .frac{font-family:var(--mono); font-size:12px; color:var(--muted); white-space:nowrap; font-weight:500}
+
+  .legend{display:flex; gap:16px; flex-wrap:wrap; font-size:12px; color:var(--muted); margin-top:16px; font-weight:500}
+  .legend span{display:flex; align-items:center; gap:6px}
+
+  /* ===== Progress bars (shared) ===== */
+  .pbar{background:var(--surface-cream-strong); border-radius:9999px; overflow:hidden; height:8px}
+  .pbar > i{display:block; height:100%; background:var(--coral); border-radius:9999px}
+
+  /* ===== Layout ===== */
+  main{max-width:1120px; margin:0 auto; padding:36px 32px 72px}
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:20px}
   @media(max-width:820px){.grid{grid-template-columns:1fr}}
-  .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:16px}
-  .card h2{font-size:13px;margin:0 0 10px;font-weight:600;color:var(--fg);
-    display:flex;align-items:center;gap:8px}
-  .card h2 .n{color:var(--dim);font-weight:400}
-  .row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--border)}
+
+  /* ===== Cards ===== */
+  .card{
+    background:var(--canvas); border:1px solid var(--hairline); border-radius:12px;
+    padding:24px 28px; margin-bottom:24px;
+  }
+  .card.soft{background:var(--surface-card); border-color:transparent}
+  /* dark navy container for gate-waiting — the attention pacing surface */
+  .card.dark{
+    background:var(--surface-dark); border-color:transparent; color:var(--on-dark);
+  }
+
+  .card h2{
+    font-family:var(--serif); font-weight:600; font-size:24px; line-height:1.2; letter-spacing:-.015em;
+    margin:0 0 18px; color:var(--ink); display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;
+  }
+  .card.dark h2{color:var(--on-dark)}
+  .card h2 .n{font-family:var(--mono); font-size:13px; font-weight:500; letter-spacing:0; color:var(--muted)}
+  .card.dark h2 .n{color:var(--on-dark-soft)}
+  /* coral count badge for gate-waiting */
+  .card h2 .n.coral{
+    background:var(--coral); color:var(--on-primary); border-radius:9999px;
+    padding:3px 11px; font-size:11px; letter-spacing:.02em; align-self:center;
+  }
+
+  /* ===== Issue rows ===== */
+  .row{
+    display:flex; align-items:center; gap:12px; padding:11px 0;
+    border-top:1px solid var(--hairline);
+  }
   .row:first-of-type{border-top:none}
-  a{color:#58a6ff;text-decoration:none}
+  .card.dark .row{border-top-color:var(--hairline-dark)}
+
+  .num{
+    font-family:var(--mono); font-size:13px; color:var(--muted); font-weight:500;
+    min-width:46px; flex:none;
+  }
+  .card.dark .num{color:var(--on-dark-soft)}
+
+  a{color:var(--coral); text-decoration:none}
   a:hover{text-decoration:underline}
-  .num{color:var(--dim);font-variant-numeric:tabular-nums;min-width:42px}
-  .title{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .age{font-variant-numeric:tabular-nums;font-size:12px;color:var(--muted);white-space:nowrap}
-  .age.hot{color:var(--human);font-weight:650}
-  .chip{font-size:11px;padding:2px 7px;border-radius:999px;background:var(--chip);color:var(--muted);white-space:nowrap}
-  .chip.human{background:rgba(248,81,73,.15);color:#ff7b72}
-  .chip.stale{background:rgba(210,153,34,.15);color:#e3b341}
-  .empty{color:var(--dim);padding:6px 0;font-style:italic}
-  /* progress bars */
-  .pbar{height:8px;background:var(--barbg);border-radius:6px;overflow:hidden;flex:1}
-  .pbar > i{display:block;height:100%;background:var(--bar)}
-  .phase-row{display:flex;align-items:center;gap:10px;padding:6px 0}
-  .phase-row .lbl{width:46px;color:var(--muted);font-variant-numeric:tabular-nums}
-  .phase-row .frac{width:64px;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums;font-size:12px}
-  /* header progress */
-  .hprog{display:flex;align-items:center;gap:10px;margin-top:8px;max-width:520px}
-  .hprog .pbar{height:10px}
-  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none}
-  .d-human{background:var(--human)} .d-running{background:var(--running)}
-  .d-verify{background:var(--verify)} .d-tech{background:var(--tech)} .d-done{background:var(--done)}
-  footer{color:var(--dim);font-size:12px;text-align:center;padding:20px}
-  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-top:6px}
-  .legend span{display:flex;align-items:center;gap:5px}
-  code{background:var(--panel2);padding:1px 5px;border-radius:5px;font-size:12px}
+  .title{
+    flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    color:var(--ink); font-size:14px; font-weight:400;
+  }
+  a.title{color:var(--ink)}
+  a.title:hover{color:var(--ink); text-decoration:underline}
+  .card.dark a.title, .card.dark .title{color:var(--on-dark)}
+  .card.dark a.title:hover{color:var(--on-dark)}
+
+  .age{font-family:var(--mono); font-size:12px; color:var(--muted); white-space:nowrap; flex:none; font-weight:500}
+  .age.hot{color:var(--error); font-weight:600}
+  .card.dark .age{color:var(--on-dark-soft)}
+  .card.dark .age.hot{color:#e88a8a}
+
+  /* chips */
+  .chip{
+    font-family:var(--sans); font-size:11px; font-weight:500; padding:3px 10px; border-radius:9999px;
+    background:var(--surface-card); color:var(--muted); white-space:nowrap; flex:none; letter-spacing:.01em;
+  }
+  .chip.human{background:#f6e5e5; color:var(--error)}
+  .chip.stale{background:#f6efdc; color:#b58810}
+  .card.dark .chip.human{background:rgba(198,69,69,.22); color:#e88a8a}
+
+  .empty{color:var(--muted-soft); padding:8px 0; font-style:italic; font-size:14px}
+  .card.dark .empty{color:var(--on-dark-soft)}
+
+  /* ===== Phase progress rows ===== */
+  .phase-row{display:flex; align-items:center; gap:14px; padding:9px 0}
+  .phase-row .lbl{
+    font-family:var(--mono); width:48px; color:var(--body); font-weight:500; flex:none; font-size:13px;
+  }
+  .phase-row .frac{
+    font-family:var(--mono); width:64px; text-align:right; color:var(--muted); font-size:12px; flex:none; font-weight:500;
+  }
+  .phase-row .pbar{flex:1}
+
+  /* ===== Status dots ===== */
+  .dot{width:9px; height:9px; border-radius:50%; display:inline-block; flex:none}
+  .d-human{background:var(--st-human)} .d-tech{background:var(--st-tech)}
+  .d-running{background:var(--st-running)} .d-verify{background:var(--st-verify)} .d-done{background:var(--st-done)}
+
+  /* ===== Footer ===== */
+  footer{
+    color:var(--muted-soft); font-size:13px; text-align:center; padding:32px 24px 40px;
+    border-top:1px solid var(--hairline); font-family:var(--sans);
+  }
+  footer .rate{font-family:var(--mono); font-size:12px}
+  code{
+    font-family:var(--mono); background:var(--surface-card); padding:1px 6px; border-radius:6px; font-size:12px; color:var(--ink);
+  }
+
+  @media(max-width:640px){
+    header{padding:14px 18px 16px}
+    main{padding:24px 18px 56px}
+    .card{padding:20px 18px}
+    h1.display{font-size:30px}
+    .card h2{font-size:21px}
+  }
 </style>
 </head>
 <body>
 <header>
   <div class="top">
-    <h1>research-ops <span class="v">live dashboard · v2</span></h1>
+    <div class="brand">
+      <!-- Anthropic-style radial spike mark -->
+      <svg class="spike" viewBox="0 0 24 24" aria-hidden="true">
+        <g fill="currentColor">
+          <path d="M12 1.5 L13.15 9.35 L12 12 L10.85 9.35 Z"/>
+          <path d="M12 22.5 L10.85 14.65 L12 12 L13.15 14.65 Z"/>
+          <path d="M1.5 12 L9.35 10.85 L12 12 L9.35 13.15 Z"/>
+          <path d="M22.5 12 L14.65 13.15 L12 12 L14.65 10.85 Z"/>
+          <path d="M4.57 4.57 L10.4 9.6 L12 12 L9.6 10.4 Z"/>
+          <path d="M19.43 19.43 L13.6 14.4 L12 12 L14.4 13.6 Z"/>
+          <path d="M19.43 4.57 L14.4 10.4 L12 12 L13.6 9.6 Z"/>
+          <path d="M4.57 19.43 L9.6 13.6 L12 12 L10.4 14.4 Z"/>
+        </g>
+      </svg>
+      <span class="wordmark">research-ops<span class="sub">live dashboard · v2</span></span>
+    </div>
     <select id="projSel" title="프로젝트 선택"></select>
+    <a class="guide-link" href="../guide/">사용 설명서</a>
     <span class="spacer"></span>
     <span class="badge" id="cacheBadge" hidden>cached</span>
     <span class="badge" id="rateBadge">rate –</span>
     <button id="refreshBtn">↻ 새로고침</button>
   </div>
-  <div class="hprog">
-    <span id="phaseNow" class="badge">phase –</span>
-    <div class="pbar"><i id="overallBar" style="width:0%"></i></div>
-    <span id="overallFrac" class="age">0/0</span>
-  </div>
-  <div class="legend">
-    <span><i class="dot d-human"></i>blocked-human</span>
-    <span><i class="dot d-tech"></i>blocked-tech</span>
-    <span><i class="dot d-running"></i>running</span>
-    <span><i class="dot d-verify"></i>verify</span>
-    <span><i class="dot d-done"></i>done</span>
+
+  <div class="titleband">
+    <h1 class="display">연구 워크플로 <span class="accent">현황</span></h1>
+    <div class="hprog">
+      <span id="phaseNow" class="phaseNow">phase –</span>
+      <div class="pbar"><i id="overallBar" style="width:0%"></i></div>
+      <span id="overallFrac" class="frac">0/0</span>
+    </div>
+    <div class="legend">
+      <span><i class="dot d-human"></i>blocked-human</span>
+      <span><i class="dot d-tech"></i>blocked-tech</span>
+      <span><i class="dot d-running"></i>running</span>
+      <span><i class="dot d-verify"></i>verify</span>
+      <span><i class="dot d-done"></i>done</span>
+    </div>
   </div>
 </header>
 
 <main>
-  <div class="card" id="gatesCard">
-    <h2>🔴 게이트 대기 <span class="n" id="gatesN"></span></h2>
+  <div class="card dark" id="gatesCard">
+    <h2>🔴 게이트 대기 <span class="n coral" id="gatesN" hidden></span></h2>
     <div id="gates"></div>
   </div>
 
@@ -108,7 +272,7 @@
     </div>
   </div>
 
-  <div class="card">
+  <div class="card soft">
     <h2>📊 phase별 진행</h2>
     <div id="phases"></div>
   </div>
@@ -242,7 +406,9 @@ function render(codeIssues, mgmtIssues, milestones, note){
   // 🔴 게이트 대기
   const gates = codeIssues.filter(isGateWaiting)
     .sort((a,b)=>new Date(a.updated_at)-new Date(b.updated_at)); // 오래된 것 위로
-  $("gatesN").textContent = gates.length ? `(${gates.length})` : "";
+  const gatesN = $("gatesN");
+  if(gates.length){ gatesN.textContent = `${gates.length}`; gatesN.hidden = false; }
+  else { gatesN.textContent = ""; gatesN.hidden = true; }
   if(gates.length){
     $("gates").innerHTML = gates.map(i=>{
       const h=hoursSince(i.updated_at); const hot=h>=6;
@@ -280,7 +446,7 @@ function render(codeIssues, mgmtIssues, milestones, note){
     const {done,total}=byPhase[p]; const pc=total?Math.round(done/total*100):0;
     return `<div class="phase-row">
       <span class="lbl">${p}</span>
-      <div class="pbar"><i style="width:${pc}%;background:${done===total?'var(--done)':'var(--running)'}"></i></div>
+      <div class="pbar"><i style="width:${pc}%;background:${done===total?'var(--success)':'var(--coral)'}"></i></div>
       <span class="frac">${done}/${total}</span>
     </div>`;
   }).join("") : `<div class="empty">phase 이슈 없음</div>`;
@@ -301,8 +467,8 @@ function render(codeIssues, mgmtIssues, milestones, note){
   // footer + badges
   $("rateBadge").textContent = "rate "+rateRemaining;
   $("cacheBadge").hidden = !note.fromCache;
-  $("foot").innerHTML = `마지막 갱신 ${new Date().toLocaleString('ko-KR')} · GitHub API 잔여 ${rateRemaining}`
-    + (note.rateLimited ? ` · <span style="color:var(--tech)">rate-limit — 캐시 표시 중</span>` : "");
+  $("foot").innerHTML = `<span class="rate">마지막 갱신 ${new Date().toLocaleString('ko-KR')} · GitHub API 잔여 ${rateRemaining}</span>`
+    + (note.rateLimited ? ` · <span style="color:var(--warning)">rate-limit — 캐시 표시 중</span>` : "");
 }
 
 /* ===== 로드 ===== */
@@ -322,7 +488,7 @@ async function load(){
     const mgmtIssues = (mgmtR.data||[]).filter(i=>!i.pull_request);
     render(codeIssues, mgmtIssues, milestones, {fromCache, rateLimited});
   } catch(e){
-    $("foot").innerHTML = `<span style="color:var(--human)">로드 실패: ${esc(String(e.message||e))}</span> · 새로고침 재시도`;
+    $("foot").innerHTML = `<span style="color:var(--error)">로드 실패: ${esc(String(e.message||e))}</span> · 새로고침 재시도`;
   }
 }
 
