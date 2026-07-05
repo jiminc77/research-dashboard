@@ -48,12 +48,12 @@ bash scripts/bootstrap_project.sh \
 - Settings → Pages → Branch `main` / 폴더 지정 → 활성화. `https://jiminc77.github.io/research-dashboard/dashboard/`에서 접속.
 - 무인증 공개 API만 쓰므로 토큰 불필요. 라벨 없는 기존 이슈도 제목 `[P{k}-M{n}]` regex로 잡힌다.
 
-**④ 진행 중 P1은 그대로, P2부턴 v2 본격 적용**
+**④ 진행 중 P1은 그대로, P2부터 v2 본격 적용**
 - P1은 지금 방식대로 마무리한다(라벨은 ①에서 생겼으니 원하면 손으로 붙여도 됨).
 - **P2 명세부터** `ORCHESTRATOR.md`(v2)와 신규 `templates/issue_dev.md`·`issue_gate.md`, `setup_phase.sh`(자동 backfill)를 적용한다.
 
 **⑤ 다음 프로젝트부터 풀 부트스트랩**
-- `--labels-only` 없이 `bootstrap_project.sh`를 돌려 띻벨 + phase별 GitHub milestone까지 일괄 생성.
+- `--labels-only` 없이 `bootstrap_project.sh`를 돌려 라벨 + phase별 GitHub milestone까지 일괄 생성.
 
 ---
 
@@ -92,7 +92,7 @@ bash scripts/status.sh jiminc77 <CODE_REPO> research-dashboard
 research-ops-v2/
   README.md                     # 이 문서 — 변경 요약·적용 순서·퀵스타트
   PROTOCOL.md                   # ★ 핵심 정형화 계약: 라벨 상태기계·GATE/EVIDENCE 스키마·사전등록
-  ORCHESTRATOR.md               # v2 세션 지시서 (v1 6-STEP + STEP 0 self-check + 띻벨 전이)
+  ORCHESTRATOR.md               # v2 세션 지시서 (v1 6-STEP + STEP 0 self-check + 라벨 전이)
   templates/
     issue_dev.md                # 자기완결형 dev 이슈 (AC·작업 체크리스트·EVIDENCE 참조)
     issue_gate.md               # GATE 이슈/댓글 템플릿 (hard/soft/VERDICT 예시)
