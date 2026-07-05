@@ -1,0 +1,760 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>research-ops 사용 설명서</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* ============ Expo design tokens ============ */
+  :root{
+    --primary:#000000; --primary-active:#1a1a1a;
+    --text-link:#0d74ce;
+    --ink:#171717; --body:#60646c; --body-strong:#171717;
+    --muted:#999999; --muted-soft:#cccccc;
+    --hairline:#f0f0f3; --hairline-soft:#f5f5f7; --hairline-strong:#dcdee0;
+    --canvas:#ffffff; --canvas-soft:#fafafa;
+    --surface-card:#ffffff; --surface-strong:#f0f0f3;
+    --surface-dark:#171717; --surface-dark-elevated:#1a1a1a;
+    --on-primary:#ffffff; --on-dark:#ffffff; --on-dark-soft:#b0b4ba;
+    --sky-light:#cfe7ff; --sky-mid:#a8c8e8;
+    --warning:#ab6400; --preview:#8145b5; --success:#16a34a; --error:#eb8e90;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    --mono:'JetBrains Mono','Fira Code',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--canvas);color:var(--body);
+    font-family:var(--sans);font-size:16px;line-height:1.5;font-weight:400;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  a{color:var(--text-link);text-decoration:none}
+  a:hover{text-decoration:underline}
+  code,kbd,pre{font-family:var(--mono)}
+
+  /* ============ layout ============ */
+  .wrap{max-width:1200px;margin:0 auto;padding:0 32px}
+  section{padding:96px 0}
+  section + section{border-top:1px solid var(--hairline)}
+  .sec-label{font-family:var(--sans);font-size:11px;font-weight:600;line-height:1.4;
+    letter-spacing:.88px;text-transform:uppercase;color:var(--muted);margin:0 0 14px}
+  h2.sec{font-family:var(--sans);font-size:36px;font-weight:600;line-height:1.15;
+    letter-spacing:-1.08px;color:var(--ink);margin:0 0 12px}
+  .sec-sub{font-size:16px;color:var(--body);max-width:720px;margin:0 0 40px}
+  h3.sub{font-family:var(--sans);font-size:22px;font-weight:600;line-height:1.25;
+    letter-spacing:-.5px;color:var(--ink);margin:44px 0 16px}
+
+  /* ============ top nav ============ */
+  header.nav{position:sticky;top:0;z-index:40;height:64px;background:rgba(255,255,255,.9);
+    backdrop-filter:saturate(180%) blur(12px);border-bottom:1px solid var(--hairline)}
+  .nav-inner{max-width:1200px;margin:0 auto;height:64px;padding:0 32px;
+    display:flex;align-items:center;gap:24px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:600;color:var(--ink);
+    font-size:16px;letter-spacing:-.2px}
+  .brand .glyph{flex:none}
+  .brand code{font-family:var(--mono);font-size:15px;font-weight:600}
+  .nav-menu{display:flex;gap:4px;margin-left:12px;overflow-x:auto}
+  .nav-menu a{font-family:var(--sans);font-size:14px;font-weight:500;color:var(--body);
+    padding:6px 10px;border-radius:6px;white-space:nowrap}
+  .nav-menu a:hover{color:var(--ink);background:var(--surface-strong);text-decoration:none}
+  .nav-spacer{flex:1}
+  .nav-cta{display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 18px;
+    background:var(--primary);color:var(--on-primary);border-radius:8px;
+    font-family:var(--sans);font-size:14px;font-weight:500;white-space:nowrap}
+  .nav-cta:hover{background:var(--primary-active);text-decoration:none}
+  @media(max-width:920px){.nav-menu{display:none}}
+
+  /* ============ hero ============ */
+  .hero{position:relative;overflow:hidden;padding:112px 0 96px;border-bottom:1px solid var(--hairline)}
+  .hero::before{content:"";position:absolute;inset:-20% -10% auto -10%;height:620px;z-index:0;
+    background:
+      radial-gradient(1100px 520px at 50% -8%, var(--sky-light) 0%, rgba(207,231,255,.55) 34%, rgba(168,200,232,.22) 60%, rgba(255,255,255,0) 78%);
+    pointer-events:none}
+  .hero-inner{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 32px}
+  .hero .pill{display:inline-block;background:var(--surface-strong);color:var(--ink);
+    font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.88px;text-transform:uppercase;
+    padding:5px 12px;border-radius:9999px;margin-bottom:24px}
+  h1.mega{font-family:var(--sans);font-size:64px;font-weight:600;line-height:1.05;
+    letter-spacing:-1.92px;color:var(--ink);margin:0 0 24px;max-width:15ch}
+  .hero-sub{font-size:18px;line-height:1.55;color:var(--body);max-width:640px;margin:0 0 36px}
+  .hero-cta-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .btn-primary{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 22px;
+    background:var(--primary);color:var(--on-primary);border-radius:8px;
+    font-family:var(--sans);font-size:15px;font-weight:500}
+  .btn-primary:hover{background:var(--primary-active);text-decoration:none}
+  .btn-secondary{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 20px;
+    background:var(--surface-card);color:var(--ink);border:1px solid var(--hairline-strong);
+    border-radius:8px;font-family:var(--sans);font-size:15px;font-weight:500}
+  .btn-secondary:hover{border-color:var(--muted);text-decoration:none}
+  .btn-primary code,.btn-secondary code{font-family:var(--mono);font-size:13px}
+
+  /* ============ cards ============ */
+  .card{background:var(--surface-card);border:1px solid var(--hairline-strong);
+    border-radius:12px;padding:24px}
+  .card-dark{background:var(--surface-dark);color:var(--on-dark);border:none;
+    border-radius:12px;padding:24px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  @media(max-width:960px){.grid-3,.grid-4{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:640px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
+
+  .role-card .role-badge{display:inline-block;background:var(--surface-strong);color:var(--ink);
+    font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.88px;text-transform:uppercase;
+    padding:4px 10px;border-radius:9999px;margin-bottom:14px}
+  .role-card h4{font-family:var(--sans);font-size:18px;font-weight:600;color:var(--ink);
+    margin:0 0 8px;letter-spacing:-.2px}
+  .role-card p{font-size:14px;line-height:1.55;color:var(--body);margin:0}
+  .role-card ul{margin:8px 0 0;padding-left:18px}
+  .role-card li{font-size:14px;line-height:1.6;color:var(--body);margin:2px 0}
+
+  .repo-card h4{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--ink);margin:0 0 4px}
+  .repo-card .repo-tag{font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.88px;
+    text-transform:uppercase;color:var(--muted);display:block;margin-bottom:10px}
+  .repo-card p{font-size:14px;line-height:1.55;color:var(--body);margin:0}
+  .repo-card ul{margin:10px 0 0;padding-left:18px}
+  .repo-card li{font-size:14px;line-height:1.6;color:var(--body);margin:2px 0}
+  .repo-card li code{font-family:var(--mono);font-size:12.5px;background:var(--surface-strong);
+    padding:1px 5px;border-radius:4px;color:var(--ink)}
+
+  /* ============ inline code + prose ============ */
+  p{margin:0 0 16px}
+  .prose{max-width:820px}
+  .prose p{font-size:16px;line-height:1.6;color:var(--body)}
+  .prose strong{color:var(--ink);font-weight:600}
+  :not(pre) > code{font-family:var(--mono);font-size:.86em;background:var(--surface-strong);
+    color:var(--ink);padding:1.5px 6px;border-radius:4px}
+
+  /* ============ tables ============ */
+  .table-wrap{border:1px solid var(--hairline-strong);border-radius:12px;overflow:hidden;overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:14px;background:var(--surface-card)}
+  thead th{text-align:left;font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.88px;
+    text-transform:uppercase;color:var(--muted);padding:12px 16px;background:var(--canvas-soft);
+    border-bottom:1px solid var(--hairline-strong);white-space:nowrap}
+  tbody td{padding:12px 16px;border-top:1px solid var(--hairline);color:var(--body);vertical-align:top;line-height:1.5}
+  tbody tr:first-child td{border-top:none}
+  td code, th code{font-family:var(--mono);font-size:12.5px;background:var(--surface-strong);
+    padding:1.5px 6px;border-radius:4px;color:var(--ink);white-space:nowrap}
+  td strong{color:var(--ink);font-weight:600}
+  .state-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:middle;flex:none}
+  .sw{display:inline-flex;align-items:center}
+  /* label state colors mirrored from bootstrap */
+  .c-ready{background:#cccccc} .c-running{background:#1d76db} .c-verify{background:#8250df}
+  .c-done{background:#0e8a16} .c-human{background:#d73a4a} .c-tech{background:#d93f0b}
+  .who{font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;
+    padding:2px 8px;border-radius:9999px;background:var(--surface-strong);color:var(--ink);white-space:nowrap}
+
+  /* ============ dark code block + copy ============ */
+  .code{position:relative;background:var(--surface-dark);border-radius:12px;margin:0 0 20px}
+  .code-head{display:flex;align-items:center;justify-content:space-between;
+    padding:12px 16px 10px;border-bottom:1px solid rgba(255,255,255,.08)}
+  .code-title{font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.88px;
+    text-transform:uppercase;color:var(--on-dark-soft)}
+  .copy-btn{display:inline-flex;align-items:center;gap:6px;background:var(--surface-dark-elevated);
+    color:var(--on-dark);border:1px solid rgba(255,255,255,.14);border-radius:6px;
+    font-family:var(--sans);font-size:12px;font-weight:500;padding:5px 11px;cursor:pointer;
+    transition:background .12s,border-color .12s}
+  .copy-btn:hover{background:#242424;border-color:rgba(255,255,255,.28)}
+  .copy-btn.done{color:#7ee2a8;border-color:rgba(126,226,168,.4)}
+  .code pre{margin:0;padding:18px 20px 20px;overflow-x:auto}
+  .code code{font-family:var(--mono);font-size:13px;line-height:1.65;color:var(--on-dark);
+    white-space:pre;display:block}
+  .code .cm{color:#8b9198}
+  .code .kw{color:#79c0ff}
+
+  /* ============ workflow step cards ============ */
+  .steps{display:flex;flex-direction:column;gap:12px;margin:0 0 28px}
+  .step{display:flex;gap:16px;background:var(--surface-card);border:1px solid var(--hairline-strong);
+    border-radius:12px;padding:20px}
+  .step-plate{flex:none;width:32px;height:32px;border-radius:8px;background:var(--surface-strong);
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--mono);font-size:14px;font-weight:700;color:var(--ink)}
+  .step-body h4{font-family:var(--sans);font-size:16px;font-weight:600;color:var(--ink);margin:0 0 4px;letter-spacing:-.1px}
+  .step-body p{font-size:14px;line-height:1.55;color:var(--body);margin:0}
+  .step-body code{font-family:var(--mono);font-size:12.5px;background:var(--surface-strong);
+    padding:1.5px 5px;border-radius:4px;color:var(--ink)}
+
+  /* ============ callout ============ */
+  .callout{display:flex;gap:12px;background:var(--canvas-soft);border:1px solid var(--hairline-strong);
+    border-left:3px solid var(--primary);border-radius:8px;padding:16px 18px;margin:0 0 24px}
+  .callout .ico{flex:none;font-family:var(--mono);font-weight:700;color:var(--ink)}
+  .callout p{margin:0;font-size:14.5px;line-height:1.55;color:var(--body)}
+  .callout strong{color:var(--ink)}
+
+  /* ============ diff / compare table ============ */
+  .note{font-size:13px;color:var(--muted);margin-top:8px}
+
+  /* ============ FAQ ============ */
+  .faq-item{border:1px solid var(--hairline-strong);border-radius:12px;padding:20px 24px;margin-bottom:12px;background:var(--surface-card)}
+  .faq-item h4{font-family:var(--sans);font-size:16px;font-weight:600;color:var(--ink);margin:0 0 8px;letter-spacing:-.1px}
+  .faq-item p{font-size:14.5px;line-height:1.6;color:var(--body);margin:0}
+  .faq-item code{font-family:var(--mono);font-size:12.5px;background:var(--surface-strong);padding:1.5px 5px;border-radius:4px;color:var(--ink)}
+
+  /* ============ footer ============ */
+  footer.foot{border-top:1px solid var(--hairline);padding:64px 0}
+  .foot-grid{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap}
+  .foot h5{font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.88px;text-transform:uppercase;
+    color:var(--muted);margin:0 0 14px}
+  .foot-links{display:flex;flex-direction:column;gap:9px}
+  .foot-links a{font-size:14px;color:var(--body)}
+  .foot-links a code{font-family:var(--mono);font-size:12.5px}
+  .foot-note{font-size:13px;color:var(--muted);margin-top:8px;max-width:420px;line-height:1.5}
+  .foot .brand-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .foot .brand-row code{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--ink)}
+
+  /* ============ misc helpers ============ */
+  .lede{font-size:16px;line-height:1.6;color:var(--body);max-width:820px;margin:0 0 24px}
+  .lede strong{color:var(--ink);font-weight:600}
+  .schema-cap{font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.88px;text-transform:uppercase;color:var(--muted);margin:26px 0 10px}
+
+  @media(max-width:640px){
+    .wrap,.hero-inner,.nav-inner{padding-left:20px;padding-right:20px}
+    section{padding:64px 0}
+    h1.mega{font-size:32px;letter-spacing:-1px}
+    h2.sec{font-size:28px;letter-spacing:-.84px}
+    .hero{padding:88px 0 64px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== TOP NAV ===================== -->
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="#top" aria-label="research-ops">
+      <svg class="glyph" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <g stroke="#171717" stroke-width="1.6" stroke-linecap="round">
+          <path d="M10 2.5v15M2.5 10h15M4.4 4.4l11.2 11.2M15.6 4.4L4.4 15.6"/>
+        </g>
+      </svg>
+      <code>research-ops</code>
+    </a>
+    <nav class="nav-menu">
+      <a href="#overview">시스템</a>
+      <a href="#labels">상태 라벨</a>
+      <a href="#milestones">마일스톤</a>
+      <a href="#case-a">새 연구</a>
+      <a href="#case-b">새 단계</a>
+      <a href="#case-c">재개</a>
+      <a href="#gate">게이트</a>
+      <a href="#ntfy">알림</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <span class="nav-spacer"></span>
+    <a class="nav-cta" href="https://jiminc77.github.io/research-dashboard/dashboard/" target="_blank" rel="noopener">대시보드 열기 &rarr;</a>
+  </div>
+</header>
+
+<!-- ===================== HERO ===================== -->
+<div id="top"></div>
+<section class="hero">
+  <div class="hero-inner">
+    <span class="pill">GitHub 연구 오케스트레이션 키트</span>
+    <h1 class="mega">세션 실행 지시서 하나로 굴러가는 연구 오케스트레이션</h1>
+    <p class="hero-sub">
+      상태는 <strong style="color:var(--ink);font-weight:600">라벨</strong>로, 증거는 <strong style="color:var(--ink);font-weight:600">스키마</strong>로, 게이트는 <strong style="color:var(--ink);font-weight:600">사전등록</strong>으로.
+      오케스트레이터 세션에 프롬프트 하나를 붙이면 계획·명세·이슈 생성부터 CI 검증·게이트 알림까지 GitHub 위에서 자동으로 돈다. 인프라는 gh CLI · GitHub Actions · ntfy.sh · 클라이언트 대시보드 — 서버 제로.
+    </p>
+    <div class="hero-cta-row">
+      <a class="btn-primary" href="https://jiminc77.github.io/research-dashboard/dashboard/" target="_blank" rel="noopener">대시보드로 가기 &rarr;</a>
+      <a class="btn-secondary" href="#case-a">새 연구 시작하기</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== §1 시스템 한눈에 ===================== -->
+<section id="overview" class="wrap">
+  <p class="sec-label">§1 · 시스템 한눈에</p>
+  <h2 class="sec">역할 넷과 레포 둘</h2>
+  <p class="sec-sub">한 사람이 굴리는 연구를 네 주체가 나눠 맡는다. 사람은 판정과 승인만, 나머지는 에이전트와 자동화가 처리한다.</p>
+
+  <div class="grid-4">
+    <div class="card role-card">
+      <span class="role-badge">오케스트레이터</span>
+      <h4>계획 · 명세 · 이슈</h4>
+      <p>세션을 지휘하는 에이전트. 코드는 짜지 않는다.</p>
+      <ul>
+        <li>계획서 보강 · 정형화</li>
+        <li>단계 명세 <code>P{k}.md</code> 작성</li>
+        <li>dev 이슈 생성 · 검증</li>
+      </ul>
+    </div>
+    <div class="card role-card">
+      <span class="role-badge">gjc</span>
+      <h4>구현 · evidence</h4>
+      <p>명세를 받아 실제 코드를 구현하는 실행자.</p>
+      <ul>
+        <li>이슈 착수 · 코드 작성</li>
+        <li><code>### EVIDENCE</code> 게시</li>
+        <li>라벨 전이 · PROGRESS 갱신</li>
+      </ul>
+    </div>
+    <div class="card role-card">
+      <span class="role-badge">사람</span>
+      <h4>GATE VERDICT · 승인</h4>
+      <p>분기점에서만 개입하는 최종 판정자.</p>
+      <ul>
+        <li>HUMAN GATE 판정</li>
+        <li>단계 완료 승인</li>
+        <li>모호성 결정 · 토큰 제공</li>
+      </ul>
+    </div>
+    <div class="card role-card">
+      <span class="role-badge">Actions</span>
+      <h4>알림 · CI · 자동채택</h4>
+      <p>사람 손 없이 도는 GitHub Actions 자동화.</p>
+      <ul>
+        <li>게이트 ntfy 푸시 · 리마인더</li>
+        <li>EVIDENCE SHA 재검증</li>
+        <li>soft default 자동 채택</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="sub">두 레포 구조</h3>
+  <div class="grid-2">
+    <div class="card repo-card">
+      <span class="repo-tag">MGMT 레포</span>
+      <h4>research-dashboard</h4>
+      <p>연구 흐름과 지식이 쌓이는 관리 레포. 라이브 대시보드가 여기서 호스팅된다.</p>
+      <ul>
+        <li>계획서 · 리포트 문서 (<code>docs/</code>)</li>
+        <li><code>[Milestone]</code> · <code>[Decision]</code> 이슈</li>
+        <li>라이브 대시보드 (<code>dashboard/</code>, GitHub Pages)</li>
+      </ul>
+    </div>
+    <div class="card repo-card">
+      <span class="repo-tag">CODE 레포</span>
+      <h4>{CODE_REPO}</h4>
+      <p>실제 구현이 일어나는 코드 레포. 상태기계와 CI 워크플로가 여기서 돈다.</p>
+      <ul>
+        <li>코드 · 단계 명세 <code>P{k}.md</code></li>
+        <li>dev 이슈 (<code>state:*</code> 라벨)</li>
+        <li>워크플로 (<code>gate-notify</code> · <code>evidence-verify</code>)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== §2 상태 라벨 ===================== -->
+<section id="labels" class="wrap">
+  <p class="sec-label">§2 · 상태 라벨</p>
+  <h2 class="sec">18종의 라벨이 곧 진실</h2>
+  <p class="sec-sub">별도 상태 파일은 없다. GitHub 라벨이 유일한 기계 판독 진실이며, 대시보드와 자동화는 이 라벨만 읽는다.</p>
+
+  <h3 class="sub">state — 6종 (이슈당 정확히 1개)</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>state 라벨</th><th>색상</th><th>의미</th><th>다음 전이 주체</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="sw"><span class="state-dot c-ready"></span><code>state:ready</code></span></td>
+          <td>회색</td>
+          <td>착수 대기 (이슈 생성 직후 기본, soft default 채택 후)</td>
+          <td><span class="who">gjc</span></td>
+        </tr>
+        <tr>
+          <td><span class="sw"><span class="state-dot c-running"></span><code>state:running</code></span></td>
+          <td>파랑</td>
+          <td>gjc 구현 중</td>
+          <td><span class="who">gjc</span></td>
+        </tr>
+        <tr>
+          <td><span class="sw"><span class="state-dot c-verify"></span><code>state:verify</code></span></td>
+          <td>보라</td>
+          <td>EVIDENCE 게시됨, CI 검증 대기</td>
+          <td><span class="who">Actions</span></td>
+        </tr>
+        <tr>
+          <td><span class="sw"><span class="state-dot c-done"></span><code>state:done</code></span></td>
+          <td>초록</td>
+          <td>CI VERIFIED ✅ 후 완료 · close</td>
+          <td><span class="who">—</span></td>
+        </tr>
+        <tr>
+          <td><span class="sw"><span class="state-dot c-human"></span><code>state:blocked-human</code></span></td>
+          <td>빨강</td>
+          <td>HUMAN GATE 대기 (분기)</td>
+          <td><span class="who">사람</span></td>
+        </tr>
+        <tr>
+          <td><span class="sw"><span class="state-dot c-tech"></span><code>state:blocked-tech</code></span></td>
+          <td>주황</td>
+          <td>기술 블로커 · 3-strike · CI 실패 (분기)</td>
+          <td><span class="who">gjc</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout" style="margin-top:16px">
+    <span class="ico">!</span>
+    <p><strong>단일 state 규칙:</strong> dev 이슈는 항상 <code>state:*</code> 라벨을 <strong>정확히 1개</strong> 보유한다. 0개거나 2개 이상이면 대시보드가 이상으로 표시한다.</p>
+  </div>
+
+  <h3 class="sub">type — 4종 · phase — 8종 (state와 병존)</h3>
+  <div class="grid-2">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>type 라벨</th><th>이슈 종류</th></tr></thead>
+        <tbody>
+          <tr><td><code>type:dev</code></td><td>구현 작업 이슈</td></tr>
+          <tr><td><code>type:gate</code></td><td>HUMAN GATE 이슈</td></tr>
+          <tr><td><code>type:decision</code></td><td>MGMT 기준 변경 결정</td></tr>
+          <tr><td><code>type:milestone</code></td><td>MGMT 단계 마일스톤</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>phase 라벨</th><th>의미</th></tr></thead>
+        <tbody>
+          <tr><td><code>phase:P0</code> … <code>phase:P7</code></td><td>이슈가 소속된 단계 (P0–P7)</td></tr>
+          <tr><td colspan="2" style="color:var(--muted)">각 이슈는 소속 단계 phase 라벨 1개를 붙여 대시보드의 단계별 진행률로 집계된다.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== §3 마일스톤 ===================== -->
+<section id="milestones" class="wrap">
+  <p class="sec-label">§3 · GitHub 마일스톤</p>
+  <h2 class="sec">제목 접두어와 네이티브 마일스톤은 다르다</h2>
+  <div class="prose">
+    <p>
+      이슈 제목의 <code>[P2-M1]</code> 접두어는 <strong>사람 눈을 위한 관례</strong>일 뿐이다. 반면 <strong>GitHub 네이티브 milestone</strong>은 이슈들을 단계로 묶어 <code>done/total</code> 진행률을 GitHub이 <strong>자동으로 계산·필터</strong>해 주는 기능이다. 둘은 별개다 — 하나는 텍스트, 하나는 실제 집계.
+    </p>
+    <p>
+      <code>setup_phase.sh</code>가 dev 이슈를 생성할 때 해당 milestone에 <strong>자동으로 연결</strong>하므로, 손으로 이슈를 마일스톤에 넣을 필요가 없다. 그 결과 GitHub의 Milestones 화면에서 각 단계의 진행률이 바로 보인다.
+    </p>
+    <p>
+      P0·P1은 <strong>이미 지난 단계</strong>이므로 네이티브 milestone은 <strong>P2–P7만</strong> 생성돼 있다. 새 단계를 시작할 때 이미 만들어진 milestone을 재사용한다.
+    </p>
+  </div>
+</section>
+
+<!-- ===================== §4 CASE A ===================== -->
+<section id="case-a" class="wrap">
+  <p class="sec-label">§4 · 케이스 A</p>
+  <h2 class="sec">완전히 새 연구 시작</h2>
+  <p class="sec-sub">아무것도 없는 상태에서 시작한다. 인프라 5단계를 먼저 세우고, 오케스트레이터 세션에 착수 프롬프트를 붙인다.</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-plate">1</div>
+      <div class="step-body">
+        <h4>CODE 레포 생성</h4>
+        <p>구현이 일어날 코드 레포 <code>jiminc77/{CODE_REPO}</code>를 GitHub에 만든다. 계획서 초안은 경로 또는 URL로 준비한다.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-plate">2</div>
+      <div class="step-body">
+        <h4>bootstrap_project.sh — 라벨 18종 + 마일스톤 생성 (1회)</h4>
+        <p>양 레포에 <code>state:*</code>·<code>type:*</code>·<code>phase:*</code> 라벨과 phase별 GitHub 마일스톤을 멱등 일괄 생성한다. 프로젝트당 딱 한 번.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-plate">3</div>
+      <div class="step-body">
+        <h4>워크플로 2개 커밋 + NTFY_TOPIC secret</h4>
+        <p><code>gate-notify.yml</code>·<code>evidence-verify.yml</code>을 CODE 레포 <code>.github/workflows/</code>에 커밋하고, <code>gh secret set NTFY_TOPIC</code>으로 알림 토픽을 등록한다.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-plate">4</div>
+      <div class="step-body">
+        <h4>dashboard CONFIG.projects에 프로젝트 추가</h4>
+        <p>MGMT 레포 <code>dashboard/index.html</code>의 <code>CONFIG.projects</code> 배열에 이 프로젝트 항목을 추가하고 커밋한다. 대시보드가 새 프로젝트를 인식한다.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-plate">5</div>
+      <div class="step-body">
+        <h4>오케스트레이터 세션에 착수 프롬프트</h4>
+        <p>아래 <code>PROMPT-NEW</code>를 복사해 오케스트레이터 세션에 붙인다. STEP 0 self-check부터 인프라 구축과 P0 명세까지 스스로 진행한다.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <span class="ico">★</span>
+    <p><strong>인프라는 프로젝트당 딱 1회.</strong> 위 1–4단계(레포·라벨·마일스톤·워크플로·secret·대시보드 등록)는 프로젝트를 처음 세울 때만 한다. 이후 단계 진행은 케이스 B로 넘어간다.</p>
+  </div>
+
+  <p class="schema-cap">복사해서 붙이는 프롬프트 · PROMPT-NEW</p>
+  <div class="code" data-copy>
+    <div class="code-head">
+      <span class="code-title">PROMPT-NEW — 새 연구 착수</span>
+      <button class="copy-btn" type="button">복사</button>
+    </div>
+<pre><code>새 연구 프로젝트의 오케스트레이션을 맡긴다.
+jiminc77/research-dashboard 의 research-ops/ORCHESTRATOR.md, research-ops/PROTOCOL.md, research-ops/templates/ 를 읽고 그대로 따른다. STEP 0 self-check부터 시작한다.
+
+- 계획서 초안: {경로 또는 URL}
+- 구현 레포: jiminc77/{CODE_REPO}
+- 프로젝트명: {PROJECT}
+- 실행 환경: SSH_HOST={..} / WORKDIR={..} / HARDWARE={..} / 도구={..}
+
+인프라 미구축 상태면 먼저 수행:
+1) bash research-ops/scripts/bootstrap_project.sh jiminc77 research-dashboard {CODE_REPO} {PROJECT} "P0:{이름},P1:{이름},..."
+2) research-ops/workflows/*.yml 을 {CODE_REPO}/.github/workflows/ 에 커밋
+3) gh secret set NTFY_TOPIC -R jiminc77/{CODE_REPO}   # 값: 기존 topic 재사용
+4) dashboard/index.html 의 CONFIG.projects 에 {PROJECT} 항목 추가 후 커밋
+이후 STEP 1→6: 계획서 보강·정형화(HUMAN 승인) → milestone → P0.md(사전등록 포함) → setup_phase.sh → gjc 위임.</code></pre>
+  </div>
+</section>
+
+<!-- ===================== §5 CASE B ===================== -->
+<section id="case-b" class="wrap">
+  <p class="sec-label">§5 · 케이스 B</p>
+  <h2 class="sec">진행 중 프로젝트의 새 단계 <span style="color:var(--muted);font-weight:600">(P2 예시)</span></h2>
+  <p class="sec-sub">인프라는 이미 서 있다. 이전 단계 종료를 검증하고, 바로 단계 명세부터 작성한다.</p>
+
+  <h3 class="sub">케이스 A와의 차이</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>항목</th><th>케이스 A (새 연구)</th><th>케이스 B (새 단계)</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>인프라 구축</td>
+          <td>레포·라벨·마일스톤·워크플로·대시보드 등록</td>
+          <td><strong>스킵</strong> — 이미 존재</td>
+        </tr>
+        <tr>
+          <td>시작 지점</td>
+          <td>계획서 보강부터 (STEP 1–6)</td>
+          <td><code>P{k}.md</code> 작성부터</td>
+        </tr>
+        <tr>
+          <td>선행 조건</td>
+          <td>없음</td>
+          <td><strong>이전 단계 종료 검증 필수</strong> — dev 이슈 전부 closed + HUMAN sign-off 존재</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="schema-cap">복사해서 붙이는 프롬프트 · PROMPT-PHASE</p>
+  <div class="code" data-copy>
+    <div class="code-head">
+      <span class="code-title">PROMPT-PHASE — 새 단계 (P2 예시)</span>
+      <button class="copy-btn" type="button">복사</button>
+    </div>
+<pre><code>DGCC P2 단계의 오케스트레이션을 맡긴다.
+jiminc77/research-dashboard 의 research-ops/ORCHESTRATOR.md 와 research-ops/PROTOCOL.md 를 읽고 그대로 따른다.
+
+1) STEP 0 self-check
+2) P1 종료 검증: phase:P1 dev 이슈 전부 closed, HUMAN sign-off 이슈에 GATE VERDICT 존재. 미완이면 정지하고 나에게 보고.
+3) P2.md 작성 (jiminc77/DGCC 루트, P0.md/P1.md 형식 계승):
+   - 입력: docs/research/DGCC_research_plan.md §10 의 P2 정의 + docs/reports/P2_probing_decision.md 의 사전 고정 임계 (수치 변경 금지)
+   - @goal: M0..Mj 각 블록 Exit 에 primary+guard 지표와 판정 기준을 사전등록
+   - HUMAN GATE goal 은 class(hard|soft) 지정, soft 는 default+deadline 포함
+   - "실행 환경(고정)" 블록은 P1.md 승계
+4) P2.md 요약을 나에게 보고하고 승인받은 뒤 push
+5) bash research-ops/scripts/setup_phase.sh P2 {DGCC 로컬 경로}/P2.md   # 이슈·라벨·마일스톤 연결·번호 backfill 자동
+6) gjc 위임 (PROTOCOL.md 준수 명시) → 완료 검증은 ORCHESTRATOR §4 체크리스트</code></pre>
+  </div>
+</section>
+
+<!-- ===================== §6 CASE C ===================== -->
+<section id="case-c" class="wrap">
+  <p class="sec-label">§6 · 케이스 C</p>
+  <h2 class="sec">중단 세션 재개</h2>
+  <p class="sec-sub">세션이 끊겼다면 상태를 GitHub에서 복원한다. 라벨 쿼리 한 방으로 지금 사람을 기다리는지, 어디까지 왔는지 알아낸다.</p>
+
+  <p class="schema-cap">복사해서 붙이는 프롬프트 · PROMPT-RESUME</p>
+  <div class="code" data-copy>
+    <div class="code-head">
+      <span class="code-title">PROMPT-RESUME — 세션 재개</span>
+      <button class="copy-btn" type="button">복사</button>
+    </div>
+<pre><code>{PROJECT} 오케스트레이션을 재개한다.
+research-ops/ORCHESTRATOR.md 와 PROTOCOL.md 를 읽은 뒤 상태를 복원한다:
+- bash research-ops/scripts/status.sh jiminc77 {CODE_REPO} research-dashboard
+- state:blocked-human 이 있으면: 해당 GATE REQUEST 를 요약해 나에게 보고하고 VERDICT 를 기다린다
+- 없으면: MGMT [Milestone] 이슈의 마지막 [CHECKPOINT] 코멘트 기준으로 다음 STEP 을 이어간다</code></pre>
+  </div>
+</section>
+
+<!-- ===================== §7 게이트 응답법 ===================== -->
+<section id="gate" class="wrap">
+  <p class="sec-label">§7 · 게이트 응답법</p>
+  <h2 class="sec">푸시가 오면 이렇게 답한다</h2>
+  <p class="sec-sub">게이트는 세션이 사람을 기다리는 분기점이다. 폰 알림 → 이슈 열기 → GATE REQUEST 읽기 → GATE VERDICT 댓글 순으로 처리한다.</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-plate">1</div>
+      <div class="step-body"><h4>이슈 열기</h4><p>알림 제목의 레포명·이슈 번호로 해당 CODE 레포 이슈를 연다.</p></div>
+    </div>
+    <div class="step">
+      <div class="step-plate">2</div>
+      <div class="step-body"><h4>GATE REQUEST 읽기</h4><p><code>### GATE REQUEST</code> 댓글의 question · options · evidence · impact를 확인한다. class가 <code>soft</code>인지 <code>hard</code>인지 본다.</p></div>
+    </div>
+    <div class="step">
+      <div class="step-plate">3</div>
+      <div class="step-body"><h4><code>### GATE VERDICT</code> 댓글 작성</h4><p>같은 이슈에 아래 스키마로 회신한다. 회신 후 gjc/오케스트레이터가 <code>blocked-human → ready</code>로 전환하고 집행한다.</p></div>
+    </div>
+  </div>
+
+  <p class="schema-cap">GATE VERDICT 스키마 예시</p>
+  <div class="code">
+    <div class="code-head">
+      <span class="code-title">이슈 댓글 · GATE VERDICT</span>
+    </div>
+<pre><code><span class="kw">### GATE VERDICT</span>
+id: P1-M3-G1
+choice: B
+rationale: &lt;왜 이 선택인지&gt;
+follow-ups:
+- &lt;추가 지시나 후속 작업, 없으면 생략&gt;</code></pre>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h4 style="font-family:var(--sans);font-size:16px;font-weight:600;color:var(--ink);margin:0 0 8px">soft 게이트</h4>
+      <p style="font-size:14.5px;line-height:1.6;color:var(--body);margin:0">되돌릴 수 있는 결정. <strong style="color:var(--ink)">deadline이 지나면 default가 자동 채택</strong>되며 다음 세션이 집행한다. 그 전까지는 GATE VERDICT를 올려 <strong style="color:var(--ink)">override 가능</strong>(default 무효).</p>
+    </div>
+    <div class="card">
+      <h4 style="font-family:var(--sans);font-size:16px;font-weight:600;color:var(--ink);margin:0 0 8px">hard 게이트</h4>
+      <p style="font-size:14.5px;line-height:1.6;color:var(--body);margin:0">방향을 가르거나 되돌리기 어려운 결정. <strong style="color:var(--ink)">무기한 대기</strong>, 자동 채택 없음. <strong style="color:var(--ink)">6시간마다 리마인더 푸시</strong>가 온다. go/no-go·임계값 변경·데이터 폐기·아키텍처 선택은 반드시 hard.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== §8 알림 ntfy ===================== -->
+<section id="ntfy" class="wrap">
+  <p class="sec-label">§8 · 알림 (ntfy)</p>
+  <h2 class="sec">topic 문자열이 곧 채널</h2>
+  <div class="prose">
+    <p>
+      ntfy에서는 <strong>topic 문자열이 곧 채널</strong>이다. 폰 ntfy 앱에서 그 topic을 <strong>구독하는 일은 평생 1회</strong>면 된다 — 한 번 구독해 두면 모든 프로젝트의 게이트 알림이 같은 채널로 온다.
+    </p>
+    <p>
+      현재 topic은 <code>jiminc77-dgcc-gates-ed9518</code>. 새 프로젝트에서 할 일은 딱 한 줄, 같은 topic을 재사용하도록 secret만 등록하면 된다 (알림 제목에 레포명이 붙어 프로젝트가 구분된다):
+    </p>
+  </div>
+
+  <div class="code" data-copy>
+    <div class="code-head">
+      <span class="code-title">shell · 새 프로젝트에서 topic 재사용</span>
+      <button class="copy-btn" type="button">복사</button>
+    </div>
+<pre><code>gh secret set NTFY_TOPIC -R jiminc77/{CODE_REPO}</code></pre>
+  </div>
+
+  <h3 class="sub">알림이 오는지 확인하는 두 가지 방법</h3>
+  <div class="grid-2">
+    <div class="card">
+      <span class="role-badge" style="display:inline-block;background:var(--surface-strong);color:var(--ink);font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.88px;text-transform:uppercase;padding:4px 10px;border-radius:9999px;margin-bottom:14px">방법 1 · 웹 발행</span>
+      <p style="font-size:14.5px;line-height:1.6;color:var(--body);margin:0"><a href="https://ntfy.sh/" target="_blank" rel="noopener">https://ntfy.sh/</a> 웹에서 해당 topic으로 테스트 메시지를 발행한다. <strong style="color:var(--ink)">폰이 울리면 정상</strong>이다.</p>
+    </div>
+    <div class="card">
+      <span class="role-badge" style="display:inline-block;background:var(--surface-strong);color:var(--ink);font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.88px;text-transform:uppercase;padding:4px 10px;border-radius:9999px;margin-bottom:14px">방법 2 · 수동 실행</span>
+      <p style="font-size:14.5px;line-height:1.6;color:var(--body);margin:0">CODE 레포 <strong style="color:var(--ink)">Actions</strong> 탭에서 <code>gate-notify</code>를 <code>workflow_dispatch</code>로 수동 실행한다. 대기 게이트가 있으면 <strong style="color:var(--ink)">리마인더 푸시가 도착</strong>한다.</p>
+    </div>
+  </div>
+  <p class="note">topic 분리를 원하면 폰에서 새 topic을 구독하고 그 프로젝트의 <code>NTFY_TOPIC</code> secret만 바꾸면 된다.</p>
+</section>
+
+<!-- ===================== §9 FAQ ===================== -->
+<section id="faq" class="wrap">
+  <p class="sec-label">§9 · FAQ</p>
+  <h2 class="sec">막힐 때 먼저 보는 곳</h2>
+
+  <div class="faq-item">
+    <h4>state 라벨이 2개 붙었어요</h4>
+    <p>단일 state 규칙 위반이다. <strong>사람이 정리</strong>해 정확히 1개만 남긴다. 그동안 대시보드는 해당 이슈를 이상으로 표시한다.</p>
+  </div>
+  <div class="faq-item">
+    <h4>CI가 ❌ VERIFICATION FAILED로 떠요</h4>
+    <p>EVIDENCE의 SHA 재검증이 실패한 것이다. 라벨이 <code>state:blocked-tech</code>로 바뀐다. <strong>gjc가 블로커를 해소한 뒤 재개</strong>한다 (<code>blocked-tech → running</code>).</p>
+  </div>
+  <div class="faq-item">
+    <h4>결과를 본 뒤에 판정 기준을 바꾸고 싶어요</h4>
+    <p>금지가 아니라 절차화한다. <strong>MGMT <code>[Decision]</code> 이슈로만</strong> — 무엇을·왜·기존 기준 대비 어떻게 바꾸는지 기록하고 판정한다. 이슈 본문/댓글에서 임의로 재정의하지 않는다.</p>
+  </div>
+  <div class="faq-item">
+    <h4>대시보드에 <code>cached</code> 배지가 떠요</h4>
+    <p>GitHub API rate limit에 걸려 캐시를 표시하는 중이다. <strong>잠시 후 새로고침</strong>하면 최신 데이터로 돌아온다. 데이터가 사라진 게 아니라 마지막 성공 응답을 보여주는 것이다.</p>
+  </div>
+  <div class="faq-item">
+    <h4><code>P{k}.md</code>와 이슈 본문 내용이 달라요</h4>
+    <p><strong><code>P{k}.md</code>가 canonical</strong>이다. 이슈는 명세에서 파생된 작업 단위일 뿐이므로, 충돌하면 <code>P{k}.md</code>를 기준으로 삼는다.</p>
+  </div>
+  <div class="faq-item">
+    <h4>게이트를 놓쳐 세션이 멈춰 있어요</h4>
+    <p>hard 게이트는 무기한 대기하므로 데이터는 안전하다. 이슈를 열어 <code>### GATE VERDICT</code>를 올리면 즉시 재개된다. 재개 프롬프트(<a href="#case-c">케이스 C</a>)로 상태를 먼저 복원해도 된다.</p>
+  </div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="foot">
+  <div class="wrap">
+    <div class="brand-row">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <g stroke="#171717" stroke-width="1.6" stroke-linecap="round">
+          <path d="M10 2.5v15M2.5 10h15M4.4 4.4l11.2 11.2M15.6 4.4L4.4 15.6"/>
+        </g>
+      </svg>
+      <code>research-ops</code>
+    </div>
+    <div class="foot-grid">
+      <div>
+        <h5>파일 지도</h5>
+        <div class="foot-links">
+          <a href="https://github.com/jiminc77/research-dashboard/blob/main/research-ops/README.md" target="_blank" rel="noopener"><code>research-ops/README.md</code></a>
+          <a href="https://github.com/jiminc77/research-dashboard/blob/main/research-ops/PROTOCOL.md" target="_blank" rel="noopener"><code>research-ops/PROTOCOL.md</code></a>
+          <a href="https://github.com/jiminc77/research-dashboard/blob/main/research-ops/ORCHESTRATOR.md" target="_blank" rel="noopener"><code>research-ops/ORCHESTRATOR.md</code></a>
+          <a href="https://github.com/jiminc77/research-dashboard/blob/main/research-ops/NEW_PROJECT_PROMPT.md" target="_blank" rel="noopener"><code>research-ops/NEW_PROJECT_PROMPT.md</code></a>
+        </div>
+      </div>
+      <div>
+        <h5>바로가기</h5>
+        <div class="foot-links">
+          <a href="https://jiminc77.github.io/research-dashboard/dashboard/" target="_blank" rel="noopener">라이브 대시보드</a>
+          <a href="#labels">상태 라벨 18종</a>
+          <a href="#case-a">새 연구 시작</a>
+          <a href="#gate">게이트 응답법</a>
+        </div>
+      </div>
+      <div style="max-width:420px">
+        <h5>원칙</h5>
+        <p class="foot-note">상태는 라벨로, 증거는 스키마로, 게이트는 사전등록으로. 인프라는 gh CLI · GitHub Actions · ntfy.sh · 클라이언트 대시보드 — 서버 제로.</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* 복사 버튼 — 각 프롬프트/코드 블록의 <code> 텍스트를 클립보드로 */
+document.querySelectorAll('.code[data-copy]').forEach(block=>{
+  const btn = block.querySelector('.copy-btn');
+  const codeEl = block.querySelector('pre code');
+  if(!btn || !codeEl) return;
+  btn.addEventListener('click', async ()=>{
+    const text = codeEl.innerText;
+    try{
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(text);
+      } else {
+        const ta=document.createElement('textarea');
+        ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+        document.body.appendChild(ta); ta.select();
+        document.execCommand('copy'); document.body.removeChild(ta);
+      }
+      const prev = btn.textContent;
+      btn.textContent = '복사됨';
+      btn.classList.add('done');
+      setTimeout(()=>{ btn.textContent = '복사'; btn.classList.remove('done'); }, 1800);
+    }catch(e){
+      btn.textContent = '복사 실패';
+      setTimeout(()=>{ btn.textContent = '복사'; }, 1800);
+    }
+  });
+});
+</script>
+</body>
+</html>

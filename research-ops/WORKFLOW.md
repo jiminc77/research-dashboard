@@ -1,5 +1,7 @@
 # Research Ops Workflow — 운영 계약서 (프로젝트 무관)
 
+> **상태 표현의 정본은 `PROTOCOL.md`의 라벨 상태기계다.** 본 문서의 `human_blocked` 산문 관례·수동 보드 조작 서술은 라벨·자동화 도입 이전의 맥락이며, 3층위 모델(Docs=지식 / Issues=상태 / Code repo=증거)과 이슈 3종 규약은 그대로 유효하다.
+
 > 연구를 GitHub Issues/Projects로 관리하는 **재사용 운영 모델**. 어떤 프로젝트든 동일하게 적용된다.
 > 세션 실행 절차는 `ORCHESTRATOR.md`, 산출물 뼈대는 `templates/`. 잘 채운 실제 예시는 **DGCC**.
 
