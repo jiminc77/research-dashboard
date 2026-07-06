@@ -142,6 +142,17 @@ bash research-ops/scripts/make_pro_bundle.sh gate 42 dgcc
   폴백 --backend api: OPENAI_API_KEY + o3-pro (per-token $20/$80 per 1M) — 최난도 콜 전용.
 ```
 
+경로 C (웹 ChatGPT + codexpro — 대화형 레포 탐색 후 결과 복사):
+  분석 머신에 레포 clone → `npm i -g codexpro` → 레포에서 `codexpro setup` →
+  출력된 URL을 ChatGPT 앱(Developer Mode 커넥터)으로 등록 → 웹 ChatGPT가
+  read/tree/search/git_diff 도구로 레포를 직접 탐색·분석 → 답을 복사해 사용.
+  · 여러 레포: 워크스페이스 전환 도구(open_workspace)로 이동
+  · 주의 1: pro(딥리즈닝) 서페이스는 커넥터 툴콜 미보장 — 그 경우 codexpro의
+    pro-bundle(export)로 컨텍스트를 내보내 pro에 붙여넣는다 (= 경로 A와 동일 패턴)
+  · 주의 2: GitHub 이슈/라벨은 파일이 아니라 codexpro가 못 읽음 —
+    make_pro_bundle.sh gate 스냅샷 파일을 워크스페이스에 두고 조합
+  · 보안: 터널 URL 토큰 비공개, CODEXPRO_BASH_MODE=full 사용 금지
+
 경로 B는 세션 A·Cowork·임의 쉘에서 "고지능이 필요한 순간"에 한 줄로 호출하는 자문 도구다.
 비용 주의(o3-pro: 입력 $20/1M·출력 $80/1M) — 번들 크기를 확인 후 호출. 거버넌스 동일:
 출력은 자문/초안이며, 정본은 issue 코멘트(사람)와 세션 A 규약 검증(파서·임계 불변·lint) 후 커밋뿐.
