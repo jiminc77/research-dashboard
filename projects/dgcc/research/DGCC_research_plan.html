@@ -1706,5 +1706,137 @@ predicts OOD performance within architectures.</pre>
   </div>
 </footer>
 
+<!-- ============ LIVING PLAN OVERLAY (additive · 2026-07-06) ============ -->
+<!-- 이 블록만이 원문 사전등록 계획서에 대한 유일한 추가물이다. 본문 텍스트는 불변. -->
+<!-- status.json(같은 폴더)을 fetch해 진행 상태를 오버레이한다. file://에서는 아무 것도 하지 않는다(graceful no-op). -->
+<style id="lp-style">
+  .lp-strip { max-width: var(--maxw); margin: 18px auto 0; padding: 10px 16px;
+    display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center;
+    border: 1px solid var(--hairline-strong); border-radius: 10px;
+    background: var(--canvas-soft); color: var(--ink);
+    font-family: var(--sans); font-size: 13.5px; line-height: 1.5; }
+  .lp-strip .lp-k { color: var(--body); font-weight: 500; }
+  .lp-strip a { color: var(--text-link); }
+  .lp-badge { display: inline-block; padding: 1px 8px; border-radius: 999px;
+    font-size: 12px; font-weight: 500; line-height: 1.7; white-space: nowrap;
+    border: 1px solid transparent; }
+  .lp-badge.done    { background: #e7f5ec; color: #1a7f43; border-color: #bfe3cd; }
+  .lp-badge.current { background: #e6f0fb; color: #0d5bb5; border-color: #c2dbf5; }
+  .lp-badge.other   { background: var(--surface-strong); color: var(--body); border-color: var(--hairline-strong); }
+  td .lp-badge { margin-left: 8px; }
+  td .lp-result { margin-left: 8px; font-size: 12.5px; white-space: nowrap; }
+  .lp-amend { border: 1px solid var(--hairline-strong); border-radius: 12px;
+    padding: 20px 22px; margin: 8px 0 4px; background: var(--canvas); }
+  .lp-amend .lp-amend-label { font-family: var(--mono); font-size: 12px;
+    letter-spacing: 0.02em; color: var(--accent-warning); text-transform: uppercase; }
+  .lp-amend h3 { margin: 6px 0 4px; font-size: 20px; color: var(--ink);
+    font-family: var(--sans); font-weight: 600; letter-spacing: -0.3px; }
+  .lp-amend p.lp-amend-sub { margin: 0 0 14px; color: var(--body); font-size: 14px; }
+  .lp-amend ul { margin: 0; padding-left: 18px; }
+  .lp-amend li { margin: 7px 0; color: var(--body); font-size: 14.5px; }
+  .lp-amend li .lp-iss { font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
+  @media print { .lp-strip { background: none; } }
+</style>
+<script>
+/* 살아있는 계획 오버레이 — 원문 불변, status.json 기반 상태만 덧입힌다. */
+(function () {
+  fetch('./status.json', { cache: 'no-store' })
+    .then(function (r) { if (!r.ok) throw new Error('no status'); return r.json(); })
+    .then(function (st) { try { applyOverlay(st); } catch (e) { /* no-op */ } })
+    .catch(function () { /* file:// 또는 부재 — 조용히 아무 것도 안 함 */ });
+
+  function esc(s) { return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function cls(state) { return state === 'done' ? 'done' : state === 'current' ? 'current' : 'other'; }
+  function label(k, ph) {
+    var st = ph.state || 'backlog';
+    var t = st === 'done' ? 'Done' : st === 'current' ? 'Current'
+          : st === 'next' ? 'Next' : 'Backlog';
+    if (st === 'done' && ph.verdict) t += ' (' + ph.verdict + ')';
+    return t;
+  }
+
+  function applyOverlay(st) {
+    var phases = st.phases || {};
+
+    // (a) hero meta 뒤에 슬림 상태 스트립
+    var meta = document.querySelector('.hero .meta');
+    if (meta && !document.getElementById('lp-strip')) {
+      var order = Object.keys(phases).sort();
+      var parts = [];
+      order.forEach(function (k) {
+        var ph = phases[k];
+        parts.push('<span class="lp-badge ' + cls(ph.state) + '">' + esc(k) + ' ' + esc(label(k, ph)) + '</span>');
+      });
+      var repK = order.filter(function (k) { return phases[k] && phases[k].report; });
+      var repLink = '';
+      if (repK.length) {
+        var rk = repK[0];
+        repLink = ' &nbsp;·&nbsp; <a href="' + esc(phases[rk].report) + '">[' + esc(rk) + ' 리포트]</a>';
+      }
+      var strip = document.createElement('div');
+      strip.className = 'lp-strip';
+      strip.id = 'lp-strip';
+      strip.innerHTML = '<span class="lp-k">진행 현황</span>' + parts.join(' ')
+        + ' &nbsp;·&nbsp; <span class="lp-k">갱신 ' + esc(st.updated || '') + '</span>' + repLink;
+      meta.parentNode.insertBefore(strip, meta.nextSibling);
+    }
+
+    // (b) §10 일정 표의 각 행에 상태 배지 + (report 있으면) 결과 링크
+    var s10 = document.getElementById('s10');
+    if (s10) {
+      var rows = s10.querySelectorAll('table tbody tr');
+      Array.prototype.forEach.call(rows, function (tr) {
+        var c0 = tr.cells && tr.cells[0];
+        if (!c0) return;
+        var m = (c0.textContent || '').match(/P[0-7]/);
+        if (!m) return;
+        var k = m[0];
+        var ph = phases[k];
+        if (!ph || c0.querySelector('.lp-badge')) return;
+        var b = document.createElement('span');
+        b.className = 'lp-badge ' + cls(ph.state);
+        b.textContent = label(k, ph);
+        c0.appendChild(b);
+        if (ph.report) {
+          var a = document.createElement('a');
+          a.className = 'lp-result';
+          a.href = ph.report;
+          a.innerHTML = '결과 &rarr;';
+          c0.appendChild(a);
+        }
+      });
+    }
+
+    // (c) Related Works(#s12) 직전에 Amendments 카드
+    var decisions = st.decisions || [];
+    var s12 = document.getElementById('s12');
+    if (s12 && decisions.length && !document.getElementById('lp-amendments')) {
+      var items = decisions.map(function (d) {
+        var iss = d.issue != null ? '<span class="lp-iss">#' + esc(d.issue) + '</span> ' : '';
+        var ph = d.phase ? ' <span class="lp-iss">(' + esc(d.phase) + ')</span>' : '';
+        var title = d.url
+          ? '<a href="' + esc(d.url) + '">' + esc(d.title) + '</a>'
+          : esc(d.title);
+        return '<li>' + iss + title + ph + '</li>';
+      }).join('');
+      var sec = document.createElement('section');
+      sec.className = 'major';
+      sec.id = 'lp-amendments';
+      sec.innerHTML =
+        '<div class="wrap">' +
+          '<div class="lp-amend">' +
+            '<div class="lp-amend-label">Amendments</div>' +
+            '<h3>사전 등록 이후 변경</h3>' +
+            '<p class="lp-amend-sub">이 계획서는 사전등록 문서다. 확정 이후의 기준·정의 변경은 아래 [Decision] 이슈로만 이뤄지며, 각 항목은 그 근거를 남긴다.</p>' +
+            '<ul>' + items + '</ul>' +
+          '</div>' +
+        '</div>';
+      s12.parentNode.insertBefore(sec, s12);
+    }
+  }
+})();
+</script>
+
 </body>
 </html>
