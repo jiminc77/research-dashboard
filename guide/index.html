@@ -823,7 +823,7 @@ follow-ups:
       <li>
         <span class="num">2</span>
         <h4>세션 A 실행 — 이슈 안의 두 옵션 중 하나</h4>
-        <p><strong>(a) Claude/Cowork 경로</strong> — 이슈 본문의 프롬프트를 새 세션 A에 붙여넣기. &nbsp;<strong>(b) 웹 pro 경로</strong> — GitHub 쓰기 앱이 붙은 웹 pro에 <a href="https://github.com/jiminc77/research-dashboard/blob/main/research-ops/templates/pro_orchestrator_prompt.md" target="_blank" rel="noopener">계약 프롬프트</a>를 열고, 이슈가 채워준 파라미터 블록(<code class="inl">PROJECT/OWNER/MGMT_REPO/CODE_REPO/PHASE_DONE/PHASE_NEXT</code>)으로 치환해 붙여넣기.</p>
+        <p><strong>(a) Claude/Cowork 경로</strong> — 이슈 본문의 프롬프트를 새 세션 A에 붙여넣기. &nbsp;<strong>(b) 웹 pro 경로</strong> — GitHub 쓰기 앱이 붙은 웹 pro에 <strong>킥오프 이슈의 완성본 프롬프트(<code class="inl">웹 pro 프롬프트 (완성본 — 그대로 복붙)</code> 접기 블록)를 그대로 복붙</strong>합니다. 파라미터는 이미 전부 치환돼 있어 손댈 필요가 없습니다(치환 실패 시엔 <a href="https://github.com/jiminc77/research-dashboard/blob/main/research-ops/templates/pro_orchestrator_prompt.md" target="_blank" rel="noopener">계약 프롬프트</a> + 파라미터 블록으로 폴백).</p>
       </li>
       <li>
         <span class="num">3</span>

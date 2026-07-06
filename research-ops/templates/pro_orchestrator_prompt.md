@@ -7,7 +7,8 @@
 ## 파라미터 (붙여넣기 전 치환)
 
 ```
-PROJECT     = {PROJECT}
+PROJECT     = {PROJECT}          # 표시명 (라벨·제목용)
+PROJECT_SLUG = {PROJECT_SLUG}     # 경로용 소문자 슬러그 (projects/<slug>/ — 보통 PROJECT 소문자)
 OWNER       = {OWNER}
 MGMT_REPO   = {MGMT_REPO}       # 관리/대시보드 레포
 CODE_REPO   = {CODE_REPO}       # 구현 레포 (gjc 가 실행 중)
@@ -35,7 +36,7 @@ PHASE_NEXT  = {PHASE_NEXT}      # 이번에 설계할 단계
 GitHub 쓰기 앱의 읽기 기능으로 **두 레포를 직접 분석**한다:
 
 - **CODE `{OWNER}/{CODE_REPO}`**: 루트 `{PHASE_DONE}.md`(사전등록 기준·@goal·Exit·HUMAN GATE class), `outputs/{reports,metrics,plots}`(확정 수치·플롯·리포트 원본), `STEP_LOG.md`(조정 이력), `README.md`.
-- **MGMT `{OWNER}/{MGMT_REPO}`**: `research-ops/`(ORCHESTRATOR·PROTOCOL·templates), `projects/{PROJECT}/`(project.yml·research·reports), `[Decision]` 이슈.
+- **MGMT `{OWNER}/{MGMT_REPO}`**: `research-ops/`(ORCHESTRATOR·PROTOCOL·templates), `projects/{PROJECT_SLUG}/`(project.yml·research·reports), `[Decision]` 이슈.
 - **`phase:{PHASE_DONE}` 이슈들**: `### EVIDENCE`(커밋 SHA·primary/guard 수치·산출물 경로), `### GATE REQUEST` / `### GATE VERDICT`, `### PROGRESS`.
 
 → 이들을 요약하고 `{PHASE_NEXT}` 설계 반영 목록을 만든 **뒤에** 산출물을 쓴다. 회고 없이 명세를 쓰지 않는다.
@@ -48,12 +49,12 @@ GitHub 쓰기 앱의 읽기 기능으로 **두 레포를 직접 분석**한다:
 
 - `templates/phase_report_guide.md` **계약 준수**: 단일 self-contained HTML, 섹션 **id 고정** `summary`·`goals`·`gates`·`constants`·`risks`·`artifacts`, 헤더에 최종 판정 배지(`GO`/`NO-GO`/`PARTIAL`), 어투 계약(사실 평서형·청중 언급/안내체/이모지 금지).
 - 모든 수치·주장에 근거(이슈·커밋 SHA·`outputs/` 경로) 링크. 날조 금지.
-- 위치: MGMT `projects/{PROJECT}/reports/P{k}_report.html` (`{k}` = `{PHASE_DONE}` 번호).
+- 위치: MGMT `projects/{PROJECT_SLUG}/reports/P{k}_report.html` (`{k}` = `{PHASE_DONE}` 번호).
 - **PR 전 `research-ops/scripts/lint_report.sh` 통과 필수** — 이 리포트는 pr-verify 가 `*_report.html` 로 재검증한다.
 
 ### (2) `status.json` — 대시보드 상태
 
-- 위치: MGMT `projects/{PROJECT}/research/status.json`.
+- 위치: MGMT `projects/{PROJECT_SLUG}/research/status.json`.
 - 스키마(`lint_status.sh` 계약): `.project`(문자열), `.phases`(각 값 `.state ∈ {done,current,next,backlog,blocked}`), `.decisions`(각 `{issue,title,url}`).
 - `{PHASE_DONE}` → `done`(+verdict·report URL), `{PHASE_NEXT}` → `current`, 이후 단계 상태 갱신. 새 `[Decision]` 이슈를 `.decisions` 에 추가.
 
