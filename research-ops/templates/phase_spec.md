@@ -1,7 +1,7 @@
 # {PROJECT} P{N} — {단계 이름} 구현 명세 (gjc 실행용)
 
 작성일: {DATE} · 대상 실행자: gajae-code (gjc), ralplan → ultragoal
-연구 배경: `{MGMT_REPO}/docs/research/{PLAN_FILE}` (참고용 — 충돌 시 **본 명세가 우선**)
+연구 배경: `{MGMT_REPO}/projects/{project}/research/{PLAN_FILE}` (참고용 — 충돌 시 **본 명세가 우선**)
 
 > 이 문서의 첫 `@goal:` 이전 내용은 **모든 goal에 적용되는 전역 컨텍스트·제약**이다.
 > 작성 지침: `research-ops/WORKFLOW.md`, 세션 절차: `research-ops/ORCHESTRATOR.md`. 잘 채운 예시: `DGCC/P0.md`.

@@ -2,7 +2,7 @@
 
 정형화된 최종 계획서가 따라야 할 구조. 도메인 무관 골격이며, `{ }`를 채운다.
 원칙: 내부 버전명 없음 · Related Works는 **하단 통합** · 본문은 prose(리스트 남발 금지) · 실행 가능할 만큼 구체.
-잘 채운 예시: `docs/research/DGCC_research_plan.md`.
+잘 채운 예시: `projects/dgcc/research/DGCC_research_plan.md`.
 
 ---
 

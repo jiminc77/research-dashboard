@@ -1,7 +1,7 @@
 # 단계 리포트 HTML 생성 가이드 (회고 산출물 · 세션 A)
 
 한 단계(P{k})가 끝날 때, **단일 self-contained HTML 리포트**를 만들어 관리 레포
-`docs/reports/P{k}_report.html` 에 커밋한다 (이미 있으면 갱신). 회고(§ 단계 회고)의 산출물이다.
+`projects/{project}/reports/P{k}_report.html` 에 커밋한다 (이미 있으면 갱신). 회고(§ 단계 회고)의 산출물이다.
 
 **커밋 전 `research-ops/scripts/lint_report.sh <file>` 통과가 필수다** — 아래 섹션 id 계약·금지어·self-contained 요건을 기계 검증한다. lint 실패 상태로 커밋하지 않는다.
 
@@ -44,10 +44,9 @@
 
 ## 파일명·위치 규약
 
-- 기본: MGMT 레포 **`docs/reports/P{k}_report.html`**.
-- 프로젝트가 여럿이면: **`docs/{PROJECT}/reports/P{k}_report.html`**.
-- GitHub Pages URL로 접근: `https://{owner}.github.io/{mgmtRepo}/docs/reports/P{k}_report.html`
-  (대시보드 "단계 리포트" 카드가 이 목록을 자동으로 링크한다).
+- 기본: MGMT 레포 **`projects/{project}/reports/P{k}_report.html`** (멀티프로젝트 레이아웃 — `{project}`는 소문자 프로젝트 slug, 예: `dgcc`).
+- GitHub Pages URL로 접근: `https://{owner}.github.io/{mgmtRepo}/projects/{project}/reports/P{k}_report.html`
+  (대시보드 "단계 리포트" 카드가 프로젝트별 `docsBase`로 이 목록을 자동으로 링크한다).
 
 ## 금지
 
@@ -58,10 +57,10 @@
 ## 산출물 검증 (커밋 전)
 
 ```text
-[ ] bash research-ops/scripts/lint_report.sh docs/reports/P{k}_report.html → OK
+[ ] bash research-ops/scripts/lint_report.sh projects/{project}/reports/P{k}_report.html → OK
 [ ] 7개 섹션 모두 존재 (id 계약 일치) · 최종 판정 배지 있음
 [ ] 모든 수치가 EVIDENCE/outputs 출처와 일치 (날조 없음)
 [ ] Goal 표의 각 행에 evidence 링크(커밋 SHA·이슈) 존재
 [ ] HUMAN GATE 판정·근거 기록 · 변경 시 [Decision] 링크
-[ ] docs/reports/P{k}_report.html 로 커밋 · Pages URL로 열림 확인
+[ ] projects/{project}/reports/P{k}_report.html 로 커밋 · Pages URL로 열림 확인
 ```

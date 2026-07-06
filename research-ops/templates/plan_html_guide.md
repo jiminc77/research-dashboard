@@ -1,7 +1,7 @@
 # 계획서 HTML 생성 가이드 (ORCHESTRATOR STEP 2 마지막)
 
 정형화된 최종 계획서(.md)를 **보기 쉬운 단일 HTML**로 변환한다. 무거운 변환은 subagent에 위임 가능.
-잘 된 예시: `docs/research/DGCC_research_plan.html` (DESIGN-expo.md 적용).
+잘 된 예시: `projects/dgcc/research/DGCC_research_plan.html` (DESIGN-expo.md 적용).
 
 ## 입력
 
@@ -35,4 +35,4 @@
 
 ## 산출
 
-`docs/research/<project>_research_plan.html` — 사람이 브라우저로 열어 확인. 이후 STEP 3로.
+`projects/{project}/research/<project>_research_plan.html` — 사람이 브라우저로 열어 확인. 이후 STEP 3로.

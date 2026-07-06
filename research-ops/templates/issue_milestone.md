@@ -12,9 +12,9 @@ P{N} — {단계 이름}
 
 ## Docs
 
-- Main: `docs/research/{PLAN_FILE}`
+- Main: `projects/{project}/research/{PLAN_FILE}`
 - Spec: `{CODE_REPO}` repo `P{N}.md` (gjc brief, @goal = M0..Mk)
-- Report: `docs/reports/{리포트}`
+- Report: `projects/{project}/reports/{리포트}`
 
 ## Code
 

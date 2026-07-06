@@ -1,7 +1,7 @@
 # 계획서 보강·정형화 프로세스 (ORCHESTRATOR STEP 2)
 
 받은 **초안 계획서**를 학회(예: ICML/ICLR/ICRA/CoRL) 수준으로 끌어올리고, `research_plan_template.md` 구조에 맞춰 정형화한 뒤, `plan_html_guide.md`로 HTML을 생성한다.
-잘 된 실제 예시: DGCC (초안 v3/v4 → `docs/research/DGCC_research_plan.md` + `.html`).
+잘 된 실제 예시: DGCC (초안 v3/v4 → `projects/dgcc/research/DGCC_research_plan.md` + `.html`).
 
 ## 원칙
 
@@ -36,9 +36,9 @@ F. 검증        인용·수치·논리 자기모순 재점검 (필요 시 subag
 ## 출력
 
 ```text
-docs/research/<project>_research_plan.md    최종본 (버전명 없음, Related Works 하단)
-docs/research/<project>_research_plan.html  plan_html_guide.md 로 생성
-(보조) 문헌 리뷰·gap·리뷰 로그 등은 docs/research/ 또는 별도 폴더에
+projects/{project}/research/<project>_research_plan.md    최종본 (버전명 없음, Related Works 하단)
+projects/{project}/research/<project>_research_plan.html  plan_html_guide.md 로 생성
+(보조) 문헌 리뷰·gap·리뷰 로그 등은 projects/{project}/research/ 또는 별도 폴더에
 ```
 
 이 최종 계획서의 **일정/단계 섹션**(template §단계)이 STEP 3 milestone과 각 P{k}.md의 입력이 된다.
