@@ -3,6 +3,7 @@ project: "{PROJECT}"
 owner: "{OWNER}"
 mgmt_repo: "{MGMT_REPO}"
 code_repo: "{CODE_REPO}"
+immutables: ".github/immutables.txt (CODE repo)"   # 불변값 매니페스트 위치 — pr-verify 가 P-명세에서 강제
 phases: "{P0:이름,P1:이름,...}"
 ssh_host: "{SSH_HOST}"
 workdir: "{WORKDIR}"

@@ -187,6 +187,20 @@ gh issue list -R "$CODE_REPO" --label "state:blocked-tech" --state open \
 
 ---
 
+## 7-B. 쓰기 규율 (PR-only publish)
+
+LLM 세션(세션 A — **웹 pro 포함**)의 repo 쓰기는 **branch+PR 로만** 한다. default branch(main) 직접 push 금지.
+
+- **게시 확정 조건**: PR 이 `pr-verify` 로 **green** 이고 **사람이 merge** 해야 게시로 확정된다. 세션은 스스로 merge 하지 않는다.
+- **branch+PR 절차**: `create_branch`(예: `phase/P{k+1}-kickoff`) → `push_files` → PR(base=main). 레포별 1 PR(MGMT·CODE). PR 본문에 evidence 링크 + 불변값 이월 확인 명시. 불변값 매니페스트를 건드리면 `[Decision]` 이슈 인용 필수(`check_immutables.sh` 강제).
+- **`pr-verify` 워크플로**: `research-ops/workflows/pr-verify.yml`(양 레포 `.github/workflows/` 로 무수정 복사). `on: pull_request` 만 — 직접 push 는 트리거하지 않는다. 변경 파일 종류별로 킷 린터(리포트·@goal 명세·불변값·status)를 조건 실행하고 결과를 step summary 에 쓴다. job 이름은 `pr-verify` 고정.
+- **직접 push 잠정 허용 대상**: (1) **gjc** — CODE 레포에서 phase 실행 중 milestone 커밋을 main 에 직접 push(P0/P1 운영 방식), (2) **유지보수 세션** — 킷 정비. 그 외 LLM 세션 게시는 PR-only.
+- **branch protection 활성화 (P1 종료 시)**: P1 이 끝나 gjc 의 직접 push 의존이 사라지는 시점에 CODE 레포에 required status check `pr-verify` 를 켠다. 절차: **Settings → Branches → Add branch protection rule** → 대상 `main` → **Require a pull request before merging** + **Require status checks to pass** 에서 `pr-verify` 지정. (P1 실행 중에는 켜지 않는다 — gjc 직접 push 가 막힌다. 이 문서에 절차만 문서화하고 활성화는 P1→P2 전환에서 수행.)
+
+한 줄: **LLM 세션 게시 = branch+PR → pr-verify green → 사람 merge.** 직접 push 는 gjc(phase 실행)와 유지보수 세션에만 잠정 허용, P1 종료 시 protection 으로 고정.
+
+---
+
 ## 8. 요약 카드 (gjc·오케스트레이터가 외울 것)
 
 1. dev 이슈 = state 라벨 정확히 1개. 착수 `running`, 증거 후 `verify`, CI ✅ 후 `done`.

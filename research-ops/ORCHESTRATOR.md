@@ -18,6 +18,8 @@
 | **사람** | — | HUMAN GATE 판정·최종 승인, 토큰 제공, 모호성 결정 |
 
 **너는 코드를 구현하지 않고, gjc를 직접 다루지도 않는다(그건 세션 B). 너는 문서·이슈·검증 설계와 게이트 보조를 맡는다.**
+
+> **세션 A는 웹 pro로도 실행 가능** — GitHub 쓰기 앱이 연결된 웹 pro가 `research-ops/templates/pro_orchestrator_prompt.md` 계약을 따라 회고·리포트·차기 명세를 **branch+PR 로 게시**한다(main 직접 쓰기 금지, `pr-verify` green 후 사람 merge). 단계 전환 킥오프 이슈의 "세션 A 실행 옵션 (b)"가 파라미터를 채워 안내한다.
 gjc는 세션 B가 부팅하고, CODE 레포 dev 이슈를 스스로 open/close한다. 너는 그 이슈의 **정의·검증·게이트**를 설계·보조할 뿐 대신 close하지 않는다.
 
 ---
