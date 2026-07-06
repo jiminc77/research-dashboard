@@ -494,7 +494,6 @@
       <a href="#phase">단계 실행</a>
       <a href="#gate">게이트</a>
       <a href="#next">단계 넘기기</a>
-      <a href="#advisor">자문</a>
       <a class="btn btn-primary" href="https://jiminc77.github.io/research-dashboard/dashboard/" target="_blank" rel="noopener">라이브 대시보드</a>
     </div>
   </div>
@@ -505,7 +504,7 @@
   <div class="wrap">
     <span class="eyebrow"><span class="dot"></span> 1인 연구자 · GitHub 기반 AI 에이전트 워크플로</span>
     <h1>research-ops 사용법</h1>
-    <p class="sub">할 일과 커맨드만. 프로젝트 시작 → 단계 실행 → 게이트 판정 → 단계 넘기기 → 자문 → 보기 → 검증 대처. 상태는 GitHub 라벨에, 규약은 <code class="inl">research-ops/PROTOCOL.md</code>에 있습니다.</p>
+    <p class="sub">할 일과 커맨드만. 프로젝트 시작 → 단계 실행 → 게이트 판정 → 단계 넘기기 → 보기 → 검증 대처. 상태는 GitHub 라벨에, 규약은 <code class="inl">research-ops/PROTOCOL.md</code>에 있습니다.</p>
     <div class="who-legend">
       <span>배지:</span>
       <span class="who me">나</span> 직접 실행 <span class="sep">·</span>
@@ -548,9 +547,8 @@
       <a href="#phase">2 · 단계 실행</a>
       <a href="#gate">3 · 게이트 판정</a>
       <a href="#next">4 · 단계 넘기기</a>
-      <a href="#advisor">5 · 고지능 자문</a>
-      <a href="#view">6 · 보기</a>
-      <a href="#troubleshoot">7 · 검증이 막을 때</a>
+      <a href="#view">5 · 보기</a>
+      <a href="#troubleshoot">6 · 검증이 막을 때</a>
     </div>
   </div>
 </header>
@@ -742,14 +740,15 @@ gh secret set NTFY_TOPIC -R {OWNER}/{CODE_REPO}   <span class="cmt"># 값: {proj
     <div class="sec-head">
       <span class="pill" style="margin-bottom:14px;">2</span>
       <h2 class="sec-title">단계(Phase) 실행하기</h2>
-      <p><span class="who sa">세션 A</span>가 <code class="inl">P{k}.md</code>·dev 이슈를 발행하면, <span class="who gjc">gjc</span>가 goal을 실행합니다. gjc는 <span class="who me">나</span>가 원격 워크스테이션에서 1회 부팅하면 이후 자율 실행합니다.</p>
+      <p><code class="inl">P{k}.md</code>와 dev 이슈는 <span class="who sa">세션 A</span>(웹 pro)가 GitHub 앱으로 직접 만듭니다(§4 흐름). <strong>이슈가 생겨도 gjc는 자동 시작되지 않습니다</strong> — <span class="who me">나</span>가 원격 워크스테이션에서 1회 부팅해야 실행이 시작되고, 이후 <span class="who gjc">gjc</span>가 자율 실행합니다.</p>
     </div>
 
     <div class="grid grid-2">
       <div class="code" style="margin:0;">
-        <div class="code-top"><span class="fname">dev 이슈 발행 (세션 A)</span><span class="lang">bash</span><span class="who sa">세션 A</span><button class="copy-btn" data-label="복사">복사</button></div>
-        <pre><code><span class="cmt"># P{k}.md 의 @goal 블록 → dev 이슈 + state:ready</span>
-<span class="cmt"># + 마일스톤 부착 + 이슈 번호 backfill</span>
+        <div class="code-top"><span class="fname">dev 이슈 수동 발행 (대안)</span><span class="lang">bash</span><span class="who me">나</span><button class="copy-btn" data-label="복사">복사</button></div>
+        <pre><code><span class="cmt"># 표준: 세션 A(웹 pro)가 §4에서 GitHub 앱으로 직접 발행</span>
+<span class="cmt"># 아래는 내가 로컬 셸에서 수동 발행할 때의 대안</span>
+<span class="cmt"># @goal→이슈 + state:ready + 마일스톤 + backfill</span>
 bash research-ops/scripts/setup_phase.sh P{k} \
   projects/{project}/... /P{k}.md --push</code></pre>
       </div>
@@ -767,7 +766,7 @@ gjc ultragoal create-goals --brief-file P{k}.md</code></pre>
       <table class="tbl">
         <thead><tr><th>전이</th><th>주체</th><th>트리거</th></tr></thead>
         <tbody>
-          <tr><td><span class="m">생성 → ready</span></td><td class="desc"><span class="who auto">자동</span> setup_phase.sh</td><td class="desc">dev 이슈 생성 시 자동</td></tr>
+          <tr><td><span class="m">생성 → ready</span></td><td class="desc"><span class="who sa">세션 A</span> 생성 시 부착</td><td class="desc">이슈 생성과 동시 (수동 대안: <span class="who auto">자동</span> setup_phase.sh)</td></tr>
           <tr><td><span class="m">ready → running</span></td><td class="desc"><span class="who gjc">gjc</span></td><td class="desc">goal 착수</td></tr>
           <tr><td><span class="m">running → verify</span></td><td class="desc"><span class="who gjc">gjc</span></td><td class="desc"><code class="inl">### EVIDENCE</code> 게시</td></tr>
           <tr><td><span class="m">verify → done</span></td><td class="desc"><span class="who auto">자동</span> CI + <span class="who gjc">gjc</span> close</td><td class="desc">CI VERIFIED ✅ 후 close</td></tr>
@@ -856,7 +855,7 @@ follow-ups:
     <div class="sec-head">
       <span class="pill" style="margin-bottom:14px;">4</span>
       <h2 class="sec-title">단계 넘어가기</h2>
-      <p>마지막 <code class="inl">phase:Pk</code> open 이슈를 close하면 <strong>킥오프 이슈가 자동 생성</strong>됩니다. 세션 A가 산출물 4종을 PR로 올리고, pr-verify green 후 <strong>내가</strong> merge합니다.</p>
+      <p>마지막 <code class="inl">phase:P{k}</code>(현재 단계 라벨, 예: <code class="inl">phase:P1</code>) open 이슈를 close하면 <strong>킥오프 이슈가 자동 생성</strong>됩니다. 세션 A가 산출물 4종을 PR로 올리고, pr-verify green 후 <strong>내가</strong> merge합니다.</p>
       <div class="who-legend" style="margin-top:12px;">
         <span class="who auto">자동</span> 킥오프 <span class="sep">→</span>
         <span class="who me">나</span> 복붙 <span class="sep">→</span>
@@ -896,72 +895,14 @@ follow-ups:
   </div>
 </section>
 
-<!-- ===================== 5. ADVISOR PATHS ===================== -->
-<span id="advisor" class="anchor"></span>
-<section>
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="pill" style="margin-bottom:14px;">5</span>
-      <h2 class="sec-title">고지능 자문 쓰기</h2>
-      <p><span class="who me">나</span> 강한 추론 모델을 자문으로 끼우는 4경로(전부 내가 도구/커맨드로 호출). <strong>정본은 issue 코멘트/세션 A 검증뿐</strong> — 자문 초안이 임계를 바꾸자고 하면 <code class="inl">[Decision]</code> 이슈로.</p>
-    </div>
 
-    <div class="grid grid-2">
-      <div class="card">
-        <span class="pill mono" style="margin-bottom:10px;">A · 수동 번들</span> <span class="who me">나</span>
-        <p style="font-size:14px;margin:0 0 12px;">번들 만들어 웹 ChatGPT pro에 붙여넣기.</p>
-        <div class="code" style="margin:0;">
-          <div class="code-top"><span class="fname">make_pro_bundle.sh</span><span class="lang">bash</span><span class="who me">나</span><button class="copy-btn" data-label="복사">복사</button></div>
-          <pre><code>bash research-ops/scripts/make_pro_bundle.sh \
-  phase-spec P2 dgcc
-<span class="cmt"># 또는: gate &lt;ISSUE#&gt; dgcc</span>
-<span class="cmt"># → /tmp/pro_bundle.md 붙여넣기</span></code></pre>
-        </div>
-      </div>
-      <div class="card">
-        <span class="pill mono" style="margin-bottom:10px;">B · ask_pro.sh</span> <span class="who me">나</span>
-        <p style="font-size:14px;margin:0 0 12px;">번들을 도구처럼 호출. 기본 codex 구독 OAuth(gpt-5.5 xhigh), 폴백 <code class="inl">--backend api</code>(o3-pro).</p>
-        <div class="code" style="margin:0;">
-          <div class="code-top"><span class="fname">ask_pro.sh</span><span class="lang">bash</span><span class="who me">나</span><button class="copy-btn" data-label="복사">복사</button></div>
-          <pre><code>bash research-ops/scripts/make_pro_bundle.sh \
-  gate 17 dgcc
-bash research-ops/scripts/ask_pro.sh \
-  /tmp/pro_bundle.md
-<span class="cmt"># → /tmp/pro_answer.md  (폴백: --backend api)</span></code></pre>
-        </div>
-      </div>
-      <div class="card">
-        <span class="pill mono" style="margin-bottom:10px;">C · 웹 codexpro</span> <span class="who me">나</span>
-        <p style="font-size:14px;margin:0 0 12px;">웹 ChatGPT가 레포를 직접 탐색(read/tree/search/git_diff)하며 대화형 분석.</p>
-        <div class="code" style="margin:0;">
-          <div class="code-top"><span class="fname">분석 머신에서</span><span class="lang">bash</span><span class="who me">나</span><button class="copy-btn" data-label="복사">복사</button></div>
-          <pre><code>npm i -g codexpro
-codexpro setup   <span class="cmt"># 출력 URL을 ChatGPT 커넥터로 등록</span>
-<span class="cmt"># 주의: 이슈/라벨은 파일 아님</span>
-<span class="cmt"># → make_pro_bundle.sh gate 스냅샷 병행</span></code></pre>
-        </div>
-      </div>
-      <div class="card">
-        <span class="pill mono" style="margin-bottom:10px;">D · 웹 pro + PR/CI</span> <span class="who me">나</span> <span class="who sa">세션 A</span>
-        <p style="font-size:14px;margin:0 0 12px;">웹 pro를 <strong>세션 A 자체</strong>로 세워 회고→리포트→명세→이슈를 <strong>직접 게시</strong>(branch+PR). = <a href="#next">4단계</a> (b) 옵션.</p>
-        <div class="code" style="margin:0;">
-          <div class="code-top"><span class="fname">계약 프롬프트</span><span class="lang">md</span><span class="who me">나</span><span class="who sa">세션 A</span><button class="copy-btn" data-label="복사">복사</button></div>
-          <pre><code><span class="cmt"># templates/pro_orchestrator_prompt.md 파라미터 치환 후</span>
-<span class="cmt"># GitHub 쓰기 앱 붙은 웹 pro에 붙여넣기</span>
-<span class="cmt"># create_branch → push_files → PR</span>
-<span class="cmt"># → pr-verify green → 나 merge</span></code></pre>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
-<!-- ===================== 6. VIEW ===================== -->
+<!-- ===================== 5. VIEW ===================== -->
 <span id="view" class="anchor"></span>
 <section style="background:var(--canvas-soft);">
   <div class="wrap">
     <div class="sec-head">
-      <span class="pill" style="margin-bottom:14px;">6</span>
+      <span class="pill" style="margin-bottom:14px;">5</span>
       <h2 class="sec-title">보기</h2>
       <p><span class="who me">나</span> 실시간 대시보드(무인증 API 렌더, 수동 갱신 없음) · 계획서 LIVE 페이지 · 단계 리포트.</p>
     </div>
@@ -987,7 +928,7 @@ codexpro setup   <span class="cmt"># 출력 URL을 ChatGPT 커넥터로 등록</
 <section>
   <div class="wrap">
     <div class="sec-head">
-      <span class="pill" style="margin-bottom:14px;">7</span>
+      <span class="pill" style="margin-bottom:14px;">6</span>
       <h2 class="sec-title">검증이 막을 때</h2>
       <p><code class="inl">pr-verify</code>는 PR에서만 돌고, 변경 파일 종류별로 4종 린터를 조건 실행합니다. 실패 원인과 대처.</p>
       <div class="who-legend" style="margin-top:12px;"><span class="who auto">자동</span> 검사·재실행 <span class="sep">·</span> <span class="who me">나</span> 또는 <span class="who sa">세션 A</span> 원인 진단·수정 커밋</div>
@@ -1042,9 +983,8 @@ curl -d "test" ntfy.sh/{topic}   <span class="cmt"># 폰에 뜨면 정상</span>
         <a href="#phase">2 · 단계 실행</a>
         <a href="#gate">3 · 게이트 판정</a>
         <a href="#next">4 · 단계 넘기기</a>
-        <a href="#advisor">5 · 고지능 자문</a>
-        <a href="#view">6 · 보기</a>
-        <a href="#troubleshoot">7 · 검증이 막을 때</a>
+        <a href="#view">5 · 보기</a>
+        <a href="#troubleshoot">6 · 검증이 막을 때</a>
       </div>
       <div class="ft-col">
         <h5>레포 &amp; 규약</h5>
