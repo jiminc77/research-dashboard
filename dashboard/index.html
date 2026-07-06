@@ -153,6 +153,11 @@
   .card.dark h2 .n.coral{background:rgba(255,255,255,.12); color:#fff}
 
   /* ===== Issue rows ===== */
+  .doctag{display:inline-flex;align-items:center;margin-left:8px;padding:1px 8px;border-radius:999px;
+    font-size:10.5px;font-weight:600;letter-spacing:.4px;border:1px solid var(--hairline-strong);color:var(--muted);flex:none}
+  a.title .ext{font-size:11px;color:var(--muted);margin-left:3px}
+  a.title.rec{color:var(--body);font-weight:400}
+  .card.dark a.title.rec{color:var(--on-dark-soft)}
   .row{
     display:flex; align-items:center; gap:12px; padding:11px 0;
     border-top:1px solid var(--hairline);
@@ -412,17 +417,24 @@ function renderReports(p, entries, research){
   const pages = `https://${p.owner}.github.io/${p.mgmtRepo}/${base}`;
   const blob  = `https://github.com/${p.owner}/${p.mgmtRepo}/blob/main/${base}`;
   const rows = [];
-  // 연구 계획서 (research/*_research_plan.html — 상태 오버레이 포함 living plan)
+  // 연구 계획서 — living page (상태 오버레이 포함)
   (research||[]).filter(e=>e && e.type==="file" && /_research_plan\.html$/.test(e.name||""))
-    .forEach(f=>rows.push(`<div class="row"><a class="title" href="${esc(pages)}/research/${esc(f.name)}" target="_blank">연구 계획서 — ${esc(f.name)}</a></div>`));
-  // 단계 리포트 HTML
+    .forEach(f=>rows.push(`<div class="row"><a class="title" href="${esc(pages)}/research/${esc(f.name)}" target="_blank">${esc(p.name)} 연구 계획서 <span class="ext">↗</span></a><span class="doctag">LIVE</span></div>`));
+  // 단계 리포트 — 페이지
   (entries||[]).filter(e=>e && e.type==="file" && /_report\.html$/.test(e.name||""))
     .sort((a,b)=>a.name.localeCompare(b.name))
-    .forEach(f=>rows.push(`<div class="row"><a class="title" href="${esc(pages)}/reports/${esc(f.name)}" target="_blank" title="${esc(f.name)}">${esc(f.name)}</a></div>`));
-  // 게이트/결정 기록 (md → GitHub 렌더)
+    .forEach(f=>{
+      const m=(f.name||"").match(/^P(\d+)_report\.html$/i);
+      const label=m?`P${m[1]} 단계 리포트`:f.name.replace(/\.html$/,"");
+      rows.push(`<div class="row"><a class="title" href="${esc(pages)}/reports/${esc(f.name)}" target="_blank">${esc(label)} <span class="ext">↗</span></a></div>`);
+    });
+  // 판정 기록 (md) — 페이지와 구분되는 보조 자료
   (entries||[]).filter(e=>e && e.type==="file" && /\.md$/.test(e.name||""))
     .sort((a,b)=>a.name.localeCompare(b.name))
-    .forEach(f=>rows.push(`<div class="row"><a class="title" href="${esc(blob)}/reports/${esc(f.name)}" target="_blank" title="${esc(f.name)}">기록 — ${esc(f.name)}</a></div>`));
+    .forEach(f=>{
+      const label=f.name.replace(/\.md$/,"").replace(/_/g," ");
+      rows.push(`<div class="row"><a class="title rec" href="${esc(blob)}/reports/${esc(f.name)}" target="_blank">${esc(label)}</a><span class="doctag">기록</span></div>`);
+    });
   el.innerHTML = rows.length ? rows.join("") : `<div class="empty">없음</div>`;
 }
 
