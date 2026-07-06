@@ -132,11 +132,14 @@ bash research-ops/scripts/make_pro_bundle.sh gate 42 dgcc
 경로 A (수동 · 구독 ChatGPT의 pro 사용):
   make_pro_bundle.sh → /tmp/pro_bundle.md → ChatGPT(pro 모델)에 붙여넣기 → 답을 가져와 사용
 
-경로 B (프로그래매틱 · API — 세션 유지한 채 도구처럼 호출):
+경로 B (프로그래매틱 — 세션 유지한 채 도구처럼 호출; 기본=구독 OAuth, 폴백=API):
   make_pro_bundle.sh phase-spec P2          # 또는: gate <issue#>
-  OPENAI_API_KEY=... bash research-ops/scripts/ask_pro.sh /tmp/pro_bundle.md
-  → /tmp/pro_answer.md 로 답 수신 (Responses API + background 폴링, 기본 모델 o3-pro,
-     PRO_MODEL 환경변수로 교체 가능)
+  bash research-ops/scripts/ask_pro.sh /tmp/pro_bundle.md
+  → /tmp/pro_answer.md 로 답 수신.
+  기본 backend=codex: ChatGPT 구독 OAuth (Codex CLI, gpt-5.5 @ xhigh reasoning) —
+    구독 포함이라 추가 과금 없음. 1회 로그인: `codex login` (headless는 --device-auth
+    또는 로컬 로그인 후 ~/.codex/auth.json 복사, chmod 600, 절대 커밋 금지).
+  폴백 --backend api: OPENAI_API_KEY + o3-pro (per-token $20/$80 per 1M) — 최난도 콜 전용.
 ```
 
 경로 B는 세션 A·Cowork·임의 쉘에서 "고지능이 필요한 순간"에 한 줄로 호출하는 자문 도구다.
