@@ -125,3 +125,20 @@ bash research-ops/scripts/make_pro_bundle.sh gate 42 dgcc
 3. **초안 회수**: 돌아온 결과는 **초안**이다. 세션 A가 규약 검증(파서가 `@goal`을 다 잡는가·임계 불변인가·lint)을 거쳐 커밋으로 정본화하고, 게이트 판정은 사람이 `### GATE VERDICT` 코멘트로만 확정한다.
 
 거버넌스 규칙(불변): **자문은 참고, 정본은 issue 코멘트/세션 A 검증.** 자문 초안이 사전등록 임계를 바꾸자고 하면 그건 게이트 통과가 아니라 `[Decision]` 이슈를 거쳐야 하는 기준 변경이다.
+
+### 호출 경로 2가지
+
+```text
+경로 A (수동 · 구독 ChatGPT의 pro 사용):
+  make_pro_bundle.sh → /tmp/pro_bundle.md → ChatGPT(pro 모델)에 붙여넣기 → 답을 가져와 사용
+
+경로 B (프로그래매틱 · API — 세션 유지한 채 도구처럼 호출):
+  make_pro_bundle.sh phase-spec P2          # 또는: gate <issue#>
+  OPENAI_API_KEY=... bash research-ops/scripts/ask_pro.sh /tmp/pro_bundle.md
+  → /tmp/pro_answer.md 로 답 수신 (Responses API + background 폴링, 기본 모델 o3-pro,
+     PRO_MODEL 환경변수로 교체 가능)
+```
+
+경로 B는 세션 A·Cowork·임의 쉘에서 "고지능이 필요한 순간"에 한 줄로 호출하는 자문 도구다.
+비용 주의(o3-pro: 입력 $20/1M·출력 $80/1M) — 번들 크기를 확인 후 호출. 거버넌스 동일:
+출력은 자문/초안이며, 정본은 issue 코멘트(사람)와 세션 A 규약 검증(파서·임계 불변·lint) 후 커밋뿐.
