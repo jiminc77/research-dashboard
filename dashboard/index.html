@@ -405,20 +405,25 @@ function renderIssueRow(issue, {showChip}={}){
 function renderEmpty(el){ el.innerHTML = `<div class="empty">없음</div>`; }
 
 /* 📄 단계 리포트 (MGMT {docsBase}/reports/*_report.html) — GitHub Contents API 결과를 링크로 */
-function renderReports(p, entries){
+function renderReports(p, entries, research){
   const el = $("reports");
   if(!el) return;
-  const files = (entries||[])
-    .filter(e => e && e.type==="file" && /_report\.html$/.test(e.name||""))
-    .sort((a,b)=>a.name.localeCompare(b.name));
-  if(!files.length){ renderEmpty(el); return; }
-  el.innerHTML = files.map(f=>{
-    const base = p.docsBase || "docs";
-    const url = `https://${p.owner}.github.io/${p.mgmtRepo}/${base}/reports/${f.name}`;
-    return `<div class="row">
-      <a class="title" href="${esc(url)}" target="_blank" title="${esc(f.name)}">${esc(f.name)}</a>
-    </div>`;
-  }).join("");
+  const base = p.docsBase || "docs";
+  const pages = `https://${p.owner}.github.io/${p.mgmtRepo}/${base}`;
+  const blob  = `https://github.com/${p.owner}/${p.mgmtRepo}/blob/main/${base}`;
+  const rows = [];
+  // 연구 계획서 (research/*_research_plan.html — 상태 오버레이 포함 living plan)
+  (research||[]).filter(e=>e && e.type==="file" && /_research_plan\.html$/.test(e.name||""))
+    .forEach(f=>rows.push(`<div class="row"><a class="title" href="${esc(pages)}/research/${esc(f.name)}" target="_blank">연구 계획서 — ${esc(f.name)}</a></div>`));
+  // 단계 리포트 HTML
+  (entries||[]).filter(e=>e && e.type==="file" && /_report\.html$/.test(e.name||""))
+    .sort((a,b)=>a.name.localeCompare(b.name))
+    .forEach(f=>rows.push(`<div class="row"><a class="title" href="${esc(pages)}/reports/${esc(f.name)}" target="_blank" title="${esc(f.name)}">${esc(f.name)}</a></div>`));
+  // 게이트/결정 기록 (md → GitHub 렌더)
+  (entries||[]).filter(e=>e && e.type==="file" && /\.md$/.test(e.name||""))
+    .sort((a,b)=>a.name.localeCompare(b.name))
+    .forEach(f=>rows.push(`<div class="row"><a class="title" href="${esc(blob)}/reports/${esc(f.name)}" target="_blank" title="${esc(f.name)}">기록 — ${esc(f.name)}</a></div>`));
+  el.innerHTML = rows.length ? rows.join("") : `<div class="empty">없음</div>`;
 }
 
 function render(codeIssues, mgmtIssues, milestones, note){
@@ -523,8 +528,10 @@ async function load(){
     try {
       const base = p.docsBase || "docs";
       const repR = await fetchAll(`${API}/repos/${p.owner}/${p.mgmtRepo}/contents/${base}/reports`);
-      renderReports(p, Array.isArray(repR.data) ? repR.data : []);
-    } catch(e){ renderReports(p, []); }
+      let resR = {data: []};
+      try { resR = await fetchAll(`${API}/repos/${p.owner}/${p.mgmtRepo}/contents/${base}/research`); } catch(_e){}
+      renderReports(p, Array.isArray(repR.data) ? repR.data : [], Array.isArray(resR.data) ? resR.data : []);
+    } catch(e){ renderReports(p, [], []); }
   } catch(e){
     $("foot").innerHTML = `<span style="color:var(--error)">로드 실패: ${esc(String(e.message||e))}</span> · 새로고침 재시도`;
   }
