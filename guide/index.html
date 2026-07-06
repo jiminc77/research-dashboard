@@ -164,6 +164,8 @@
   h2.sec-title { font-size: 36px; line-height: 1.15; letter-spacing: -1.08px; margin-bottom: 14px; }
   .sec-head p { font-size: 17px; color: var(--body); }
   h3.sub-title { font-size: 22px; line-height: 1.25; letter-spacing: -0.5px; margin: 0 0 8px; }
+  /* 카드·그리드·표 직후의 소제목은 확실히 띄운다 (다크 카드 뒤 밀착 방지) */
+  .grid + .sub-title, .card + .sub-title, .tbl-wrap + .sub-title, pre + .sub-title, .code + .sub-title { margin-top: 48px; }
 
   /* ---------- Badges ---------- */
   .pill {
