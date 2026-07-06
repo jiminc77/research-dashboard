@@ -302,8 +302,8 @@
 /* ===== CONFIG — 프로젝트 추가는 여기만 ===== */
 const CONFIG = {
   projects: [
-    { name:"DGCC", owner:"jiminc77", mgmtRepo:"research-dashboard", codeRepo:"DGCC", titlePrefix:"" }
-    // 다중 프로젝트: { name:"XYZ", owner:"jiminc77", mgmtRepo:"research-dashboard", codeRepo:"XYZ", titlePrefix:"[XYZ] " }
+    { name:"DGCC", owner:"jiminc77", mgmtRepo:"research-dashboard", codeRepo:"DGCC", titlePrefix:"", docsBase:"projects/dgcc" }
+    // 다중 프로젝트: { name:"XYZ", owner:"jiminc77", mgmtRepo:"research-dashboard", codeRepo:"XYZ", titlePrefix:"[XYZ] ", docsBase:"projects/xyz" }
   ]
 };
 const REFRESH_MS = 5*60*1000;   // 5분 자동 새로고침
@@ -404,7 +404,7 @@ function renderIssueRow(issue, {showChip}={}){
 }
 function renderEmpty(el){ el.innerHTML = `<div class="empty">없음</div>`; }
 
-/* 📄 단계 리포트 (MGMT docs/reports/*_report.html) — GitHub Contents API 결과를 링크로 */
+/* 📄 단계 리포트 (MGMT {docsBase}/reports/*_report.html) — GitHub Contents API 결과를 링크로 */
 function renderReports(p, entries){
   const el = $("reports");
   if(!el) return;
@@ -413,7 +413,8 @@ function renderReports(p, entries){
     .sort((a,b)=>a.name.localeCompare(b.name));
   if(!files.length){ renderEmpty(el); return; }
   el.innerHTML = files.map(f=>{
-    const url = `https://${p.owner}.github.io/${p.mgmtRepo}/docs/reports/${f.name}`;
+    const base = p.docsBase || "docs";
+    const url = `https://${p.owner}.github.io/${p.mgmtRepo}/${base}/reports/${f.name}`;
     return `<div class="row">
       <a class="title" href="${esc(url)}" target="_blank" title="${esc(f.name)}">${esc(f.name)}</a>
     </div>`;
@@ -520,7 +521,8 @@ async function load(){
     render(codeIssues, mgmtIssues, milestones, {fromCache, rateLimited});
     // 단계 리포트 (독립 fetch — 실패해도 나머지 대시보드는 유지)
     try {
-      const repR = await fetchAll(`${API}/repos/${p.owner}/${p.mgmtRepo}/contents/docs/reports`);
+      const base = p.docsBase || "docs";
+      const repR = await fetchAll(`${API}/repos/${p.owner}/${p.mgmtRepo}/contents/${base}/reports`);
       renderReports(p, Array.isArray(repR.data) ? repR.data : []);
     } catch(e){ renderReports(p, []); }
   } catch(e){
