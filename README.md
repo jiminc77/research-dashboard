@@ -16,7 +16,7 @@
 ## 구조
 
 - `research-ops/` — 재사용 키트 (계약 · 지시서 · 템플릿 · 스크립트). 프로젝트 독립.
-- `docs/` — 프로젝트 문서 (연구계획서 · 명세 요약 · 게이트 리포트).
+- `projects/{name}/` — 프로젝트별 문서 (연구계획서 · 명세 요약 · 게이트 리포트 · `status.json`). 예: `projects/dgcc/`. 설정은 `projects/{name}/project.yml` (`_template.yml` 참조).
 - `dashboard/` · `guide/` — GitHub Pages 정적 페이지. 상태는 API로 실시간 렌더 — 수동 갱신 없음.
 - 이슈 2종 — `[Milestone]` 단계 관리 · `[Decision]` 기준 변경 기록.
 

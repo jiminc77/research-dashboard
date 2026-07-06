@@ -11,4 +11,4 @@
 | `docs/reports/` | `projects/dgcc/reports/` |
 | `docs/references/` | `projects/dgcc/references/` |
 
-재편 결정: [Decision] issue — <!-- DECISION_ISSUE_URL -->
+재편 결정: [Decision] issue [#18](https://github.com/jiminc77/research-dashboard/issues/18).
