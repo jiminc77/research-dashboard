@@ -953,7 +953,7 @@ codexpro setup   <span class="cmt"># 출력 URL을 ChatGPT 커넥터로 등록</
           <pre><code>gh secret list -R {OWNER}/{CODE_REPO} | grep NTFY_TOPIC
 curl -d "test" ntfy.sh/{topic}   <span class="cmt"># 폰에 뜨면 정상</span></code></pre>
         </div>
-        <p style="font-size:13.5px;margin:12px 0 0;color:var(--body);">topic은 프로젝트마다 다름. 폰 ntfy 앱에서 그 topic을 <strong>구독</strong>했는지 확인.</p>
+        <p style="font-size:13.5px;margin:12px 0 0;color:var(--body);"><code class="inl">curl</code> 줄은 <strong>아무 로컬 셸</strong>에서 실행 — topic 문자열만 알면 되고 인증 불필요. 구독은 <strong>폰/웹 ntfy 앱</strong>에서 그 topic을 구독(topic은 프로젝트마다 다름).<br>secret 위치: <strong>CODE repo → Settings → Secrets and variables → Actions → <code class="inl">NTFY_TOPIC</code></strong> (워크플로가 여기서 읽어 푸시).</p>
       </div>
       <div class="card">
         <span class="pill mono" style="margin-bottom:10px;">CI가 EVIDENCE를 ❌ 냈다</span>

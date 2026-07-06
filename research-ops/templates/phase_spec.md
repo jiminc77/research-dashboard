@@ -4,7 +4,7 @@
 연구 배경: `{MGMT_REPO}/projects/{project}/research/{PLAN_FILE}` (참고용 — 충돌 시 **본 명세가 우선**)
 
 > 이 문서의 첫 `@goal:` 이전 내용은 **모든 goal에 적용되는 전역 컨텍스트·제약**이다.
-> 작성 지침: `research-ops/WORKFLOW.md`, 세션 절차: `research-ops/ORCHESTRATOR.md`. 잘 채운 예시: `DGCC/P0.md`.
+> 작성 지침·계약: `research-ops/PROTOCOL.md`, 세션 절차: `research-ops/ORCHESTRATOR.md`. 잘 채운 예시: `DGCC/P0.md`.
 > 이전 단계에서 이월된 확정 수치·승계 리스크가 있으면 아래 §0/전역 규칙에 반드시 반영한다.
 
 ---
@@ -23,7 +23,7 @@
 - git 원격: `{CODE_REPO_URL}` (branch: `{BRANCH}`)
 - 금지: sudo, 시스템 패키지 변경, 드라이버/CUDA 변경, 타 사용자 디렉토리 접근
 
-## 2. 전역 규칙 (WORKFLOW.md §5를 이 단계에 맞게 구체화)
+## 2. 전역 규칙 (PROTOCOL.md 계약을 이 단계에 맞게 구체화)
 
 1. 명세에 없는 것 구현 금지. 특히 범위 밖: {이 Phase에서 만들면 안 되는 것 나열}.
 2. 모호성은 스스로 정하지 말고 `gjc ultragoal classify-blocker --classification human_blocked --evidence "<질문+선택지>"` 후 정지. `STEP_LOG.md`에도 기록.

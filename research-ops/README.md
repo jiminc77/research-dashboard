@@ -8,7 +8,7 @@
 
 - 세부 규칙: `PROTOCOL.md`
 - 세션 절차: `ORCHESTRATOR.md`
-- 프롬프트 3종(착수·단계전환·재개): `NEW_PROJECT_PROMPT.md` · `manual.html`
+- 착수·단계전환·재개 프롬프트: **가이드 웹매뉴얼** (`guide/index.html` — 착수 위저드 + 단계 전환은 phase-transition 킥오프 이슈가 완성본 프롬프트를 자동 생성)
 
 ---
 
@@ -19,9 +19,7 @@ research-ops/
   README.md                     # 이 문서 — 키트 front page·퀵스타트
   PROTOCOL.md                   # ★ 정형화 계약: 라벨 상태기계·GATE/EVIDENCE 스키마·사전등록·guard/close
   ORCHESTRATOR.md               # 세션 실행 지시서 (6-STEP + STEP 0 self-check + 라벨 전이)
-  NEW_PROJECT_PROMPT.md         # 사람이 복붙하는 프롬프트 3종 (착수 / 단계 전환 / 재개)
-  WORKFLOW.md                   # 3층위 멘탈 모델·이슈 3종 규약 (운영 계약서)
-  manual.html                   # 위 프롬프트·절차의 브라우저용 매뉴얼
+  SESSION_B.md                  # 세션 B(gjc 감독) 지시서 템플릿
   templates/
     issue_dev.md                # 자기완결형 dev 이슈 (AC·작업 체크리스트·EVIDENCE 참조)
     issue_gate.md               # GATE 이슈/댓글 템플릿 (hard/soft/VERDICT 예시)
@@ -32,9 +30,11 @@ research-ops/
     setup_phase.sh              # @goal 파싱 → dev 이슈 + 매핑표 자동 backfill
     status.sh                   # 한 방 상태 조회 (blocked/running/verify/진행률)
     make_pro_bundle.sh          # gpt-pro 자문용 컨텍스트 번들러 (phase-spec | gate → /tmp/pro_bundle.md)
-  workflows/                    # → CODE repo .github/workflows/ 로 복사해 사용
+  workflows/                    # → CODE repo .github/workflows/ 로 복사해 사용 (4종)
     gate-notify.yml             # ntfy 푸시·리마인더·soft default 자동 채택
     evidence-verify.yml         # EVIDENCE SHA 체크아웃·pytest 재검증
+    phase-transition.yml        # 단계 완료 감지 → 다음 단계 세션 A 킥오프 이슈 자동 생성
+    pr-verify.yml               # PR 검증 (리포트·@goal 명세·불변값·status 린트)
 ```
 
 대시보드는 MGMT repo의 `dashboard/index.html`에 있고 GitHub Pages로 공개된다: **https://jiminc77.github.io/research-dashboard/dashboard/** (무인증 공개 API만 사용, 5분 자동 새로고침, staleness 배지).
@@ -96,7 +96,7 @@ jiminc77/research-dashboard 의 research-ops/ORCHESTRATOR.md, research-ops/PROTO
 
 ## 3. 단계 시작·재개
 
-단계 전환("P{k} 완료, P{k+1} 진행")과 세션 재개 프롬프트는 **`NEW_PROJECT_PROMPT.md`**(착수 / 단계 전환 / 재개 3종)와 브라우저용 **`manual.html`**에 정리되어 있다. 그대로 붙여넣으면 오케스트레이터가 완료 검증(ORCHESTRATOR §4) → 이월 → 다음 단계 명세·이슈 생성, 또는 라벨 기반 상태 복원을 수행한다.
+단계 전환("P{k} 완료 → P{k+1}")은 CODE repo의 **phase-transition 워크플로**가 마지막 `phase:Pk` 이슈 close 시 **킥오프 이슈**(복붙용 세션 A 지시서 — 웹 pro 완성본 포함)를 자동 생성한다. 착수·재개 절차와 규약은 **가이드 웹매뉴얼**(`guide/index.html`)에 정리되어 있다. 그대로 붙여넣으면 오케스트레이터가 완료 검증(ORCHESTRATOR §4) → 이월 → 다음 단계 명세·이슈 생성, 또는 라벨 기반 상태 복원을 수행한다.
 
 한 줄 요약: 상태는 **라벨로 보이고**, 게이트는 **폰으로 오고**(ntfy), 증거는 **CI로 검증되고**, 대시보드는 **살아있다**.
 
