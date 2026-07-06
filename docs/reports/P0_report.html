@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DGCC P0 — 환경·파일럿 단계 회고 리포트</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #171717;
+    --primary-active: #1a1a1a;
+    --text-link: #0d74ce;
+    --ink: #171717;
+    --body: #60646c;
+    --muted: #999999;
+    --muted-soft: #cccccc;
+    --hairline: #f0f0f3;
+    --hairline-soft: #f5f5f7;
+    --hairline-strong: #dcdee0;
+    --canvas: #ffffff;
+    --canvas-soft: #fafafa;
+    --surface-card: #ffffff;
+    --surface-strong: #f0f0f3;
+    --surface-dark: #171717;
+    --surface-dark-elevated: #1a1a1a;
+    --on-primary: #ffffff;
+    --on-dark: #ffffff;
+    --on-dark-soft: #b0b4ba;
+    --sky-light: #cfe7ff;
+    --sky-mid: #a8c8e8;
+    --accent-pass: #2f7d32;
+    --accent-fail: #b42318;
+    --accent-warning: #ab6400;
+    --sans: 'Inter', -apple-system, system-ui, sans-serif;
+    --mono: 'JetBrains Mono', 'Fira Code', monospace;
+    --maxw: 920px;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--canvas);
+    color: var(--body);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  p, li, td, th, dd, dt, .kr { word-break: keep-all; }
+
+  a { color: var(--text-link); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ---------- Nav ---------- */
+  .nav {
+    position: sticky; top: 0; z-index: 100; height: 60px;
+    background: rgba(255,255,255,0.88);
+    backdrop-filter: saturate(180%) blur(12px);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid var(--hairline);
+    display: flex; align-items: center;
+  }
+  .nav-inner {
+    width: 100%; max-width: 1160px; margin: 0 auto; padding: 0 32px;
+    display: flex; align-items: center; justify-content: space-between; gap: 24px;
+  }
+  .wordmark { font-weight: 600; font-size: 16px; letter-spacing: -0.3px; color: var(--ink); white-space: nowrap; }
+  .wordmark:hover { text-decoration: none; }
+  .nav-links { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; justify-content: flex-end; }
+  .nav-links a { font-size: 13.5px; font-weight: 500; color: var(--body); letter-spacing: 0; }
+  .nav-links a:hover { color: var(--ink); text-decoration: none; }
+  .nav-print {
+    font-size: 13px; font-weight: 500; color: var(--on-primary);
+    background: var(--primary); border: none; border-radius: 8px;
+    padding: 8px 14px; cursor: pointer; white-space: nowrap; font-family: var(--sans);
+  }
+  .nav-print:hover { background: var(--primary-active); }
+
+  /* ---------- Layout ---------- */
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 32px; }
+  section.major { padding: 80px 0; border-bottom: 1px solid var(--hairline); }
+  section.major:last-of-type { border-bottom: none; }
+
+  /* ---------- Hero ---------- */
+  .hero { position: relative; overflow: hidden; padding: 88px 0 72px; border-bottom: 1px solid var(--hairline); }
+  .hero::before {
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(1100px 620px at 50% -8%, var(--sky-light) 0%, rgba(207,231,255,0.55) 34%, rgba(168,200,232,0.28) 55%, rgba(255,255,255,0) 78%),
+      linear-gradient(180deg, rgba(168,200,232,0.30) 0%, rgba(207,231,255,0.14) 30%, rgba(255,255,255,0) 62%);
+    pointer-events: none; z-index: 0;
+  }
+  .hero .wrap { position: relative; z-index: 1; }
+  .hero h1 {
+    font-family: var(--sans); font-weight: 600; font-size: 44px; line-height: 1.1;
+    letter-spacing: -1.3px; color: var(--ink); margin: 20px 0 0; max-width: 22ch;
+  }
+  .hero .subtitle { font-size: 19px; line-height: 1.6; color: var(--body); margin: 18px 0 0; max-width: 62ch; font-weight: 400; }
+  .hero .meta { margin-top: 26px; font-size: 14px; color: var(--muted); line-height: 1.8; letter-spacing: 0; }
+  .hero .meta strong { color: var(--body); font-weight: 500; }
+
+  /* ---------- Badges ---------- */
+  .badge {
+    display: inline-block; background: var(--surface-strong); color: var(--ink);
+    font-size: 11px; font-weight: 600; line-height: 1.4; letter-spacing: 0.88px;
+    text-transform: uppercase; border-radius: 9999px; padding: 5px 12px;
+  }
+  .badge.dot::before {
+    content: ""; display: inline-block; width: 5px; height: 5px; border-radius: 50%;
+    background: var(--ink); margin-right: 7px; vertical-align: middle; margin-top: -2px;
+  }
+  .verdict-badge {
+    display: inline-flex; align-items: center; gap: 9px;
+    background: var(--surface-dark); color: var(--on-dark);
+    font-size: 14px; font-weight: 600; letter-spacing: 0.5px;
+    border-radius: 9999px; padding: 9px 20px 9px 16px; margin-top: 30px;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .verdict-badge .go {
+    font-family: var(--mono); font-size: 15px; font-weight: 500;
+    letter-spacing: 1.5px; color: #7ee081;
+  }
+  .verdict-badge .vb-label { font-size: 11px; font-weight: 600; letter-spacing: 0.88px; text-transform: uppercase; color: var(--on-dark-soft); }
+  .verdict-dot { width: 8px; height: 8px; border-radius: 50%; background: #7ee081; }
+
+  .pill {
+    display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
+    border-radius: 9999px; padding: 2px 9px; vertical-align: middle; white-space: nowrap;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .pill.pass { background: #e7f4e8; color: var(--accent-pass); }
+  .pill.fail { background: #fbeae8; color: var(--accent-fail); }
+  .pill.ref  { background: var(--surface-strong); color: var(--body); }
+  .pill.go   { background: #e7f4e8; color: var(--accent-pass); font-family: var(--mono); letter-spacing: 1px; }
+
+  .eyebrow {
+    display: inline-block; background: var(--surface-strong); color: var(--ink);
+    font-size: 11px; font-weight: 600; line-height: 1.4; letter-spacing: 0.88px;
+    text-transform: uppercase; border-radius: 9999px; padding: 5px 12px; margin-bottom: 20px;
+  }
+
+  /* ---------- Headings ---------- */
+  h2.section-head { font-family: var(--sans); font-weight: 600; font-size: 33px; line-height: 1.15; letter-spacing: -1px; color: var(--ink); margin: 0 0 10px; }
+  h3.sub { font-weight: 600; font-size: 24px; line-height: 1.2; letter-spacing: -0.7px; color: var(--ink); margin: 44px 0 14px; }
+  h4.subsub { font-weight: 600; font-size: 19px; line-height: 1.25; letter-spacing: -0.4px; color: var(--ink); margin: 32px 0 12px; }
+  h5.mini { font-weight: 600; font-size: 15px; line-height: 1.4; letter-spacing: 0; color: var(--ink); margin: 24px 0 10px; }
+
+  /* ---------- Body ---------- */
+  p { margin: 0 0 18px; line-height: 1.75; }
+  .major p, .major li { color: var(--body); }
+  strong { color: var(--ink); font-weight: 600; }
+  em { font-style: italic; }
+  ul, ol { margin: 0 0 18px; padding-left: 22px; line-height: 1.75; }
+  li { margin: 0 0 9px; }
+  li::marker { color: var(--muted); }
+  .lead { font-size: 17px; line-height: 1.8; color: var(--body); }
+  .section-intro { margin-bottom: 12px; }
+
+  /* ---------- Code / inline ---------- */
+  code.inline { font-family: var(--mono); font-size: 0.86em; background: var(--surface-strong); color: var(--ink); padding: 1px 6px; border-radius: 5px; }
+  table code.inline { font-size: 0.82em; white-space: nowrap; }
+  pre.code {
+    background: var(--surface-dark); color: var(--on-dark-soft); font-family: var(--mono);
+    font-size: 13px; line-height: 1.7; border-radius: 12px; padding: 20px 22px;
+    overflow-x: auto; margin: 0 0 22px; white-space: pre;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  pre.code .hl { color: var(--on-dark); }
+
+  /* ---------- Cards ---------- */
+  .card { background: var(--surface-card); border: 1px solid var(--hairline-strong); border-radius: 12px; padding: 24px; transition: box-shadow 0.18s ease; }
+  .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
+  .card h5, .card h4 { margin-top: 0; }
+  .card p:last-child { margin-bottom: 0; }
+  .card ul:last-child { margin-bottom: 0; }
+  .grid { display: grid; gap: 16px; }
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .card .card-tag { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.7px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+  .card .card-title { font-weight: 600; font-size: 16px; color: var(--ink); letter-spacing: -0.2px; margin: 0 0 10px; line-height: 1.35; }
+  .card .card-body { font-size: 14.5px; line-height: 1.7; color: var(--body); }
+  .stat-num { font-family: var(--mono); font-weight: 500; font-size: 26px; color: var(--ink); letter-spacing: -0.5px; display: block; margin-bottom: 4px; }
+  .stat-lab { font-size: 12px; color: var(--muted); letter-spacing: 0.3px; line-height: 1.5; }
+
+  /* ---------- Feature (dark) ---------- */
+  .feature-dark { background: var(--surface-dark); color: var(--on-dark); border-radius: 12px; padding: 26px 28px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .feature-dark .fd-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.88px; text-transform: uppercase; color: var(--on-dark-soft); margin-bottom: 14px; }
+  .feature-dark h4 { color: var(--on-dark); font-weight: 600; font-size: 19px; letter-spacing: -0.4px; margin: 0 0 14px; }
+  .feature-dark p { color: var(--on-dark-soft); }
+  .feature-dark p:last-child { margin-bottom: 0; }
+  .feature-dark strong { color: var(--on-dark); }
+  .feature-dark a { color: #8fc2f2; }
+
+  /* ---------- Tables ---------- */
+  .table-scroll { overflow-x: auto; margin: 0 0 16px; border-radius: 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.55; }
+  thead th { text-align: left; font-weight: 600; color: var(--ink); border-bottom: 1.5px solid var(--hairline-strong); padding: 11px 14px; vertical-align: bottom; }
+  tbody td { border-bottom: 1px solid var(--hairline); padding: 11px 14px; color: var(--body); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody td strong { color: var(--ink); }
+  td.num, th.num { text-align: right; font-family: var(--mono); font-size: 13px; white-space: nowrap; }
+  .table-caption { font-size: 13px; color: var(--muted); margin: 0 0 14px; letter-spacing: 0; }
+  .tbl-src { font-size: 12.5px; color: var(--muted); margin: 2px 0 22px; }
+  .tbl-src a { color: var(--muted); text-decoration: underline; text-underline-offset: 2px; }
+  .tbl-src a:hover { color: var(--text-link); }
+
+  /* ---------- Note / definition ---------- */
+  .note { border-left: 3px solid var(--hairline-strong); padding: 4px 0 4px 20px; margin: 0 0 20px; color: var(--body); font-size: 14.5px; }
+  .note.caveat { border-left-color: var(--accent-warning); }
+  .definition { border-left: 3px solid var(--ink); padding: 8px 0 8px 22px; margin: 0 0 22px; }
+  .divider { height: 1px; background: var(--hairline); border: none; margin: 40px 0; }
+
+  /* ---------- Figure ---------- */
+  figure.plot { margin: 0 0 8px; }
+  figure.plot img { width: 100%; height: auto; display: block; border: 1px solid var(--hairline-strong); border-radius: 10px; background: var(--canvas); }
+  figure.plot figcaption { font-size: 12.5px; color: var(--muted); margin-top: 9px; line-height: 1.55; letter-spacing: 0; }
+  figure.plot figcaption a { color: var(--muted); text-decoration: underline; text-underline-offset: 2px; }
+  figure.plot figcaption a:hover { color: var(--text-link); }
+
+  /* ---------- TOC ---------- */
+  .toc { background: var(--surface-card); border: 1px solid var(--hairline-strong); border-radius: 12px; padding: 26px 30px; margin-top: -40px; position: relative; z-index: 2; }
+  .toc .toc-label { font-size: 11px; font-weight: 600; letter-spacing: 0.88px; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+  .toc-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px 40px; }
+  .toc-item { display: flex; align-items: baseline; gap: 14px; padding: 9px 0; border-bottom: 1px solid var(--hairline-soft); }
+  .toc-item .num { font-family: var(--mono); font-size: 12px; color: var(--muted); min-width: 22px; }
+  .toc-item a { color: var(--ink); font-size: 15px; font-weight: 500; }
+  .toc-item a:hover { color: var(--text-link); text-decoration: none; }
+  .toc-item .ko-sub { color: var(--muted); font-size: 13px; font-weight: 400; margin-left: auto; }
+
+  /* ---------- Chips ---------- */
+  .chip { display: inline-block; font-family: var(--mono); font-size: 12px; background: var(--surface-strong); color: var(--ink); padding: 1px 8px; border-radius: 6px; font-weight: 400; }
+  .sha { font-family: var(--mono); font-size: 12px; color: var(--body); }
+
+  /* ---------- Footer ---------- */
+  footer { padding: 44px 0; border-top: 1px solid var(--hairline); }
+  footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 20px; align-items: flex-start; }
+  footer .f-brand { font-weight: 600; color: var(--ink); font-size: 16px; letter-spacing: -0.2px; }
+  footer .f-meta { font-size: 14px; color: var(--body); line-height: 1.8; }
+  footer .f-meta div { color: var(--muted); }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 900px) {
+    .toc-grid { grid-template-columns: 1fr; }
+    .grid-3 { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .hero h1 { font-size: 34px; letter-spacing: -1px; }
+    section.major { padding: 56px 0; }
+    .wrap { padding: 0 22px; }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) {
+    .hero h1 { font-size: 29px; }
+    .hero .subtitle { font-size: 17px; }
+  }
+
+  /* ---------- Print ---------- */
+  @media print {
+    .nav { display: none; }
+    .nav-print { display: none; }
+    html { scroll-behavior: auto; }
+    body { font-size: 11pt; }
+    section.major { padding: 26px 0; page-break-inside: auto; }
+    .hero { padding: 22px 0; }
+    .hero::before { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    pre.code, .feature-dark, .verdict-badge, .pill { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .card:hover { box-shadow: none; }
+    h2.section-head, h3.sub, h4.subsub { page-break-after: avoid; }
+    pre.code, table, .card, .feature-dark, figure.plot { page-break-inside: avoid; }
+    a { color: var(--ink); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#top" class="wordmark">DGCC · P0 리포트</a>
+    <div class="nav-links">
+      <a href="#summary">요약</a>
+      <a href="#goals">Goal 결과</a>
+      <a href="#gates">HUMAN GATE</a>
+      <a href="#constants">확정 수치</a>
+      <a href="#risks">승계 리스크</a>
+      <a href="#artifacts">산출물</a>
+    </div>
+    <button class="nav-print" onclick="window.print()">PDF로 인쇄</button>
+  </div>
+</nav>
+
+<!-- ============ HEADER / HERO ============ -->
+<header class="hero" id="top">
+  <div class="wrap">
+    <span class="badge dot">프로젝트 DGCC · 단계 P0 — 환경·파일럿</span>
+    <h1>P0 환경·파일럿 단계 회고 리포트</h1>
+    <p class="subtitle">시뮬레이터 2종 비교, rope 상태·행동 인터페이스와 transition 로깅, δm(변형 반응) 파이프라인, 두 파일럿 게이트(G1 stiffness 유효성, G2 length-goal 정의)의 측정과 사람 판정 기록.</p>
+    <p class="meta">
+      단계 <strong>P0 — 환경·파일럿</strong> &nbsp;·&nbsp;
+      기간 <strong>2026-07-02 ~ 07-03</strong> &nbsp;·&nbsp;
+      코드 저장소 <strong><a href="https://github.com/jiminc77/DGCC">jiminc77/DGCC</a></strong> &nbsp;·&nbsp;
+      sign-off 커밋 <a href="https://github.com/jiminc77/DGCC/commit/493ea32"><span class="sha">493ea32</span></a>
+    </p>
+    <div class="verdict-badge">
+      <span class="verdict-dot"></span>
+      <span class="vb-label">최종 판정</span>
+      <span class="go">GO</span>
+    </div>
+  </div>
+</header>
+
+<!-- ============ TOC ============ -->
+<div class="wrap">
+  <nav class="toc" aria-label="목차">
+    <div class="toc-label">목차</div>
+    <div class="toc-grid">
+      <div class="toc-item"><span class="num">01</span><a href="#summary">요약</a><span class="ko-sub">질문·답·진입 근거</span></div>
+      <div class="toc-item"><span class="num">02</span><a href="#goals">Goal별 결과</a><span class="ko-sub">M0–M7</span></div>
+      <div class="toc-item"><span class="num">03</span><a href="#gates">HUMAN GATE 기록</a><span class="ko-sub">M2·G2·G1·M7</span></div>
+      <div class="toc-item"><span class="num">04</span><a href="#constants">확정 수치 표</a><span class="ko-sub">M7 sign-off</span></div>
+      <div class="toc-item"><span class="num">05</span><a href="#risks">승계 리스크</a><span class="ko-sub">미해결 6건</span></div>
+      <div class="toc-item"><span class="num">06</span><a href="#artifacts">산출물 색인</a><span class="ko-sub">outputs · 이슈</span></div>
+    </div>
+  </nav>
+</div>
+
+<!-- ============ 01. SUMMARY ============ -->
+<section class="major" id="summary">
+  <div class="wrap">
+    <span class="eyebrow">01 — 요약</span>
+    <h2 class="section-head">이 단계의 질문과 얻은 답</h2>
+    <p class="lead section-intro">P0는 강화학습(Reinforcement Learning, RL) 이전 단계로, DLO(Deformable Linear Object, 변형 선형 물체) 조작 연구에 필요한 시뮬레이션 기반과 두 파일럿 게이트의 측정 자료를 만드는 것을 목표로 했다. 게이트의 판정은 사람이 수행하고, 실행자는 측정과 보고까지만 담당했다.</p>
+    <p>이 단계가 답해야 한 질문은 네 가지였다. 어느 시뮬레이터를 primary로 쓸 것인가(M2), 길이-목표 거리 정의가 goal 성분과 정합하는가(G2), stiffness가 유효한 분포 외(Out-of-Distribution, OOD) 축인가(G1), 그리고 P1로 넘길 수치와 규약을 무엇으로 고정할 것인가(M7)이다.</p>
+    <p>얻은 답은 다음과 같다. Primary 시뮬레이터는 <strong>DLO-Lab</strong>으로 결정되었다(settle 수렴 100% 대 MuJoCo 0% @5000, GPU 배치 실행 검증, DGCC <a href="https://github.com/jiminc77/DGCC/issues/3">#3</a>). G2는 혼합 norm 정의에서 실패(Spearman ρ=0.126)한 뒤, 사람 판정으로 성분 분해형 + correspondence L2 정의로 개정되고 orientation canonicalization을 편입하여 <strong>OVERALL PASS</strong>로 종료되었다(DGCC <a href="https://github.com/jiminc77/DGCC/issues/6">#6</a>, 대시보드 <a href="https://github.com/jiminc77/research-dashboard/issues/17">[Decision] #17</a>). G1은 stiffness pooled Cohen's d가 0.24 이하로 검출력이 없어, stiffness를 주 OOD 축에서 강등하고 length 중심으로 재편하는 판정 (b)가 채택되었다(DGCC <a href="https://github.com/jiminc77/DGCC/issues/7">#7</a>).</p>
+    <p>P1 진입 근거는 2026-07-03 HUMAN SIGN-OFF(DGCC <a href="https://github.com/jiminc77/DGCC/issues/8">#8</a>, 커밋 <a href="https://github.com/jiminc77/DGCC/commit/493ea32"><span class="sha">493ea32</span></a>)이다. reward 상수·성공 임계·settle 예산·파지 노이즈·OOD split·거리 metric 8개 항목이 사람 판정으로 확정되었고, P1 선행 작업이 없음이 확인되었으며, 6건의 미해결 리스크가 P1 입력으로 승계되었다. 최종 단계 판정은 <strong>GO</strong>이다.</p>
+  </div>
+</section>
+
+<!-- ============ 02. GOALS ============ -->
+<section class="major" id="goals">
+  <div class="wrap">
+    <span class="eyebrow">02 — Goal별 결과</span>
+    <h2 class="section-head">M0 – M7 마일스톤 결과</h2>
+    <p class="lead section-intro">각 goal은 DGCC 저장소의 GitHub 이슈 하나에 대응한다(M0→#1 … M7→#8). primary 지표는 임계 대비 값으로, guard 지표는 부속 검증으로 표기한다. HUMAN GATE goal(M2/M5/M6/M7)은 산출물 생성 후 사람 판정을 기다렸다.</p>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Goal</th>
+            <th>목표 (한 줄)</th>
+            <th>결과</th>
+            <th>primary · guard 지표 (임계 대비)</th>
+            <th>evidence</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>M0</strong></td>
+            <td>작업공간 부트스트랩과 공통 추상 인터페이스·로깅 스키마 골격</td>
+            <td><span class="pill pass">완료</span></td>
+            <td><code class="inline">DLOEnvBase</code> 시그니처+스텁 테스트 커밋; 이후 전 마일스톤이 사용하는 골격 확정</td>
+            <td><a href="https://github.com/jiminc77/DGCC/issues/1">#1</a> · <a href="https://github.com/jiminc77/DGCC/commit/a35a9cc"><span class="sha">a35a9cc</span></a></td>
+          </tr>
+          <tr>
+            <td><strong>M1</strong></td>
+            <td>시뮬레이터 2종(DLO-Lab, MuJoCo cable) bring-up과 비교 보고서</td>
+            <td><span class="pill pass">완료</span></td>
+            <td>smoke 두 sim 모두 PASS (MuJoCo 7/7, DLO-Lab 8/8); DLO-Lab 설치 성공(2h 타임박스 내)</td>
+            <td><a href="https://github.com/jiminc77/DGCC/issues/2">#2</a> · <a href="https://github.com/jiminc77/DGCC/commit/e2bda5b"><span class="sha">e2bda5b</span></a></td>
+          </tr>
+          <tr>
+            <td><strong>M2</strong><br><span class="pill ref">HUMAN GATE</span></td>
+            <td>사람이 비교 보고서를 보고 primary sim 결정</td>
+            <td><span class="pill pass">DLO-Lab</span></td>
+            <td>결정 (A) DLO-Lab primary. settle 수렴 100% (mean 1471.7 steps) 대 MuJoCo 0% @5000; primitive wall-time 4.77 s 대 5.83 s; GPU 배치 <code class="inline">n_envs=4</code> 검증. MuJoCo는 M1 상태 frozen fallback.</td>
+            <td><a href="https://github.com/jiminc77/DGCC/issues/3">#3</a> · <a href="https://github.com/jiminc77/DGCC/commit/0fa0a67"><span class="sha">0fa0a67</span></a></td>
+          </tr>
+          <tr>
+            <td><strong>M3</strong></td>
+            <td>primary sim adapter의 (p,u) primitive와 파라미터화 API 완성</td>
+            <td><span class="pill pass">완료</span></td>
+            <td><code class="inline">DLOLabEnv</code>: grasp→move→release→settle, 파지 현실성 ±1 node + 5% 실패; 1000-draw 실측 실패율 4.9% (5%±1%p 수용 대역 내)</td>
+            <td><a href="https://github.com/jiminc77/DGCC/issues/4">#4</a> · <a href="https://github.com/jiminc77/DGCC/commit/12c67e4"><span class="sha">12c67e4</span></a></td>
+          </tr>
+          <tr>
+            <td><strong>M4</strong></td>
+            <td>transition 로깅과 δm(변형 반응) 파이프라인</td>
+            <td><span class="pill pass">완료</span></td>
+            <td>5,056 transitions 수집 (<code class="inline">n_envs=64</code>); grasp success 94.7% / settle 수렴 53.7% / success∧converged 48.4% (2,445 records로 normalizer fit). Φ 불변성 실측 max 상대오차 1.73% &lt; 2%</td>
+            <td><a href="https://github.com/jiminc77/DGCC/issues/5">#5</a> · <a href="https://github.com/jiminc77/DGCC/commit/53ffca7"><span class="sha">53ffca7</span></a></td>
+          </tr>
+          <tr>
+            <td><strong>M5</strong><br><span class="pill ref">HUMAN GATE</span></td>
+            <td>이원 goal·거리 구현과 G2 게이트 측정</td>
+            <td><span class="pill pass">G2 PASS</span></td>
+            <td>v1 혼합 norm ρ=0.126 FAIL → 성분 분해 개정 → v3 anchor ρ=0.9847 PASS, shape ρ=0.99999 PASS → OVERALL PASS (임계 0.9 불변). 상세는 §03 라운드 표.</td>
+            <td><a href="https://github.com/jiminc77/DGCC/issues/6">#6</a> · <a href="https://github.com/jiminc77/DGCC/commit/f4cab54"><span class="sha">f4cab54</span></a> · <a href="https://github.com/jiminc77/DGCC/commit/a9a4071"><span class="sha">a9a4071</span></a></td>
+          </tr>
+          <tr>
+            <td><strong>M6</strong><br><span class="pill ref">HUMAN GATE</span></td>
+            <td>G1 stiffness 유효성 파일럿 측정</td>
+            <td><span class="pill fail">축 강등</span></td>
+            <td>stiffness pooled Cohen's d: 0.5↔1.0 = 0.061, 1.0↔2.0 = −0.034, 0.5↔2.0 = 0.236 (전 구간 between ≈ within noise floor). 판정 (b): 주 OOD 축 강등.</td>
+            <td><a href="https://github.com/jiminc77/DGCC/issues/7">#7</a> · <a href="https://github.com/jiminc77/DGCC/commit/6da316a"><span class="sha">6da316a</span></a></td>
+          </tr>
+          <tr>
+            <td><strong>M7</strong><br><span class="pill ref">HUMAN sign-off</span></td>
+            <td>수치 고정 문서와 P0 종료 보고</td>
+            <td><span class="pill go">GO</span></td>
+            <td>8개 항목 확정 (reward·ε_succ·settle·파지·OOD·metric). 테스트 스위트 50 passed. metrics JSON 8종과 ~35건 수치 대조 전건 일치. 상세는 §04.</td>
+            <td><a href="https://github.com/jiminc77/DGCC/issues/8">#8</a> · <a href="https://github.com/jiminc77/DGCC/commit/1f2a518"><span class="sha">1f2a518</span></a> · <a href="https://github.com/jiminc77/DGCC/commit/493ea32"><span class="sha">493ea32</span></a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="tbl-src">출처: <a href="https://github.com/jiminc77/DGCC/blob/main/outputs/reports/p0_final_report.md">outputs/reports/p0_final_report.md</a>, <a href="https://github.com/jiminc77/DGCC/blob/main/STEP_LOG.md">STEP_LOG.md</a>, <a href="https://github.com/jiminc77/DGCC/blob/main/P0.md">P0.md</a> (Goal↔Issue 매핑표).</p>
+
+    <div class="grid grid-3" style="margin-top:32px;">
+      <div class="card">
+        <span class="card-tag">M4 dataset</span>
+        <span class="stat-num">5,056</span>
+        <div class="stat-lab">수집된 transition (<code class="inline">n_envs=64</code>). 그중 success∧converged 2,445건이 normalizer fit에 사용.</div>
+      </div>
+      <div class="card">
+        <span class="card-tag">M2 settle 수렴</span>
+        <span class="stat-num">100% / 0%</span>
+        <div class="stat-lab">DLO-Lab 대 MuJoCo @ velocity &lt; 1e-3, max 5000 steps. mean 1471.7 대 5000.0 steps.</div>
+      </div>
+      <div class="card">
+        <span class="card-tag">Φ 불변성</span>
+        <span class="stat-num">1.73%</span>
+        <div class="stat-lab">max 상대오차, 2% 요건 미만. discretization <code class="inline">N∈{25,100}</code>에서 측정.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03. GATES ============ -->
+<section class="major" id="gates">
+  <div class="wrap">
+    <span class="eyebrow">03 — HUMAN GATE 기록</span>
+    <h2 class="section-head">사람 판정 기록</h2>
+    <p class="lead section-intro">전역 규칙상 M2/M5/M6/M7은 자동 통과가 금지되며, 게이트 임계·수치는 결과가 나쁘게 나와도 변경하지 않는다. 판정 정본은 각 DGCC 이슈 코멘트(인증 계정 jiminc77)이며, STEP_LOG.md "HUMAN 판정 — 정본" 절에 미러링되어 있다.</p>
+
+    <!-- M2 -->
+    <h3 class="sub">M2 — Primary 시뮬레이터 결정 <a href="https://github.com/jiminc77/DGCC/issues/3" style="font-size:14px; font-weight:500;">#3</a></h3>
+    <div class="card">
+      <div class="card-body">
+        <p><strong>질문.</strong> M1 비교 보고서를 근거로 primary sim을 결정한다. 선택지: (A) DLO-Lab primary, (B) MuJoCo primary.</p>
+        <p><strong>판정.</strong> <strong>(A) DLO-Lab primary.</strong> 이후 M3+ 파이프라인은 <code class="inline">DLOLabEnv</code>를 primary adapter로 사용하고, MuJoCo cable adapter는 M1 상태의 frozen fallback으로 남긴다(삭제 금지).</p>
+        <p><strong>근거.</strong> settle 수렴 100% (mean 1471.7 steps) 대 MuJoCo 0% @5000 · primitive wall-time mean 4.77 s 대 5.83 s · GPU headless 배치 <code class="inline">n_envs=4</code> 검증 · 파라미터 setter 커버리지(소성 포함, P0에선 비활성). Caveat: settle 수렴 지표가 sim 간 완전히 동일하지 않음(MuJoCo <code class="inline">max_abs_qvel</code> 대 DLO-Lab <code class="inline">max_node_speed</code>)이나, 사람 게이트는 전체 비교를 본 뒤 DLO-Lab을 선택했다.</p>
+      </div>
+    </div>
+    <p class="tbl-src" style="margin-top:14px;">근거: <a href="https://github.com/jiminc77/DGCC/blob/main/outputs/reports/sim_comparison.md">outputs/reports/sim_comparison.md</a>, <a href="https://github.com/jiminc77/DGCC/blob/main/STEP_LOG.md">STEP_LOG.md</a> (M2 HUMAN DECISION, 2026-07-02T22:48Z).</p>
+
+    <!-- G2 -->
+    <h3 class="sub">G2 — Length-Goal 정의 게이트 <a href="https://github.com/jiminc77/DGCC/issues/6" style="font-size:14px; font-weight:500;">#6</a></h3>
+    <p><strong>질문.</strong> 거리 함수 D의 변화량 ΔD가 goal 성분 변화량 Δ‖c_g‖와 정합하는가. 게이트 통과 기준은 Spearman ρ ≥ 0.9 (전 라운드 불변). 미달 시 조정 방향은 사람이 결정한다.</p>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>라운드</th>
+            <th>정의 / 사건</th>
+            <th>결과 (ρ, 임계 0.9)</th>
+            <th>판정 · 의미</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>v1</strong></td>
+            <td>원본 혼합 norm G2: primary success∧converged 모집단(<code class="inline">n=2445</code>)에서 Spearman ρ(ΔD, Δ‖c_g‖)</td>
+            <td><span class="pill fail">FAIL</span><br><span class="sha">ρ=0.1261</span></td>
+            <td>진단: anchor-only ρ=0.9288, shape-only ρ=0.0234 — 혼합 norm이 신호를 붕괴시킴. 사람 판정: 이원 goal 설계 실패가 아니라 게이트 <strong>측정 구인(construct) 결함</strong>으로 확정.</td>
+          </tr>
+          <tr>
+            <td><strong>개정</strong></td>
+            <td>사람 승인으로 §8을 성분 분해형 G2로 개정(anchor AND shape, 각 ρ≥0.9, correspondence L2, orientation flip; D_shape는 centroid 제거) + 전역 규칙 4가 허용하는 1회 재측정</td>
+            <td><span class="pill ref">1회 재측정</span></td>
+            <td>임계 0.9 불변. D 정의를 Chamfer → 길이 정규화 correspondence L2로 교체([Decision] 대시보드 <a href="https://github.com/jiminc77/research-dashboard/issues/17">#17</a>). v1 산출물 byte-identical 보존.</td>
+          </tr>
+          <tr>
+            <td><strong>v2</strong></td>
+            <td>개정 §8 하 성분 분해 측정</td>
+            <td>anchor <span class="pill pass">PASS</span> <span class="sha">0.9847</span><br>shape <span class="pill fail">FAIL</span> <span class="sha">0.2571</span></td>
+            <td>OVERALL FAIL. Chamfer 감도 sanity ρ=0.9165 (n=248) — 실패는 Chamfer 둔감성만으로 설명되지 않음. stopping rule 존중, 게이트 재시도 아닌 원인 진단(D1/D2) + Case A/B/C 사전 등록.</td>
+          </tr>
+          <tr>
+            <td><strong>v3</strong></td>
+            <td>Case A: orientation canonicalization — <code class="inline">X_before</code> 기준 단일 flip 결정을 <code class="inline">X_before</code>/<code class="inline">X_after</code>에 동일 적용 (버그 수정으로 분류, 파라미터 불변)</td>
+            <td>anchor <span class="pill pass">PASS</span> <span class="sha">0.9847</span><br>shape <span class="pill pass">PASS</span> <span class="sha">0.99999</span></td>
+            <td><strong>OVERALL PASS.</strong> D1 진단은 기존 flip 불일치율 67.6%를 찾았고, D2 Parseval/lowpass sanity는 ρ_trunc=0.999994로 DCT truncation/tail이 원인이 아님을 보였다.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="tbl-src">출처: <a href="https://github.com/jiminc77/DGCC/blob/main/outputs/metrics/g2_correlation.json">g2_correlation.json</a> (v1), <a href="https://github.com/jiminc77/DGCC/blob/main/outputs/metrics/g2_correlation_v2.json">g2_correlation_v2.json</a>, <a href="https://github.com/jiminc77/DGCC/blob/main/outputs/metrics/g2_correlation_v3.json">g2_correlation_v3.json</a> (<code class="inline">pass_overall = true</code>). 정확값: v3 anchor ρ=0.9846875812, shape ρ=0.9999941495.</p>
+    <div class="note caveat">
+      <strong>Caveat.</strong> v3 shape 성분은 orientation-consistency 버그 수정의 검증 성격이 크다 — 고정된 규약 아래에서 자명에 가깝다. 비자명한 실증 신호는 anchor 성분(v3 ρ=0.9847)이다. v1이 무작위 far-goal에서 발견한 약한 shape coupling(shape-only ρ=0.0234)과 near-goal 거동은 P0 증거가 아니라 열린 가설로 남으며, P1 리스크 #2로 승계된다.
+    </div>
+
+    <div class="grid grid-2" style="margin-top:28px;">
+      <figure class="plot">
+        <img src="https://raw.githubusercontent.com/jiminc77/DGCC/main/outputs/plots/g2_scatter_anchor.png" alt="G2 anchor 성분 산점도 — ΔD 대 Δ‖c_g_anchor‖">
+        <figcaption>G2 anchor 성분 산점도 (v3, ρ=0.9847 PASS) — 비자명한 실증 신호. <a href="https://github.com/jiminc77/DGCC/blob/main/outputs/plots/g2_scatter_anchor.png">g2_scatter_anchor.png</a></figcaption>
+      </figure>
+      <figure class="plot">
+        <img src="https://raw.githubusercontent.com/jiminc77/DGCC/main/outputs/plots/g2_scatter_shape_v3.png" alt="G2 shape 성분 산점도 v3 — orientation canonicalization 이후">
+        <figcaption>G2 shape 성분 산점도 (v3, Case A 이후, ρ=0.99999 PASS) — orientation-consistency 검증. <a href="https://github.com/jiminc77/DGCC/blob/main/outputs/plots/g2_scatter_shape_v3.png">g2_scatter_shape_v3.png</a></figcaption>
+      </figure>
+    </div>
+
+    <!-- G1 -->
+    <h3 class="sub">G1 — Stiffness 유효성 게이트 <a href="https://github.com/jiminc77/DGCC/issues/7" style="font-size:14px; font-weight:500;">#7</a></h3>
+    <p><strong>질문.</strong> stiffness가 유효한 주 OOD 축인가. 선택지: (a) stiffness 축 유지, (b) 강등 + length 중심 재편, (c) springback task 추가 설계. 측정: 20 고정 시퀀스(4 template × 5) × seed 3 × stiffness {×0.5, ×1, ×2} (+ friction 참고 블록), 파지 현실성 OFF.</p>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>축</th>
+            <th>pair</th>
+            <th class="num">between mean</th>
+            <th class="num">within-floor mean</th>
+            <th class="num">Cohen's d</th>
+            <th class="num">cluster 95% CI</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td rowspan="3"><strong>stiffness</strong><br><span class="pill ref">primary 후보</span></td><td>0.5 ↔ 1.0</td><td class="num">0.046533</td><td class="num">0.044310</td><td class="num">0.061129</td><td class="num">[−0.292, 0.373]</td></tr>
+          <tr><td>1.0 ↔ 2.0</td><td class="num">0.052207</td><td class="num">0.054065</td><td class="num">−0.033513</td><td class="num">[−0.273, 0.168]</td></tr>
+          <tr><td>0.5 ↔ 2.0</td><td class="num">0.066673</td><td class="num">0.052999</td><td class="num">0.235856</td><td class="num">[0.041, 0.457]</td></tr>
+          <tr><td rowspan="3"><strong>friction</strong><br><span class="pill ref">참고 블록</span></td><td>0.5 ↔ 1.0</td><td class="num">0.026270</td><td class="num">0.040927</td><td class="num">−0.460699</td><td class="num">[−0.844, −0.197]</td></tr>
+          <tr><td>1.0 ↔ 2.0</td><td class="num">0.025774</td><td class="num">0.041755</td><td class="num">−0.515630</td><td class="num">[−0.847, −0.255]</td></tr>
+          <tr><td>0.5 ↔ 2.0</td><td class="num">0.030009</td><td class="num">0.044820</td><td class="num">−0.412076</td><td class="num">[−0.701, −0.202]</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="tbl-src">출처: <a href="https://github.com/jiminc77/DGCC/blob/main/outputs/metrics/g1_effect_size.json">g1_effect_size.json</a>, <a href="https://github.com/jiminc77/DGCC/blob/main/outputs/reports/g1_report.md">g1_report.md</a>. 음수 d = between-condition 거리가 within-condition noise floor를 하회(pooled-std 단위). n_between=60, n_within=120 (각 pair).</p>
+    <div class="card" style="margin-bottom:24px;">
+      <div class="card-body">
+        <p><strong>판정.</strong> <strong>(b) 채택</strong> — stiffness를 주 OOD 축에서 강등하고 length(+discretization) 중심으로 재편한다. friction은 주 축으로 승격하지 않으며((c) springback task 미채택), 소성 활성화는 A2(quasi-static) 상충으로 기각한다.</p>
+        <p><strong>방법론적 관찰(논문 반영 예정).</strong> "quasi-static pick-and-place regime에서 탄성/마찰 파라미터 OOD 전이 주장은 그 자체로 검증력이 없다." template 분해는 새 게이트 판정이 아닌 부록 자료로, pooling 이질성을 보인다: <code class="inline">u_bend</code> stiffness d는 양성(0.5↔1.0에서 0.801, 0.5↔2.0에서 0.739)인 반면 <code class="inline">random_smooth</code>는 음성. 각 template 클러스터 부트스트랩은 5 시퀀스 클러스터뿐이므로 small-n 주의가 필요하다(P1 리스크 #5).</p>
+      </div>
+    </div>
+    <div class="grid grid-2">
+      <figure class="plot">
+        <img src="https://raw.githubusercontent.com/jiminc77/DGCC/main/outputs/plots/g1_stiffness_distributions.png" alt="G1 stiffness 거리 분포 — between 대 within-floor">
+        <figcaption>stiffness 거리 분포 — between ≈ within noise floor, pooled d ≤ 0.24. <a href="https://github.com/jiminc77/DGCC/blob/main/outputs/plots/g1_stiffness_distributions.png">g1_stiffness_distributions.png</a></figcaption>
+      </figure>
+      <figure class="plot">
+        <img src="https://raw.githubusercontent.com/jiminc77/DGCC/main/outputs/plots/g1_template_decomposition.png" alt="G1 template별 효과크기 분해 — u_bend 대 random_smooth 부호 반전">
+        <figcaption>template별 효과크기 분해 (부록, small-n) — <code class="inline">u_bend</code> 양성 대 <code class="inline">random_smooth</code> 음성. <a href="https://github.com/jiminc77/DGCC/blob/main/outputs/plots/g1_template_decomposition.png">g1_template_decomposition.png</a></figcaption>
+      </figure>
+    </div>
+
+    <!-- M7 -->
+    <h3 class="sub">M7 — P0 HUMAN SIGN-OFF <a href="https://github.com/jiminc77/DGCC/issues/8" style="font-size:14px; font-weight:500;">#8</a></h3>
+    <div class="feature-dark">
+      <div class="fd-eyebrow">2026-07-03T08:38Z · issue #8 코멘트 (jiminc77)</div>
+      <h4>P0 종료 승인 — 판정 GO</h4>
+      <p><code class="inline" style="background:var(--surface-dark-elevated); color:var(--on-dark);">p0_final_report.md</code> at commit <a href="https://github.com/jiminc77/DGCC/commit/1f2a518"><span class="sha" style="color:#8fc2f2;">1f2a518</span></a> 검토 완료 — M2/G2/G1 결정 반영, M6 반영 지시 4건, metrics 대조 검증, P1 선행 작업 없음 확인. §5 잠정 고정표를 확정하고 6건의 리스크를 P1로 승계했다. 확정 항목은 §04 표에 그대로 옮긴다. sign-off 결정은 커밋 <a href="https://github.com/jiminc77/DGCC/commit/493ea32"><span class="sha" style="color:#8fc2f2;">493ea32</span></a>에 기록된다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 04. CONSTANTS ============ -->
+<section class="major" id="constants">
+  <div class="wrap">
+    <span class="eyebrow">04 — 확정 수치 표</span>
+    <h2 class="section-head">M7 확정 수치 고정표</h2>
+    <p class="lead section-intro">아래 표는 2026-07-03 HUMAN SIGN-OFF(DGCC <a href="https://github.com/jiminc77/DGCC/issues/8">#8</a>)로 확정된 수치·규약이다. 각 행의 확정값과 근거·조건은 <a href="https://github.com/jiminc77/DGCC/blob/main/outputs/reports/p0_final_report.md">p0_final_report.md §5</a> 및 대시보드 <a href="https://github.com/jiminc77/research-dashboard/blob/main/docs/reports/P0_pilot_gates.md">P0_pilot_gates.md</a>의 M7 표를 출처로 한다.</p>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>항목</th>
+            <th>확정값</th>
+            <th>근거 · 조건</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>reward 상수</strong></td>
+            <td><code class="inline">α=10</code>, <code class="inline">c_step=0.1</code>, <code class="inline">R_succ=5</code> — P1 시작값</td>
+            <td>P0 무증거 항목(RL 미수행). P1 baseline 안정화 중 조정 허용하되 변경 시 STEP_LOG.md 기록 필수, P1 종료 시 최종 잠금.</td>
+          </tr>
+          <tr>
+            <td><strong>성공 임계 ε_succ</strong></td>
+            <td><code class="inline">ε_succ = 0.05·L</code> 확정</td>
+            <td>순수 실행 노이즈 median 0.031512·L 대비 약 1.6× 여유. mean 0.046626·L는 5% grasp-failure 쌍이 부풀린 값이라 판단 기준으로 부적합. 에피소드 내 재파지 가능. P1 파일럿에서 성공률 천장 관찰 시 재상정.</td>
+          </tr>
+          <tr>
+            <td><strong>settle 기준 · 예산</strong></td>
+            <td>velocity threshold <code class="inline">1e-3</code> 불변; <code class="inline">max_steps</code> <code class="inline">5000 → 10000</code> 증액</td>
+            <td>Sweep: 10000에서 수렴 100%, first-crossing max 7608 &lt; 10000. A2(quasi-static) 보증과 usable 데이터 48.4% → ~95% 이득이 비용을 상회. 기존 M4 데이터셋은 재수집하지 않고 플래그 유지; P1 수집부터 적용.</td>
+          </tr>
+          <tr>
+            <td><strong>grasp realism</strong></td>
+            <td>±1 node execution noise + 5% failure probability 유지 확정</td>
+            <td>1000-draw probe 실측 4.9% 검증 및 Appendix B 정량화.</td>
+          </tr>
+          <tr>
+            <td><strong>OOD primary</strong></td>
+            <td>length train <code class="inline">[0.8, 1.2]</code> → OOD <code class="inline">{0.5, 0.6, 1.4, 1.6}</code> m 확정; density-preserving <code class="inline">n_segments {25, 30, 70, 80}</code> 채택</td>
+            <td>G1 verdict (b). discretization 축은 별도로 고정 L에서 <code class="inline">N∈{25, 100}</code>; Φ 불변성 실측 1.73% &lt; 2%.</td>
+          </tr>
+          <tr>
+            <td><strong>OOD 보조 · 참고</strong></td>
+            <td>보조 = initial/goal shape 분포; stiffness/friction = reference-only 확정</td>
+            <td>G1 pooled stiffness d ≤ 0.24, friction negative d; 본문 claim 제외, appendix 보고. 방법론적 관찰 문구 유지.</td>
+          </tr>
+          <tr>
+            <td><strong>거리 D (reward · 성공 판정)</strong></td>
+            <td>길이 정규화 correspondence L2로 통일 확정; orientation canonicalization 규약 포함</td>
+            <td>G2 v3가 검증한 metric↔c_g 정합 조합. Chamfer는 보고·참고 지표로만 병기.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="tbl-src">출처: <a href="https://github.com/jiminc77/DGCC/blob/main/outputs/reports/p0_final_report.md">outputs/reports/p0_final_report.md</a> §5 (issue #8 HUMAN SIGN-OFF 반영), <a href="https://github.com/jiminc77/research-dashboard/blob/main/docs/reports/P0_pilot_gates.md">P0_pilot_gates.md</a> M7 표.</p>
+
+    <h4 class="subsub">부록 근거 — settle 예산 sweep</h4>
+    <p>설계: 24 cases, budgets <code class="inline">[5000, 10000, 20000]</code>, balanced init-shape cycle, threshold 0.001 불변, 소성 비활성. first-convergence(24 converged cases): min 1110, median 2434, mean 2931.9, max 7608.</p>
+    <div class="grid grid-2" style="align-items:start;">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr><th class="num">budget max_steps</th><th class="num">convergence rate</th><th class="num">speed mean @budget</th><th class="num">speed max @budget</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="num">5000</td><td class="num">0.8333</td><td class="num">0.0013058</td><td class="num">0.0082178</td></tr>
+            <tr><td class="num">10000</td><td class="num">1.0000</td><td class="num">0.0013881</td><td class="num">0.0067589</td></tr>
+            <tr><td class="num">20000</td><td class="num">1.0000</td><td class="num">0.0013099</td><td class="num">0.0060843</td></tr>
+          </tbody>
+        </table>
+        <p class="tbl-src">출처: <a href="https://github.com/jiminc77/DGCC/blob/main/outputs/metrics/settle_budget_sweep.json">settle_budget_sweep.json</a> (<code class="inline">threshold_immutable = 0.001</code>).</p>
+      </div>
+      <figure class="plot">
+        <img src="https://raw.githubusercontent.com/jiminc77/DGCC/main/outputs/plots/settle_budget_sweep.png" alt="settle 예산 sweep — budget별 수렴률 곡선">
+        <figcaption>settle 예산 sweep — 10000에서 수렴 100%. <a href="https://github.com/jiminc77/DGCC/blob/main/outputs/plots/settle_budget_sweep.png">settle_budget_sweep.png</a></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 05. RISKS ============ -->
+<section class="major" id="risks">
+  <div class="wrap">
+    <span class="eyebrow">05 — 승계 리스크</span>
+    <h2 class="section-head">P1로 넘길 리스크 · 미해결 6건</h2>
+    <p class="lead section-intro">아래 6건은 전부 P1.md 입력으로 승계 확정되었다. 추가로 P4+에서 곡률 지배 task로 stiffness를 재검토할 수 있다는 노트를 함께 기록한다. 각 항목의 근거는 링크로 표기한다.</p>
+    <div class="grid grid-2">
+      <div class="card">
+        <span class="card-tag">리스크 01 · settle</span>
+        <div class="card-title">Settle budget implementation boundary</div>
+        <div class="card-body">
+          <p>HUMAN SIGN-OFF는 <code class="inline">vel_threshold=1e-3</code>를 고정하고 향후 수집 <code class="inline">max_steps</code>를 10000으로 올렸으나, 기존 M4 데이터셋은 재수집하지 않는다. 그 non-convergence 플래그는 감사 추적의 일부로 남는다.</p>
+          <p style="margin-bottom:0;"><a href="https://github.com/jiminc77/DGCC/blob/main/outputs/metrics/dm_stats.json">dm_stats.json</a> · <a href="https://github.com/jiminc77/DGCC/blob/main/outputs/metrics/settle_budget_sweep.json">settle_budget_sweep.json</a></p>
+        </div>
+      </div>
+      <div class="card">
+        <span class="card-tag">리스크 02 · goal 표현</span>
+        <div class="card-title">Shape-channel coupling (열린 가설)</div>
+        <div class="card-body">
+          <p>v1 혼합 norm 진단은 무작위 far goal에서 shape-only ρ=0.0234를 찾았고, Case A 이전 v2 shape 성분은 ρ=0.2571이었다. Case A는 orientation consistency를 고치지만, near-goal shape 거동은 P0 증거가 아닌 열린 가설로 남는다.</p>
+          <p style="margin-bottom:0;"><a href="https://github.com/jiminc77/DGCC/blob/main/outputs/metrics/g2_correlation.json">g2_correlation.json</a> · <a href="https://github.com/jiminc77/DGCC/blob/main/outputs/metrics/g2_correlation_v3.json">g2_correlation_v3.json</a></p>
+        </div>
+      </div>
+      <div class="card">
+        <span class="card-tag">리스크 03 · 외부 코드</span>
+        <div class="card-title">DLO-Lab external-code risk</div>
+        <div class="card-body">
+          <p>DLO-Lab은 여전히 신생 외부 코드다. 런타임 <code class="inline">gs.ti_float=gs.qd_float</code> aliasing이 필요하고, SharePoint asset이 처음에 HTTP 401을 반환했으며, torch/genesis/numpy/fsspec/packaging 의존성 pin이 취약하다.</p>
+          <p style="margin-bottom:0;"><a href="https://github.com/jiminc77/DGCC/blob/main/outputs/reports/sim_comparison.md">sim_comparison.md</a> · <a href="https://github.com/jiminc77/DGCC/blob/main/STEP_LOG.md">STEP_LOG.md</a></p>
+        </div>
+      </div>
+      <div class="card">
+        <span class="card-tag">리스크 04 · metric 경계</span>
+        <div class="card-title">Metric boundary (L2 대 Chamfer)</div>
+        <div class="card-body">
+          <p>reward와 성공 판정은 orientation canonicalization을 포함한 길이 정규화 correspondence L2를 쓰며, Chamfer는 보고·참고 지표로만 남는다. P1 명세는 이 경계를 명시적으로 보존해야 한다.</p>
+          <p style="margin-bottom:0;"><a href="https://github.com/jiminc77/DGCC/blob/main/P0.md">P0.md</a> · <a href="https://github.com/jiminc77/DGCC/blob/main/outputs/metrics/g2_correlation_v3.json">g2_correlation_v3.json</a></p>
+        </div>
+      </div>
+      <div class="card">
+        <span class="card-tag">리스크 05 · 이질성</span>
+        <div class="card-title">Template heterogeneity</div>
+        <div class="card-body">
+          <p>pooled G1 수치는 template별 부호 변화를 가린다. stiffness에서 <code class="inline">u_bend</code>는 양성인 반면 <code class="inline">random_smooth</code>는 음성이며, template당 시퀀스 클러스터는 5개뿐이다.</p>
+          <p style="margin-bottom:0;"><a href="https://github.com/jiminc77/DGCC/blob/main/outputs/metrics/g1_template_decomposition.json">g1_template_decomposition.json</a></p>
+        </div>
+      </div>
+      <div class="card">
+        <span class="card-tag">리스크 06 · 운영</span>
+        <div class="card-title">Rendering / datagen operational note</div>
+        <div class="card-body">
+          <p><code class="inline">assets/dlo-lab.zip</code>이 디스크에 존재하며 gitignore 상태다. 향후 DLO-Lab 렌더링/datagen은 LuisaRender를 올바로 연결하고 공식 datagen <code class="inline">--raytracer</code> 경로를 사용해야 한다.</p>
+          <p style="margin-bottom:0;"><a href="https://github.com/jiminc77/DGCC/blob/main/STEP_LOG.md">STEP_LOG.md</a></p>
+        </div>
+      </div>
+    </div>
+    <div class="note" style="margin-top:26px;">
+      <strong>추가 노트 (P4+).</strong> stiffness는 P0 quasi-static regime에서 검출력이 없어 reference-only로 강등되었으나, 곡률이 지배하는 task로 범위가 넓어지는 P4 이후 단계에서는 재검토가 가능하다. 출처: <a href="https://github.com/jiminc77/research-dashboard/blob/main/docs/reports/P0_pilot_gates.md">P0_pilot_gates.md</a> (P1 승계 리스크 절).
+    </div>
+
+    <figure class="plot" style="margin-top:28px;">
+      <img src="https://raw.githubusercontent.com/jiminc77/DGCC/main/outputs/plots/repeat_variance.png" alt="반복 실행 분산 — 파지 현실성 ON 대 OFF 분포">
+      <figcaption>반복 실행 분산 (Appendix B) — 파지 현실성 ON mean 0.046626 / median 0.031512 (ε_succ=0.05·L 근거), OFF는 결정적 solver noise floor(mean 2.82e-06). <a href="https://github.com/jiminc77/DGCC/blob/main/outputs/plots/repeat_variance.png">repeat_variance.png</a></figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ============ 06. ARTIFACTS ============ -->
+<section class="major" id="artifacts">
+  <div class="wrap">
+    <span class="eyebrow">06 — 산출물 색인</span>
+    <h2 class="section-head">산출물 · 이슈 색인</h2>
+    <p class="lead section-intro">P0 사실 근거의 출처 파일, 임베드한 플롯, 관련 이슈 전체 목록이다. 파일 경로는 DGCC 저장소 <code class="inline">main</code> 브랜치 blob 링크로, 플롯은 <code class="inline">raw.githubusercontent.com</code> URL로 연결한다.</p>
+
+    <h4 class="subsub">주요 보고서 · metrics 파일</h4>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>파일</th><th>내용</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><a href="https://github.com/jiminc77/DGCC/blob/main/outputs/reports/p0_final_report.md">outputs/reports/p0_final_report.md</a></td><td>P0 최종 사실 요약 (PRIMARY 출처) — HUMAN sign-off 반영</td></tr>
+          <tr><td><a href="https://github.com/jiminc77/DGCC/blob/main/outputs/reports/sim_comparison.md">outputs/reports/sim_comparison.md</a></td><td>M1 시뮬레이터 2종 비교 보고서</td></tr>
+          <tr><td><a href="https://github.com/jiminc77/DGCC/blob/main/outputs/reports/g1_report.md">outputs/reports/g1_report.md</a></td><td>G1 stiffness 유효성 파일럿 보고서</td></tr>
+          <tr><td><a href="https://github.com/jiminc77/DGCC/blob/main/outputs/metrics/g1_effect_size.json">outputs/metrics/g1_effect_size.json</a></td><td>G1 pooled Cohen's d, i.i.d./cluster CI</td></tr>
+          <tr><td><a href="https://github.com/jiminc77/DGCC/blob/main/outputs/metrics/g1_template_decomposition.json">outputs/metrics/g1_template_decomposition.json</a></td><td>G1 template별 효과크기 분해 (recompute-only)</td></tr>
+          <tr><td><a href="https://github.com/jiminc77/DGCC/blob/main/outputs/metrics/g2_correlation.json">outputs/metrics/g2_correlation.json</a></td><td>G2 v1 혼합 norm ρ=0.126 + anchor/shape 진단</td></tr>
+          <tr><td><a href="https://github.com/jiminc77/DGCC/blob/main/outputs/metrics/g2_correlation_v2.json">outputs/metrics/g2_correlation_v2.json</a></td><td>G2 v2 성분 분해 (anchor PASS / shape FAIL)</td></tr>
+          <tr><td><a href="https://github.com/jiminc77/DGCC/blob/main/outputs/metrics/g2_correlation_v3.json">outputs/metrics/g2_correlation_v3.json</a></td><td>G2 v3 Case A (<code class="inline">pass_overall = true</code>)</td></tr>
+          <tr><td><a href="https://github.com/jiminc77/DGCC/blob/main/outputs/metrics/dm_stats.json">outputs/metrics/dm_stats.json</a></td><td>M4 dataset 통계 (5,056 transitions, 비율, δm norm)</td></tr>
+          <tr><td><a href="https://github.com/jiminc77/DGCC/blob/main/outputs/metrics/settle_budget_sweep.json">outputs/metrics/settle_budget_sweep.json</a></td><td>settle 예산 sweep (5000/10000/20000)</td></tr>
+          <tr><td><a href="https://github.com/jiminc77/DGCC/blob/main/outputs/metrics/repeat_variance.json">outputs/metrics/repeat_variance.json</a></td><td>반복 실행 분산 (realism ON/OFF)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4 class="subsub">임베드한 플롯</h4>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>플롯</th><th>사용 위치</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><a href="https://raw.githubusercontent.com/jiminc77/DGCC/main/outputs/plots/g2_scatter_anchor.png">g2_scatter_anchor.png</a></td><td>§03 G2 — anchor 성분 산점도 (비자명 신호)</td></tr>
+          <tr><td><a href="https://raw.githubusercontent.com/jiminc77/DGCC/main/outputs/plots/g2_scatter_shape_v3.png">g2_scatter_shape_v3.png</a></td><td>§03 G2 — shape 성분 산점도 (v3, Case A 이후)</td></tr>
+          <tr><td><a href="https://raw.githubusercontent.com/jiminc77/DGCC/main/outputs/plots/g1_stiffness_distributions.png">g1_stiffness_distributions.png</a></td><td>§03 G1 — stiffness 거리 분포</td></tr>
+          <tr><td><a href="https://raw.githubusercontent.com/jiminc77/DGCC/main/outputs/plots/g1_template_decomposition.png">g1_template_decomposition.png</a></td><td>§03 G1 — template별 효과크기 분해</td></tr>
+          <tr><td><a href="https://raw.githubusercontent.com/jiminc77/DGCC/main/outputs/plots/settle_budget_sweep.png">settle_budget_sweep.png</a></td><td>§04 — settle 예산 sweep 수렴 곡선</td></tr>
+          <tr><td><a href="https://raw.githubusercontent.com/jiminc77/DGCC/main/outputs/plots/repeat_variance.png">repeat_variance.png</a></td><td>§05 — 반복 실행 분산 (ε_succ 근거)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4 class="subsub">관련 이슈 전체 목록</h4>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>이슈</th><th>제목</th><th>상태</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><a href="https://github.com/jiminc77/DGCC/issues/1">DGCC #1</a></td><td>[P0-M0] 작업공간 부트스트랩과 공통 인터페이스 골격</td><td><span class="pill ref">closed</span></td></tr>
+          <tr><td><a href="https://github.com/jiminc77/DGCC/issues/2">DGCC #2</a></td><td>[P0-M1] 시뮬레이터 2종 bring-up과 비교 보고서</td><td><span class="pill ref">closed</span></td></tr>
+          <tr><td><a href="https://github.com/jiminc77/DGCC/issues/3">DGCC #3</a></td><td>[P0-M2] HUMAN GATE — primary 시뮬레이터 결정</td><td><span class="pill ref">closed</span></td></tr>
+          <tr><td><a href="https://github.com/jiminc77/DGCC/issues/4">DGCC #4</a></td><td>[P0-M3] (p,u) primitive와 파라미터화 API</td><td><span class="pill ref">closed</span></td></tr>
+          <tr><td><a href="https://github.com/jiminc77/DGCC/issues/5">DGCC #5</a></td><td>[P0-M4] Transition 로깅과 δm 파이프라인</td><td><span class="pill ref">closed</span></td></tr>
+          <tr><td><a href="https://github.com/jiminc77/DGCC/issues/6">DGCC #6</a></td><td>[P0-M5] HUMAN GATE — 이원 goal과 G2 측정</td><td><span class="pill ref">closed</span></td></tr>
+          <tr><td><a href="https://github.com/jiminc77/DGCC/issues/7">DGCC #7</a></td><td>[P0-M6] HUMAN GATE — G1 stiffness 파일럿</td><td><span class="pill ref">closed</span></td></tr>
+          <tr><td><a href="https://github.com/jiminc77/DGCC/issues/8">DGCC #8</a></td><td>[P0-M7] HUMAN sign-off — P0 종료 보고와 수치 고정</td><td><span class="pill ref">closed</span></td></tr>
+          <tr><td><a href="https://github.com/jiminc77/research-dashboard/issues/9">dashboard #9</a></td><td>[Milestone] P0 — 환경·파일럿 (2-sim + δm + G1/G2)</td><td><span class="pill ref">milestone</span></td></tr>
+          <tr><td><a href="https://github.com/jiminc77/research-dashboard/issues/17">dashboard #17</a></td><td>[Decision] G2 게이트 정의 정제 — 성분 분해 + correspondence L2</td><td><span class="pill ref">decision</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="tbl-src">판정 기록 원본: <a href="https://github.com/jiminc77/research-dashboard/blob/main/docs/reports/P0_pilot_gates.md">research-dashboard/docs/reports/P0_pilot_gates.md</a>. 커밋 기준: sign-off <a href="https://github.com/jiminc77/DGCC/commit/493ea32"><span class="sha">493ea32</span></a>, 보고서 <a href="https://github.com/jiminc77/DGCC/commit/1f2a518"><span class="sha">1f2a518</span></a>.</p>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div>
+      <div class="f-brand">DGCC · P0 회고 리포트</div>
+      <div class="f-meta" style="margin-top:6px;">Deformation-Grounded Contact Critic — 환경·파일럿 단계</div>
+    </div>
+    <div class="f-meta">
+      <div>기간 2026-07-02 ~ 07-03 · 최종 판정 GO</div>
+      <div>코드 <a href="https://github.com/jiminc77/DGCC">jiminc77/DGCC</a> · 대시보드 <a href="https://github.com/jiminc77/research-dashboard">research-dashboard</a></div>
+      <div>sign-off 커밋 <span class="sha">493ea32</span> · 보고서 커밋 <span class="sha">1f2a518</span></div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
