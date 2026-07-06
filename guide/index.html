@@ -277,6 +277,8 @@
   .callout.warn { border-color: #f0e2c4; background: #fdf8ee; }
   .callout.warn .mk { background: #f6e6c2; color: var(--warning); }
   .callout.tip .mk { background: var(--surface-strong); color: var(--ink); }
+  .callout.note { border-color: #cfe0f0; background: #f4f8fc; }
+  .callout.note .mk { background: var(--sky-light); color: var(--text-link); }
   .callout p { font-size: 14px; margin: 0; color: var(--body); }
   .callout strong { color: var(--ink); }
 
@@ -590,6 +592,11 @@
     <div class="callout tip mb0" style="margin-bottom:24px;">
       <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16v-5M12 8h.01" stroke-linecap="round"/><circle cx="12" cy="12" r="9"/></svg></span>
       <p>세션 A가 STEP 0에서 자동 실행: <code class="inl">bootstrap_project.sh</code>(라벨 18종·마일스톤) → CODE repo <code class="inl">.github/workflows/</code>에 <strong>pr-verify · phase-transition · gate-notify · evidence-verify</strong> 4종 + <code class="inl">.github/immutables.txt</code> 복사 → <code class="inl">projects/{name}/</code> + <code class="inl">project.yml</code> 생성 → 대시보드 <code class="inl">CONFIG.projects</code>에 항목 추가(<code class="inl">docsBase</code> 포함).</p>
+    </div>
+
+    <div class="callout note mb0" style="margin-bottom:24px;">
+      <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16v-5M12 8h.01" stroke-linecap="round"/><circle cx="12" cy="12" r="9"/></svg></span>
+      <p><strong>인증 — 실행 주체로 갈린다.</strong> 세션 A(위저드 지시서를 받는 LLM 세션·샌드박스)는 <code class="inl">gh</code>가 없다 → 사람이 준 <strong>fine-grained PAT</strong>(두 레포 Contents RW + Issues RW)로 <strong>REST API</strong>를 쓴다. 아래 <code class="inl">gh auth status</code>류 커맨드는 <strong>사람이 로컬 셸</strong>에서 직접 부트스트랩할 때만(전제: <code class="inl">gh</code> 설치 + <code class="inl">gh auth login</code> 완료).</p>
     </div>
 
     <!-- ===== SETUP WIZARD ===== -->
@@ -1081,6 +1088,7 @@ curl -d "test" ntfy.sh/{topic}   <span class="cmt"># 폰에 뜨면 정상</span>
 
   function buildInstruction(v) {
     var project = v.project || v.code;
+    var slug = project.toLowerCase().replace(/[^a-z0-9-]/g, '') || 'project';
     var repoLine = '- 구현 레포: ' + v.owner + '/' + v.code +
       (v.noRepo ? ' (없으면 gh repo create ' + v.owner + '/' + v.code + ' --private 로 생성)' : '');
     return 'research-ops 세션 A(메인 오케스트레이터) 실행 지시서 — ' + project + '\n' +
@@ -1096,15 +1104,15 @@ repoLine + '\n' +
 '- ntfy topic: ' + v.ntfy + '\n' +
 '\n' +
 'STEP 0 — 초기 세팅 (전부 네가 실행하고 결과를 표로 보고하라):\n' +
-'1) gh auth status 확인\n' +
+'1) GitHub 인증 확인 — 이 지시서를 실행하는 너(세션 A)는 gh CLI 없는 LLM 세션이다: 사람에게서 fine-grained PAT(두 레포 Contents RW + Issues RW)를 받아 REST API로 쓴다. (사람이 로컬 셸에서 직접 밟는 경우에만 `gh auth login` 후 `gh auth status`.)\n' +
 '2) 라벨 상태기계 18종을 관리·구현 레포에, phase 마일스톤을 구현 레포에 생성 (research-ops/scripts/bootstrap_project.sh 참조)\n' +
 '3) 관리 레포 research-ops/workflows/ 의 pr-verify.yml · phase-transition.yml · gate-notify.yml · evidence-verify.yml 4종과 .github/immutables.txt 를 구현 레포 .github/ 에 커밋\n' +
 '4) NTFY_TOPIC secret 등록은 내 몫이다 — `gh secret set NTFY_TOPIC -R ' + v.owner + '/' + v.code + '` 와 topic 값(' + v.ntfy + '), 폰 ntfy 앱 구독법을 보여주고 완료 확인을 받아라\n' +
-'5) 관리 레포 projects/' + project + '.yml 에 이 설정 전체를 커밋 (projects/_template.yml 참조 — 이후 모든 단계 세션이 이 파일을 읽는다)\n' +
-'6) 관리 레포 dashboard/index.html 의 CONFIG.projects 에 ' + project + ' 항목을 추가 커밋 (titlePrefix "[' + project + '] " · docsBase "projects/' + project.toLowerCase() + '")\n' +
+'5) 관리 레포 projects/' + slug + '/project.yml 에 이 설정 전체를 커밋 (projects/_template.yml 참조 — 이후 모든 단계 세션이 이 파일을 읽는다)\n' +
+'6) 관리 레포 dashboard/index.html 의 CONFIG.projects 에 ' + project + ' 항목을 추가 커밋 (titlePrefix "[' + project + '] " · docsBase "projects/' + slug + '")\n' +
 '7) 셋업 검증 리포트 출력\n' +
 '\n' +
-'STEP 1 — 이 메시지에 첨부된 계획서 초안을 plan_refinement 절차로 학회 수준 정형화 → projects/{project}/research/ 에 커밋 → 내 승인 대기\n' +
+'STEP 1 — 이 메시지에 첨부된 계획서 초안을 plan_refinement 절차로 학회 수준 정형화 → projects/' + slug + '/research/ 에 커밋 → 내 승인 대기\n' +
 'STEP 2~ — ORCHESTRATOR.md 절차대로 P0 준비: 단계 회고(해당 시) → P0.md 명세 → dev 이슈 발행 → 마지막에 세션 B 실행 지시서(SESSION_B.md 템플릿에 값 채움)를 복사 블록으로 출력하고 정지\n' +
 '\n' +
 '게이트 모드: 내가 "이슈 확인"이라고 하면 ORCHESTRATOR.md §게이트 코파일럿 절차를 수행하라 (상황 요약 → 선택지 분석 → VERDICT 초안. 판정은 내가 한다).';
