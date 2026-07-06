@@ -1,0 +1,26 @@
+# DGCC 프로젝트 설정 — 세션 A/B와 단계 전환이 읽는 진실
+# (projects/_template.yml 을 채운 것. 멀티프로젝트 재편 2026-07-06.)
+project: "DGCC"
+owner: "jiminc77"
+mgmt_repo: "research-dashboard"
+code_repo: "DGCC"
+docs_base: "projects/dgcc"
+phases: "P0:환경·파일럿,P1:베이스라인,P2:Probing게이트,P3:구조비교게이트,P4:본학습,P5:기제분석,P6:OOD·ablation,P7:집필"
+phase_status:
+  P0: "done (2026-07-03 sign-off, GO)"
+  P1: "current"
+  P2: "backlog"
+  P3: "backlog"
+  P4: "backlog"
+  P5: "backlog"
+  P6: "backlog"
+  P7: "backlog"
+ssh_host: "{SSH_HOST}"
+workdir: "{WORKDIR}"
+gjc:
+  main_models: "{MODEL_MAIN}"    # default/planner/architect
+  exec_models: "{MODEL_EXEC}"    # executor/critic
+ntfy_topic_name: "NTFY_TOPIC"    # 값은 secret에만 둔다 — 여기엔 적지 않는다
+# title_prefix 는 grandfathered(빈 문자열) — DGCC 이슈는 접두어 없이 생성됨
+dashboard_title_prefix: ""
+labels_prefix: ""                # 라벨 접두어 없음 (grandfathered)
