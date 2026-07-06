@@ -611,7 +611,7 @@
     <div class="sec-head">
       <span class="pill" style="margin-bottom:14px;">1</span>
       <h2 class="sec-title">새 프로젝트 시작하기</h2>
-      <p><span class="who me">나</span> 레포 2개 준비 → 폼 채우기 → 지시서 복사 → 계획서 초안 첨부해 새 세션 A에 붙여넣기. <span class="who sa">세션 A</span>가 셋업(라벨·워크플로·설정·대시보드)부터 계획서 정형화·P0까지 수행합니다.</p>
+      <p>레포 2개 준비 → 폼 채우기 → 지시서 복사 → 계획서 초안 첨부해 새 세션 A에 붙여넣기. 세션 A가 셋업(라벨·워크플로·설정·대시보드)부터 계획서 정형화·P0까지 수행합니다.</p>
     </div>
 
     <!-- checklist first -->
@@ -633,7 +633,7 @@
 
     <div class="callout note" style="margin-bottom:24px;">
       <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16v-5M12 8h.01" stroke-linecap="round"/><circle cx="12" cy="12" r="9"/></svg></span>
-      <p><span class="who sa">세션 A</span><span class="who me">나</span> <strong>인증 — 실행 주체로 갈린다.</strong> 세션 A(위저드 지시서를 받는 LLM 세션·샌드박스)는 <code class="inl">gh</code>가 없다 → <strong>내가</strong> 준 <strong>fine-grained PAT</strong>(두 레포 Contents RW + Issues RW)로 <strong>REST API</strong>를 쓴다. 아래 <code class="inl">gh auth status</code>류 커맨드는 <strong>내가 로컬 셸</strong>에서 직접 부트스트랩할 때만(전제: <code class="inl">gh</code> 설치 + <code class="inl">gh auth login</code> 완료).</p>
+      <p><strong>인증 — 실행 주체로 갈린다.</strong> 세션 A(위저드 지시서를 받는 LLM 세션·샌드박스)는 <code class="inl">gh</code>가 없다 → <strong>내가</strong> 준 <strong>fine-grained PAT</strong>(두 레포 Contents RW + Issues RW)로 <strong>REST API</strong>를 쓴다. 아래 <code class="inl">gh auth status</code>류 커맨드는 <strong>내가 로컬 셸</strong>에서 직접 부트스트랩할 때만(전제: <code class="inl">gh</code> 설치 + <code class="inl">gh auth login</code> 완료).</p>
     </div>
 
     <!-- ===== SETUP WIZARD ===== -->
@@ -740,7 +740,7 @@ gh secret set NTFY_TOPIC -R {OWNER}/{CODE_REPO}   <span class="cmt"># 값: {proj
     <div class="sec-head">
       <span class="pill" style="margin-bottom:14px;">2</span>
       <h2 class="sec-title">단계(Phase) 실행하기</h2>
-      <p><code class="inl">P{k}.md</code>와 dev 이슈는 <span class="who sa">세션 A</span>(웹 pro)가 GitHub 앱으로 직접 만듭니다(§4 흐름). <strong>이슈가 생겨도 gjc는 자동 시작되지 않습니다</strong> — <span class="who me">나</span>가 원격 워크스테이션에서 1회 부팅해야 실행이 시작되고, 이후 <span class="who gjc">gjc</span>가 자율 실행합니다.</p>
+      <p><code class="inl">P{k}.md</code>와 dev 이슈는 세션 A(웹 pro)가 GitHub 앱으로 직접 만듭니다(§4 흐름). <strong>이슈가 생겨도 gjc는 자동 시작되지 않습니다</strong> — 내가 원격 워크스테이션에서 1회 부팅해야 실행이 시작되고, 이후 gjc가 자율 실행합니다.</p>
     </div>
 
     <div class="grid grid-2">
@@ -753,7 +753,7 @@ bash research-ops/scripts/setup_phase.sh P{k} \
   projects/{project}/... /P{k}.md --push</code></pre>
       </div>
       <div class="code" style="margin:0;">
-        <div class="code-top"><span class="fname">gjc 부팅 (원격 워크스테이션)</span><span class="lang">bash</span><span class="who me">나</span><span class="who gjc">gjc</span><button class="copy-btn" data-label="복사">복사</button></div>
+        <div class="code-top"><span class="fname">gjc 부팅 (원격 워크스테이션)</span><span class="lang">bash</span><span class="who me">나</span><button class="copy-btn" data-label="복사">복사</button></div>
         <pre><code>ssh {SSH_HOST} && cd {WORKDIR} && git pull
 tmux new -s gjc-P{k}
 gjc ralplan --interactive "P{k}.md 명세로 실행 계획"
@@ -816,7 +816,7 @@ updated: 2026-07-06T09:12Z
     <div class="sec-head">
       <span class="pill" style="margin-bottom:14px;">3</span>
       <h2 class="sec-title">게이트 판정하기</h2>
-      <p><span class="who auto">자동</span> ntfy 푸시 도착 → <span class="who me">나</span> 이슈 열기 → <code class="inl">### GATE VERDICT</code> 코멘트. 판정은 오직 나. 정본은 issue 코멘트뿐입니다.</p>
+      <p>ntfy 푸시가 도착하면 이슈를 열어 <code class="inl">### GATE VERDICT</code> 코멘트. 판정은 오직 나. 정본은 issue 코멘트뿐입니다.</p>
     </div>
 
     <div class="grid grid-2">
@@ -856,13 +856,6 @@ follow-ups:
       <span class="pill" style="margin-bottom:14px;">4</span>
       <h2 class="sec-title">단계 넘어가기</h2>
       <p>마지막 <code class="inl">phase:P{k}</code>(현재 단계 라벨, 예: <code class="inl">phase:P1</code>) open 이슈를 close하면 <strong>킥오프 이슈가 자동 생성</strong>됩니다. 세션 A가 산출물 4종을 PR로 올리고, pr-verify green 후 <strong>내가</strong> merge합니다.</p>
-      <div class="who-legend" style="margin-top:12px;">
-        <span class="who auto">자동</span> 킥오프 <span class="sep">→</span>
-        <span class="who me">나</span> 복붙 <span class="sep">→</span>
-        <span class="who sa">세션 A</span> PR <span class="sep">→</span>
-        <span class="who auto">자동</span> 검증 <span class="sep">→</span>
-        <span class="who me">나</span> merge
-      </div>
     </div>
 
     <ol class="steps">
@@ -890,7 +883,7 @@ follow-ups:
 
     <div class="callout tip mt24 mb0">
       <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9"/></svg></span>
-      <p><span class="who me">나</span> <strong>branch protection 켜는 시점 = P1 종료(sign-off).</strong> gjc의 직접 push 의존이 사라지면 CODE repo <code class="inl">Settings → Branches → Add rule</code> → <code class="inl">main</code>에 <strong>Require a pull request</strong> + <strong>Require status checks</strong>에서 <code class="inl">pr-verify</code> 지정. (P1 실행 중엔 켜지 않음 — gjc 직접 push가 막힘.)</p>
+      <p><strong>branch protection 켜는 시점 = P1 종료(sign-off).</strong> gjc의 직접 push 의존이 사라지면 CODE repo <code class="inl">Settings → Branches → Add rule</code> → <code class="inl">main</code>에 <strong>Require a pull request</strong> + <strong>Require status checks</strong>에서 <code class="inl">pr-verify</code> 지정. (P1 실행 중엔 켜지 않음 — gjc 직접 push가 막힘.)</p>
     </div>
   </div>
 </section>
@@ -904,7 +897,7 @@ follow-ups:
     <div class="sec-head">
       <span class="pill" style="margin-bottom:14px;">5</span>
       <h2 class="sec-title">보기</h2>
-      <p><span class="who me">나</span> 실시간 대시보드(무인증 API 렌더, 수동 갱신 없음) · 계획서 LIVE 페이지 · 단계 리포트.</p>
+      <p>실시간 대시보드(무인증 API 렌더, 수동 갱신 없음) · 계획서 LIVE 페이지 · 단계 리포트.</p>
     </div>
     <div class="tbl-wrap">
       <table class="tbl">
@@ -931,7 +924,6 @@ follow-ups:
       <span class="pill" style="margin-bottom:14px;">6</span>
       <h2 class="sec-title">검증이 막을 때</h2>
       <p><code class="inl">pr-verify</code>는 PR에서만 돌고, 변경 파일 종류별로 4종 린터를 조건 실행합니다. 실패 원인과 대처.</p>
-      <div class="who-legend" style="margin-top:12px;"><span class="who auto">자동</span> 검사·재실행 <span class="sep">·</span> <span class="who me">나</span> 또는 <span class="who sa">세션 A</span> 원인 진단·수정 커밋</div>
     </div>
     <div class="tbl-wrap">
       <table class="tbl">
@@ -964,7 +956,7 @@ curl -d "test" ntfy.sh/{topic}   <span class="cmt"># 폰에 뜨면 정상</span>
 
     <div class="callout warn mt24 mb0">
       <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zM8 11V7a4 4 0 018 0v4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-      <p><span class="who me">나</span> <strong>토큰:</strong> gjc는 owner 계정 <strong>fine-grained PAT</strong>(issues·contents·actions)로 <code class="inl">gh</code>를 씁니다. 스코프를 좁혀 발급하고, 끝나거나 유출 의심 시 <a href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener">GitHub 설정</a>에서 즉시 revoke.</p>
+      <p><strong>토큰:</strong> gjc는 owner 계정 <strong>fine-grained PAT</strong>(issues·contents·actions)로 <code class="inl">gh</code>를 씁니다. 스코프를 좁혀 발급하고, 끝나거나 유출 의심 시 <a href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener">GitHub 설정</a>에서 즉시 revoke.</p>
     </div>
   </div>
 </section>
