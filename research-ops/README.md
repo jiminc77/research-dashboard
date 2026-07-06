@@ -25,10 +25,13 @@ research-ops/
   templates/
     issue_dev.md                # 자기완결형 dev 이슈 (AC·작업 체크리스트·EVIDENCE 참조)
     issue_gate.md               # GATE 이슈/댓글 템플릿 (hard/soft/VERDICT 예시)
+    pro_phase_spec_prompt.md    # gpt-pro 자문: 다음 단계 명세(gjc 브리프) 초안 지시
+    pro_gate_advisor_prompt.md  # gpt-pro 자문: HUMAN GATE 판정 분석 지시
   scripts/
     bootstrap_project.sh        # 라벨 + milestone 멱등 생성 (--labels-only)
     setup_phase.sh              # @goal 파싱 → dev 이슈 + 매핑표 자동 backfill
     status.sh                   # 한 방 상태 조회 (blocked/running/verify/진행률)
+    make_pro_bundle.sh          # gpt-pro 자문용 컨텍스트 번들러 (phase-spec | gate → /tmp/pro_bundle.md)
   workflows/                    # → CODE repo .github/workflows/ 로 복사해 사용
     gate-notify.yml             # ntfy 푸시·리마인더·soft default 자동 채택
     evidence-verify.yml         # EVIDENCE SHA 체크아웃·pytest 재검증
@@ -96,3 +99,29 @@ jiminc77/research-dashboard 의 research-ops/ORCHESTRATOR.md, research-ops/PROTO
 단계 전환("P{k} 완료, P{k+1} 진행")과 세션 재개 프롬프트는 **`NEW_PROJECT_PROMPT.md`**(착수 / 단계 전환 / 재개 3종)와 브라우저용 **`manual.html`**에 정리되어 있다. 그대로 붙여넣으면 오케스트레이터가 완료 검증(ORCHESTRATOR §4) → 이월 → 다음 단계 명세·이슈 생성, 또는 라벨 기반 상태 복원을 수행한다.
 
 한 줄 요약: 상태는 **라벨로 보이고**, 게이트는 **폰으로 오고**(ntfy), 증거는 **CI로 검증되고**, 대시보드는 **살아있다**.
+
+---
+
+## 4. gpt-pro 자문 경로 (선택 — 초안 보조)
+
+강한 추론 모델(gpt-pro 등)을 **자문**으로 끼워, 다음 단계 명세 초안이나 게이트 판정 분석을 받는 경로다. **참고일 뿐이며, 정본은 issue 코멘트/세션 A 검증으로만 확정된다.**
+
+흐름은 **번들 → 붙여넣기 → 초안 회수** 3단계다.
+
+```bash
+# (A) 다음 단계 명세 초안용 번들
+bash research-ops/scripts/make_pro_bundle.sh phase-spec P2 dgcc
+#   → /tmp/pro_bundle.md : 계획서 + 이전 단계 리포트 + 현재 P{k}.md + STEP_LOG tail
+#     + 승계 리스크 골격 + pro_phase_spec_prompt.md(요구 출력 형식)
+
+# (B) HUMAN GATE 판정 자문용 번들
+bash research-ops/scripts/make_pro_bundle.sh gate 42 dgcc
+#   → /tmp/pro_bundle.md : 게이트 이슈 본문·코멘트(GATE REQUEST/EVIDENCE)
+#     + 사전등록 기준 인용 자리 + pro_gate_advisor_prompt.md
+```
+
+1. **번들**: 위 스크립트가 공개 데이터(git/curl, 인증 불필요)만 모아 `/tmp/pro_bundle.md`를 만든다.
+2. **붙여넣기**: 그 파일을 gpt-pro에 그대로 붙여넣는다. 번들 끝의 프롬프트 템플릿이 요구 출력 형식(gjc 브리프 / 게이트 분석표)을 지시한다.
+3. **초안 회수**: 돌아온 결과는 **초안**이다. 세션 A가 규약 검증(파서가 `@goal`을 다 잡는가·임계 불변인가·lint)을 거쳐 커밋으로 정본화하고, 게이트 판정은 사람이 `### GATE VERDICT` 코멘트로만 확정한다.
+
+거버넌스 규칙(불변): **자문은 참고, 정본은 issue 코멘트/세션 A 검증.** 자문 초안이 사전등록 임계를 바꾸자고 하면 그건 게이트 통과가 아니라 `[Decision]` 이슈를 거쳐야 하는 기준 변경이다.
