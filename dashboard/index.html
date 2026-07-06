@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>research-ops · live dashboard</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23171717'/><text x='16' y='22' font-family='monospace' font-size='19' font-weight='700' fill='%23ffffff' text-anchor='middle'>R</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -490,7 +491,7 @@ function render(codeIssues, mgmtIssues, milestones, note){
       <div class="pbar"><i style="width:${pc}%;background:${done===total?'var(--success)':'var(--coral)'}"></i></div>
       <span class="frac">${done}/${total}</span>
     </div>`;
-  }).join("") : `<div class="empty">phase 이슈 없음</div>`;
+  }).join("") : `<div class="empty">없음</div>`;
 
   // 🧭 최근 Decision (MGMT)
   const decs = mgmtIssues.filter(i =>
@@ -544,6 +545,9 @@ async function load(){
 /* ===== 초기화 ===== */
 function initProjects(){
   const sel = $("projSel");
+  // 프로젝트가 하나뿐이면 셀렉터를 숨긴다 (선택할 게 없음)
+  if (CONFIG.projects.length <= 1){ sel.hidden = true; return; }
+  sel.hidden = false;
   sel.innerHTML = CONFIG.projects.map((p,i)=>`<option value="${i}">${esc(p.name)}</option>`).join("");
   sel.onchange = () => { curIdx = +sel.value; load(); };
 }
