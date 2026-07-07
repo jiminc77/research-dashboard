@@ -1,0 +1,18 @@
+# OnFailure 훅 — 기존 gate-watcher.service 가 실패(비정상 종료)하면 ntfy 로 알린다.
+# 설치: 기존 유닛에 drop-in 으로 OnFailure= 한 줄만 추가한다 (기존 gate-watcher.service 는 수정·개명하지 않는다).
+#   systemctl --user edit gate-watcher
+#     [Unit]
+#     OnFailure=gate-watcher-onfailure.service
+# NTFY_TOPIC 은 환경파일에서 읽는다 (~/.config/gate-watcher/env 에 NTFY_TOPIC=... — secret, 커밋 금지).
+[Unit]
+Description=Alert (ntfy) when gate-watcher.service fails
+# %H = 호스트명. 특정 유닛에 실패가 발생했을 때 systemd 가 이 유닛을 기동한다.
+
+[Service]
+Type=oneshot
+EnvironmentFile=%h/.config/gate-watcher/env
+ExecStart=/usr/bin/curl -s \
+  -H "Title: ⚠️ gate-watcher FAILED on %H" \
+  -H "Priority: high" -H "Tags: rotating_light" \
+  -d "gate-watcher.service 가 %H 에서 실패했습니다. systemctl --user status gate-watcher 로 확인하세요." \
+  "ntfy.sh/${NTFY_TOPIC}"
