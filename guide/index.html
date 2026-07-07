@@ -957,11 +957,7 @@ loginctl enable-linger $USER</code></pre>
         </div>
         <p style="font-size:13.5px;margin:12px 0 0;color:var(--body);">체크 순서: ① 판정 첫 줄이 정확히 <code class="inl">### GATE VERDICT</code>이고 <code class="inl">choice:</code> 줄이 있는지 ② 이슈에 <code class="inl">state:blocked-human</code> 라벨이 붙었는지(없으면 수동 부착) ③ 판정 코멘트에 👀가 달렸는지(달렸으면 전달됨 — gjc 세션 확인). 최후엔 tmux 수동 nudge.</p>
       </div>
-      <div class="card">
-        <span class="pill mono" style="margin-bottom:10px;">CI가 EVIDENCE를 ❌ 냈다</span> <span class="who auto">자동</span> <span class="who me">나</span>
-        <p style="font-size:14px;margin:0;color:var(--body);"><code class="inl">evidence-verify</code>가 커밋 SHA를 checkout해 pytest 재실행 → 실패 시 <code class="inl">state:blocked-tech</code>. <strong>SHA가 origin/main에 실재</strong>하고 테스트가 재현되는지 확인. 재현 안 되는 결과는 증거가 아님.</p>
-      </div>
-    </div>
+          </div>
 
     <div class="callout warn mt24 mb0">
       <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zM8 11V7a4 4 0 018 0v4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
