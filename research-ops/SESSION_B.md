@@ -33,6 +33,13 @@ cd {WORKDIR}
 git pull                         # 최신 P{k}.md·명세 확보
 ```
 
+**계정 규율(#22) — tmux를 열기 전에 agent PAT를 주입한다.** gjc는 `jiminc77-agent` 명의로 활동한다 (verdict-guard 실효 조건). 실행 중인 단계에서는 인증을 바꾸지 않는다 — 교체는 단계 경계에서만:
+
+```bash
+export GH_TOKEN="$(cat ~/.config/gh-agent/token)"   # 사람이 미리 저장해 둔 agent PAT (secret, 커밋 금지)
+gh api user -q .login                               # → jiminc77-agent 이면 정상
+```
+
 원격 셸 안에서 **tmux 세션을 열고 그 안에 새 gjc 세션 1개**를 띄운다 (기존 gjc 세션 재사용 금지 — 단계마다 새 세션):
 
 ```bash
