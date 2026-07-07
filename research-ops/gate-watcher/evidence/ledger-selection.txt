@@ -1,0 +1,14 @@
+# gate-watcher ledger auto-selection evidence
+2026-07-07T09:53:24+09:00
+
+## stat
+2026-07-03 16:07:09.029639468 +0900 /home/simx2204/Workspaces/DGCC/.gjc/_session-019f2368-36e1-7000-bb44-301bd424fa04/ultragoal/ledger.jsonl
+2026-07-07 05:36:24.979620966 +0900 /home/simx2204/Workspaces/DGCC/.gjc/_session-019f2755-c53d-7000-80f7-7d026980913b/ultragoal/ledger.jsonl
+
+## tail -1
+### /home/simx2204/Workspaces/DGCC/.gjc/_session-019f2368-36e1-7000-bb44-301bd424fa04/ultragoal/ledger.jsonl
+{"eventId":"eedeedb3-fb23-409c-8c45-ad6d3fe1184e","event":"goal_started","goalId":"G016","timestamp":"2026-07-03T07:07:09.029Z"}
+
+### /home/simx2204/Workspaces/DGCC/.gjc/_session-019f2755-c53d-7000-80f7-7d026980913b/ultragoal/ledger.jsonl
+{"eventId":"141a9032-3556-4921-ae1f-fb997281a3d5","event":"goal_checkpointed","goalId":"G004","status":"active","evidence":"M3R Phase 1-3 완료 + Phase 4 lane 기동: suite 101 green (e843af4), O1 oracle feasibility reference ON/OFF (t1a 19%/17%, t1b·t1c ≈0 판정불능; min_d 0.13-0.17 vs ε 0.05 — P-c 기준선), {512,1024} 프로브 13.6/21.9 tr/s (M4용, c176000), GPU smoke 1536 updates clamp-hit 0. kickoff 보고 issue #12 comment 4897380371 (총 예상 65-75h). lane A (m3r_t1a_s0→s1→s2→t1b_s0) + lane B (m3r_t1b_s1→s2→t1c_s0→s1→s2) 기동 확인. early-health 체크포인트 모니터 무장 (양 lane 첫 25k eval ~3-4h → issue #12 즉시 보고, 폭주 시 lane 정지+human_blocked).","timestamp":"2026-07-06T20:36:24.980Z"}
+

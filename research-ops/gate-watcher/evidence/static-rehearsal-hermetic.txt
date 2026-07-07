@@ -1,0 +1,4 @@
+mock_ledger=/tmp/gw-rehearsal-static.hyw0ypx_/ledger.jsonl
+resolved_source=fallback
+resolved_ledger=/tmp/gw-rehearsal-static.hyw0ypx_/ledger.jsonl
+matches_mock=True

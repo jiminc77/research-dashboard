@@ -1,0 +1,76 @@
+== 목업 준비 (workdir: /tmp/gw-rehearsal.ynCd) ==
+rehearsal config: /tmp/gw-rehearsal.ynCd/config.json
+== watcher 기동 (백그라운드) ==
+[2026-07-07T01:56:09+00:00] start mode=DISARMED last_processed_id=0 labels=[] fallback_issue=20 session='gw-rehearsal'
+[2026-07-07T01:56:09+00:00] ledger resolved: /tmp/gw-rehearsal.ynCd/ledger.jsonl (source=fallback)
+[2026-07-07T01:56:09+00:00] ARMED (blocked ledger tail: '{"event":"human_blocked","goal":"REHEARSAL"}')
+[2026-07-07T01:56:09+00:00] gate issue resolved: #20 (source=fallback)
+== 이제 사람 확인 절차 ==
+1) jiminc77 계정으로 research-dashboard issue #20 에 아래 코멘트 게시:
+   ## HUMAN 판정 — rehearsal
+   테스트 판정입니다.
+   [RESUME]
+2) ~5-10초 후 수신 확인:
+   tmux capture-pane -p -t gw-rehearsal   (또는 cat /tmp/gw-rehearsal.ynCd/received.txt)
+   cat /tmp/gw-rehearsal.ynCd/watcher.log              (ARMED → DELIVERED 로그)
+3) 위반 케이스 1건 확인 권장: [RESUME] 없는 판정 → skip 로그(C3)만, 미전달
+4) ledger 재개 시뮬레이션: echo '{"event":"goal_resumed"}' >> /tmp/gw-rehearsal.ynCd/ledger.jsonl
+   → watcher.log 에 "ACK (ledger resumed) → DISARMED"
+5) 종료: Ctrl-C. 로그·스크린샷을 T2 증거로 커밋.
+[2026-07-07T01:56:37+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:56:42+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:56:48+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:56:55+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:57:01+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:57:06+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:57:12+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:57:17+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:57:22+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:57:28+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:57:33+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:57:39+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:57:44+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:57:50+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:57:55+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:58:01+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:58:07+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:58:12+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:58:18+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:58:23+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:58:29+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:58:34+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:58:39+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:58:45+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:58:51+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:58:56+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:59:02+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:59:07+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:59:13+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:59:18+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:59:24+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:59:29+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:59:35+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:59:40+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:59:46+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:59:51+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T01:59:57+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T02:00:03+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T02:00:08+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T02:00:14+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T02:00:19+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T02:00:25+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T02:00:30+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T02:00:36+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T02:00:41+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T02:00:47+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T02:00:52+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T02:00:58+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T02:01:03+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T02:01:09+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T02:01:14+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T02:01:20+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T02:01:25+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T02:01:31+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T02:01:36+00:00] skip comment 4899370795: C1 reject: author='jiminc77-agent'
+[2026-07-07T02:01:36+00:00] DELIVERED nudge for comment 4899393997
+[2026-07-07T02:01:39+00:00] ACK (ledger resumed) → DISARMED

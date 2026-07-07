@@ -1,0 +1,24 @@
+{
+  "repo": "jiminc77/research-dashboard",
+  "issue_number": 20,
+  "issue_labels": [],
+  "human_login": "jiminc77",
+  "verdict_marker": "## HUMAN 판정",
+  "resume_token": "[RESUME]",
+  "tmux_session": "gw-rehearsal",
+  "ledger_glob": "",
+  "ledger_path": "/tmp/gw-rehearsal.ynCd/ledger.jsonl",
+  "armed_substrings": [
+    "human_blocked",
+    "blocker_classified"
+  ],
+  "baseline_comment_id": 0,
+  "token_env": "GITHUB_TOKEN",
+  "disarmed_poll_s": 2,
+  "armed_poll_s": 5,
+  "ack_timeout_s": 60,
+  "log_path": "/tmp/gw-rehearsal.ynCd/watcher.log",
+  "state_path": "/tmp/gw-rehearsal.ynCd/state.json",
+  "notify_cmd": "",
+  "nudge_template": "issue #{issue}에 HUMAN 판정 코멘트(id={cid})가 게시되었다. 정본 채널 규약에 따라 gh로 직접 fetch하여 검증(author==jiminc77, 첫 줄 '## HUMAN 판정', [RESUME] 토큰)한 후 판정을 반영하여 재개하라."
+}

@@ -1,0 +1,1 @@
+issue #20에 HUMAN 판정 코멘트(id=4899393997)가 게시되었다. 정본 채널 규약에 따라 gh로 직접 fetch하여 검증(author==jiminc77, 첫 줄 '## HUMAN 판정', [RESUME] 토큰)한 후 판정을 반영하여 재개하라.

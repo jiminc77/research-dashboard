@@ -1,0 +1,35 @@
+## systemctl status
+● gate-watcher.service - research-ops gate-watcher (HUMAN GATE verdict poller)
+     Loaded: loaded (/home/simx2204/.config/systemd/user/gate-watcher.service; enabled; vendor preset: enabled)
+     Active: active (running) since Tue 2026-07-07 11:02:29 KST; 5s ago
+   Main PID: 440484 (python3)
+      Tasks: 1 (limit: 228726)
+     Memory: 9.2M
+        CPU: 21ms
+     CGroup: /user.slice/user-1000.slice/user@1000.service/app.slice/gate-watcher.service
+             └─440484 /usr/bin/python3 /home/simx2204/Workspaces/research-dashboard/research-ops/gate-watcher/watcher.py /home/simx2204/.config/gate-watcher/config.json
+
+Jul 07 11:02:29 simx2204-X870E-AORUS-PRO-ICE systemd[5307]: Started research-ops gate-watcher (HUMAN GATE verdict poller).
+Jul 07 11:02:29 simx2204-X870E-AORUS-PRO-ICE python3[440484]: [2026-07-07T02:02:29+00:00] start mode=DISARMED last_processed_id=4897920797 labels=['state:blocked-human'] fallback_issue=12 session='gajae_code_mr63fhy9_q952ghpq'
+Jul 07 11:02:29 simx2204-X870E-AORUS-PRO-ICE python3[440484]: [2026-07-07T02:02:29+00:00] ledger resolved: /home/simx2204/Workspaces/DGCC/.gjc/_session-019f2755-c53d-7000-80f7-7d026980913b/ultragoal/ledger.jsonl (source=glob)
+
+## journal tail
+Jul 07 11:02:29 simx2204-X870E-AORUS-PRO-ICE systemd[5307]: Started research-ops gate-watcher (HUMAN GATE verdict poller).
+Jul 07 11:02:29 simx2204-X870E-AORUS-PRO-ICE python3[440484]: [2026-07-07T02:02:29+00:00] start mode=DISARMED last_processed_id=4897920797 labels=['state:blocked-human'] fallback_issue=12 session='gajae_code_mr63fhy9_q952ghpq'
+Jul 07 11:02:29 simx2204-X870E-AORUS-PRO-ICE python3[440484]: [2026-07-07T02:02:29+00:00] ledger resolved: /home/simx2204/Workspaces/DGCC/.gjc/_session-019f2755-c53d-7000-80f7-7d026980913b/ultragoal/ledger.jsonl (source=glob)
+
+## watcher log tail
+[2026-07-07T02:02:29+00:00] start mode=DISARMED last_processed_id=4897920797 labels=['state:blocked-human'] fallback_issue=12 session='gajae_code_mr63fhy9_q952ghpq'
+[2026-07-07T02:02:29+00:00] ledger resolved: /home/simx2204/Workspaces/DGCC/.gjc/_session-019f2755-c53d-7000-80f7-7d026980913b/ultragoal/ledger.jsonl (source=glob)
+
+## state
+{
+  "mode": "DISARMED",
+  "last_processed_id": 4897920797,
+  "blocked_line": null,
+  "delivered_id": null,
+  "delivered_at": null,
+  "redelivered": false,
+  "active_issue": null,
+  "active_ledger": "/home/simx2204/Workspaces/DGCC/.gjc/_session-019f2755-c53d-7000-80f7-7d026980913b/ultragoal/ledger.jsonl"
+}

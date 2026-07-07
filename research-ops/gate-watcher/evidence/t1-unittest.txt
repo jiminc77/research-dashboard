@@ -1,0 +1,33 @@
+test_c1_agent_account_rejected (test_watcher.TestContract) ... ok
+test_c1_impostor_with_marker_and_resume_rejected (test_watcher.TestContract) ... ok
+test_c2_blockquoted_marker_rejected (test_watcher.TestContract) ... ok
+test_c2_wrong_first_line_rejected (test_watcher.TestContract) ... ok
+test_c3_no_resume_token_rejected (test_watcher.TestContract) ... ok
+test_c4_equal_id_rejected (test_watcher.TestContract) ... ok
+test_c4_old_comment_rejected (test_watcher.TestContract) ... ok
+test_empty_body_rejected (test_watcher.TestContract) ... ok
+test_leading_whitespace_tolerated (test_watcher.TestContract) ... ok
+test_valid_verdict_passes (test_watcher.TestContract) ... ok
+test_empty_glob_uses_ledger_path (test_watcher.TestHermeticOverrides) ... ok
+test_empty_labels_uses_issue_number (test_watcher.TestHermeticOverrides) ... ok
+test_choose_first_open_issue (test_watcher.TestIssueDiscovery) ... ok
+test_none_on_empty (test_watcher.TestIssueDiscovery) ... ok
+test_skip_pull_requests (test_watcher.TestIssueDiscovery) ... ok
+test_missing_file_safe (test_watcher.TestLedger) ... ok
+test_not_blocked_on_normal_tail (test_watcher.TestLedger) ... ok
+test_tail_last_nonempty (test_watcher.TestLedger) ... ok
+test_choose_newest_mtime (test_watcher.TestLedgerDiscovery) ... ok
+test_none_on_empty (test_watcher.TestLedgerDiscovery) ... ok
+test_resolve_fallback (test_watcher.TestLedgerDiscovery) ... ok
+test_resolve_glob_prefers_newest (test_watcher.TestLedgerDiscovery) ... /home/simx2204/Workspaces/research-dashboard/research-ops/gate-watcher/tests/test_watcher.py:84: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpxnp4g26x/_session-old/ultragoal/ledger.jsonl' mode='w' encoding='UTF-8'>
+  p_old = os.path.join(old_dir, "ledger.jsonl"); open(p_old, "w").write("{}")
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/simx2204/Workspaces/research-dashboard/research-ops/gate-watcher/tests/test_watcher.py:85: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpxnp4g26x/_session-new/ultragoal/ledger.jsonl' mode='w' encoding='UTF-8'>
+  p_new = os.path.join(new_dir, "ledger.jsonl"); open(p_new, "w").write("{}")
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+
+----------------------------------------------------------------------
+Ran 22 tests in 0.002s
+
+OK
