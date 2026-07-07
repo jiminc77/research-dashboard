@@ -162,4 +162,7 @@ jobs:
           NUM: ${{ github.event.issue.number }}
         run: |
           set -euo pipefail
+          # 가드: 실제 게이트(blocked-human 부착) 상태에서만 전환 — 인용/공지 코멘트 오발동 방지
+          has="$(gh issue view "$NUM" -R "$REPO" --json labels -q '[.labels[].name] | index("state:blocked-human")')"
+          [ "$has" != "null" ] && [ -n "$has" ] || { echo "blocked-human 아님 — 스킵"; exit 0; }
           gh issue edit "$NUM" -R "$REPO" --remove-label "state:blocked-human" --add-label "state:ready" || echo "라벨 전환 실패(무시)"
