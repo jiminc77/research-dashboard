@@ -1,0 +1,15 @@
+# 5분마다 gate-watcher-liveness.service 를 기동해 gate-watcher.service 생존을 확인한다.
+# 설치: 이 두 파일(.service/.timer)을 ~/.config/systemd/user/ 에 두고
+#   systemctl --user daemon-reload && systemctl --user enable --now gate-watcher-liveness.timer
+[Unit]
+Description=Run gate-watcher liveness probe every 5 minutes
+
+[Timer]
+# 부팅 2분 후 첫 실행, 이후 5분 간격.
+OnBootSec=2min
+OnUnitActiveSec=5min
+AccuracySec=30s
+Unit=gate-watcher-liveness.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,16 @@
+# Liveness 체크 — gate-watcher.service 가 active 인지 확인하고, inactive 면 ntfy 로 알린다.
+# 타이머(gate-watcher-liveness.timer)가 5분마다 이 oneshot 을 기동한다.
+# NTFY_TOPIC 은 환경파일에서 (~/.config/gate-watcher/env — secret, 커밋 금지).
+[Unit]
+Description=Liveness probe for gate-watcher.service (ntfy if inactive)
+
+[Service]
+Type=oneshot
+EnvironmentFile=%h/.config/gate-watcher/env
+# is-active 가 0(active)이면 조용히 통과. active 가 아니면 curl 로 경보.
+# '-' 접두사: is-active 비-0 종료여도 유닛을 실패로 만들지 않는다(경보만 목적).
+ExecStart=/bin/sh -c '\
+  systemctl --user is-active --quiet gate-watcher.service \
+  || curl -s -H "Title: 🔴 gate-watcher INACTIVE on %H" -H "Priority: high" -H "Tags: warning" \
+       -d "gate-watcher.service 가 active 가 아닙니다(호스트 %H). systemctl --user status gate-watcher 확인 후 필요 시 restart." \
+       "ntfy.sh/${NTFY_TOPIC}" >/dev/null'
