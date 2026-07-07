@@ -959,9 +959,43 @@ loginctl enable-linger $USER</code></pre>
       </div>
           </div>
 
+    <div class="grid grid-2 mt24">
+      <div class="card">
+        <span class="pill mono" style="margin-bottom:10px;">watcher 경보·생존감시 — 1회 설치</span> <span class="who me">나</span>
+        <div class="code" style="margin:12px 0 0;">
+          <div class="code-top"><span class="fname">shell — 원격 워크스테이션</span><span class="lang">bash</span><span class="who me">나</span><button class="copy-btn" data-label="복사">복사</button></div>
+          <pre><code><span class="cmt"># 0) topic 환경파일 (secret — 커밋 금지)</span>
+mkdir -p ~/.config/gate-watcher
+printf 'NTFY_TOPIC=%s\n' "{topic}" > ~/.config/gate-watcher/env
+
+<span class="cmt"># 1) 경보 유닛 3개 + OnFailure drop-in</span>
+cd ~/Workspaces/research-dashboard/research-ops/gate-watcher/alerts
+cp gate-watcher-onfailure.service gate-watcher-liveness.service \
+   gate-watcher-liveness.timer ~/.config/systemd/user/
+systemctl --user edit gate-watcher   <span class="cmt"># [Unit] 아래 OnFailure=gate-watcher-onfailure.service</span>
+
+<span class="cmt"># 2) 활성화 + 확인</span>
+systemctl --user daemon-reload
+systemctl --user enable --now gate-watcher-liveness.timer
+systemctl --user list-timers gate-watcher-liveness.timer</code></pre>
+        </div>
+        <p style="font-size:13.5px;margin:12px 0 0;color:var(--body);">watcher가 <strong>죽으면(OnFailure)</strong> 즉시, <strong>비활성이면(liveness)</strong> 5분 내 ntfy 경보. 유닛 원본: <code class="inl">research-ops/gate-watcher/alerts/</code>.</p>
+      </div>
+      <div class="card">
+        <span class="pill mono" style="margin-bottom:10px;">프로젝트 전환 시 — 워크스테이션 4가지</span> <span class="who me">나</span>
+        <p style="font-size:13.5px;margin:12px 0 0;color:var(--body);">레포 쪽(라벨·워크플로·secret·대시보드 등록)은 <strong>세션 A가 자동</strong>. 사람이 만지는 건 워크스테이션뿐:</p>
+        <ol style="font-size:13.5px;margin:10px 0 0;padding-left:18px;color:var(--body);">
+          <li><code class="inl">~/.config/gate-watcher/env</code> 의 <code class="inl">NTFY_TOPIC</code>만 새 topic으로 — 경보 유닛·타이머는 프로젝트 무관, 그대로</li>
+          <li>watcher 설정을 새 프로젝트(CODE repo·ledger)로 바꾸고 <code class="inl">systemctl --user restart gate-watcher</code></li>
+          <li>폰 ntfy 앱에서 새 topic 구독</li>
+          <li>gjc 인증(<code class="inl">GH_TOKEN</code>, agent 계정)은 <strong>단계·프로젝트 경계에서만</strong> 교체 — 실행 중 전환 금지 (SESSION_B.md §1)</li>
+        </ol>
+      </div>
+    </div>
+
     <div class="callout warn mt24 mb0">
       <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zM8 11V7a4 4 0 018 0v4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-      <p><strong>토큰:</strong> gjc는 owner 계정 <strong>fine-grained PAT</strong>(issues·contents·actions)로 <code class="inl">gh</code>를 씁니다. 스코프를 좁혀 발급하고, 끝나거나 유출 의심 시 <a href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener">GitHub 설정</a>에서 즉시 revoke.</p>
+      <p><strong>계정 규율(#22):</strong> 에이전트(gjc·세션 A·gate-watcher)는 <strong><code class="inl">jiminc77-agent</code> 계정 PAT</strong>로 <code class="inl">gh</code>·REST를 씁니다 — 사람 PAT를 에이전트에 넣지 않아야 <strong>verdict-guard가 실효</strong>합니다(비-사람 판정 자동 무효·원복). gjc 인증 교체는 <strong>단계 경계에서만</strong>(부팅 시 <code class="inl">GH_TOKEN</code> 주입 — SESSION_B.md §1). 스코프 좁혀 발급하고 유출 의심 시 <a href="https://github.com/settings/tokens" target="_blank" rel="noopener">즉시 revoke</a>.</p>
     </div>
   </div>
 </section>
