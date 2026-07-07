@@ -1,0 +1,16 @@
+# systemd user unit — ~/.config/systemd/user/gate-watcher.service 로 복사
+# 활성화: systemctl --user daemon-reload && systemctl --user enable --now gate-watcher
+# (서버 재부팅 후에도 유지하려면: loginctl enable-linger simx2204)
+[Unit]
+Description=research-ops gate-watcher (HUMAN GATE verdict poller)
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 %h/Workspaces/research-dashboard/research-ops/gate-watcher/watcher.py %h/.config/gate-watcher/config.json
+EnvironmentFile=%h/.config/gate-watcher/env
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target

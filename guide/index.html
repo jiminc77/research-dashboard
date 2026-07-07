@@ -577,7 +577,7 @@
       </div>
       <div class="card role">
         <div class="k"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" stroke-linejoin="round"/></svg></span><h4>Actions <span class="who auto" style="font-weight:600;">자동</span></h4></div>
-        <p>gate-notify(ntfy) · evidence-verify(CI) · phase-transition(킥오프 자동) · <strong>pr-verify(PR 검증)</strong>.</p>
+        <p>gate-notify(ntfy) · evidence-verify(CI) · phase-transition(킥오프 자동) · <strong>pr-verify(PR 검증)</strong> · gate-watcher(판정 → 실행 세션 자동 전달).</p>
       </div>
     </div>
 
@@ -743,30 +743,20 @@ gh secret set NTFY_TOPIC -R {OWNER}/{CODE_REPO}   <span class="cmt"># 값: {proj
       <p><code class="inl">P{k}.md</code>와 dev 이슈는 세션 A(웹 pro)가 GitHub 앱으로 직접 만듭니다(§4 흐름). <strong>이슈가 생겨도 gjc는 자동 시작되지 않습니다</strong> — 내가 원격 워크스테이션에서 1회 부팅해야 실행이 시작되고, 이후 gjc가 자율 실행합니다.</p>
     </div>
 
-    <div class="grid grid-2">
-      <div class="code" style="margin:0;">
-        <div class="code-top"><span class="fname">dev 이슈 수동 발행 (대안)</span><span class="lang">bash</span><span class="who me">나</span><button class="copy-btn" data-label="복사">복사</button></div>
-        <pre><code><span class="cmt"># 표준: 세션 A(웹 pro)가 §4에서 GitHub 앱으로 직접 발행</span>
-<span class="cmt"># 아래는 내가 로컬 셸에서 수동 발행할 때의 대안</span>
-<span class="cmt"># @goal→이슈 + state:ready + 마일스톤 + backfill</span>
-bash research-ops/scripts/setup_phase.sh P{k} \
-  projects/{project}/... /P{k}.md --push</code></pre>
-      </div>
-      <div class="code" style="margin:0;">
+    <div class="code" style="margin:0;">
         <div class="code-top"><span class="fname">gjc 부팅 (원격 워크스테이션)</span><span class="lang">bash</span><span class="who me">나</span><button class="copy-btn" data-label="복사">복사</button></div>
         <pre><code>ssh {SSH_HOST} && cd {WORKDIR} && git pull
 tmux new -s gjc-P{k}
 gjc ralplan --interactive "P{k}.md 명세로 실행 계획"
 gjc ultragoal create-goals --brief-file P{k}.md</code></pre>
       </div>
-    </div>
 
     <h3 class="sub-title mt32" style="font-size:19px;">라벨 상태기계 — 누가 어떤 전이를 하는가</h3>
     <div class="tbl-wrap mt16">
       <table class="tbl">
         <thead><tr><th>전이</th><th>주체</th><th>트리거</th></tr></thead>
         <tbody>
-          <tr><td><span class="m">생성 → ready</span></td><td class="desc"><span class="who sa">세션 A</span> 생성 시 부착</td><td class="desc">이슈 생성과 동시 (수동 대안: <span class="who auto">자동</span> setup_phase.sh)</td></tr>
+          <tr><td><span class="m">생성 → ready</span></td><td class="desc"><span class="who sa">세션 A</span> 생성 시 부착</td><td class="desc">이슈 생성과 동시</td></tr>
           <tr><td><span class="m">ready → running</span></td><td class="desc"><span class="who gjc">gjc</span></td><td class="desc">goal 착수</td></tr>
           <tr><td><span class="m">running → verify</span></td><td class="desc"><span class="who gjc">gjc</span></td><td class="desc"><code class="inl">### EVIDENCE</code> 게시</td></tr>
           <tr><td><span class="m">verify → done</span></td><td class="desc"><span class="who auto">자동</span> CI + <span class="who gjc">gjc</span> close</td><td class="desc">CI VERIFIED ✅ 후 close</td></tr>
@@ -816,7 +806,7 @@ updated: 2026-07-06T09:12Z
     <div class="sec-head">
       <span class="pill" style="margin-bottom:14px;">3</span>
       <h2 class="sec-title">게이트 판정하기</h2>
-      <p>ntfy 푸시가 도착하면 이슈를 열어 <code class="inl">### GATE VERDICT</code> 코멘트. 판정은 오직 나. 정본은 issue 코멘트뿐입니다.</p>
+      <p>ntfy 푸시가 도착하면 이슈를 열어 <code class="inl">### GATE VERDICT</code> 코멘트. 판정은 오직 나, 정본은 issue 코멘트뿐 — <strong>게시 후 실행 세션 재개 전달은 자동입니다(gate-watcher)</strong>.</p>
     </div>
 
     <div class="grid grid-2">
@@ -839,6 +829,11 @@ rationale: guard 여유 확인, 되돌릴 수 있음. M4로 진행.
 follow-ups:
 - <span class="cmt">추가 지시 (없으면 생략)</span>
 <span class="cmt"># 게시하면 gate-notify가 blocked-human → ready 로 되돌리고 gjc가 집행</span></code></pre>
+    </div>
+
+    <div class="callout tip mt16">
+      <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9"/></svg></span>
+      <p><strong>판정 후 워크스테이션에 손댈 필요 없음.</strong> 원격 데몬 <a href="https://github.com/jiminc77/research-dashboard/tree/main/research-ops/gate-watcher" target="_blank" rel="noopener"><code class="inl">gate-watcher</code></a>가 실행 세션의 blocked 상태를 감시하다 판정 코멘트를 감지하면 tmux 세션에 "가서 읽어라" 신호만 전달합니다(본문 주입 없음 — 세션이 직접 fetch·검증). 전달 확인 = 판정 코멘트의 👀 reaction, 30분 무응답 시 1회 재전달 후 알림.</p>
     </div>
 
     <div class="callout warn mt16 mb0">
@@ -909,10 +904,7 @@ follow-ups:
         </tbody>
       </table>
     </div>
-    <div class="code mt16" style="margin-bottom:0;">
-      <div class="code-top"><span class="fname">터미널에서 빠르게</span><span class="lang">bash</span><span class="who me">나</span><button class="copy-btn" data-label="복사">복사</button></div>
-      <pre><code>bash research-ops/scripts/status.sh   <span class="cmt"># phase·라벨·대기 게이트 요약 (히어로 출력 예시)</span></code></pre>
-    </div>
+    
   </div>
 </section>
 
