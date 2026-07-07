@@ -5,8 +5,8 @@
     "state:blocked-human"
   ],
   "human_login": "jiminc77",
-  "verdict_marker": "## HUMAN 판정",
-  "resume_token": "[RESUME]",
+  "verdict_marker": "### GATE VERDICT",
+  "verdict_field": "choice:",
   "tmux_session": "CONFIRM_ME_VIA_tmux_ls",
   "ledger_glob": "/home/simx2204/Workspaces/DGCC/.gjc/_session-*/ultragoal/ledger.jsonl",
   "ledger_path": "",
@@ -22,5 +22,6 @@
   "log_path": "/home/simx2204/.local/state/gate-watcher/watcher.log",
   "state_path": "/home/simx2204/.local/state/gate-watcher/state.json",
   "notify_cmd": "",
-  "nudge_template": "issue #{issue}에 HUMAN 판정 코멘트(id={cid})가 게시되었다. 정본 채널 규약에 따라 gh로 직접 fetch하여 검증(author==jiminc77, 첫 줄 '## HUMAN 판정', [RESUME] 토큰)한 후 판정을 반영하여 재개하라."
+  "nudge_template": "issue #{issue}에 GATE VERDICT 코멘트(id={cid})가 게시되었다. 정본 채널 규약(PROTOCOL.md §2)에 따라 gh로 직접 fetch하여 검증(author==jiminc77, 첫 줄 '### GATE VERDICT', choice 필드)한 후 판정을 반영하여 재개하고, 라벨을 state:running으로 복귀하라.",
+  "unresolved_notify_s": 900
 }

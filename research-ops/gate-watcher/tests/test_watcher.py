@@ -1,10 +1,10 @@
 import json, os, sys, tempfile, unittest
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import watcher
-CFG = {"human_login": "jiminc77", "verdict_marker": "## HUMAN 판정", "resume_token": "[RESUME]",
+CFG = {"human_login": "jiminc77", "verdict_marker": "### GATE VERDICT", "verdict_field": "choice:",
        "armed_substrings": ["human_blocked", "blocker_classified"]}
 def comment(cid, login, body): return {"id": cid, "user": {"login": login}, "body": body}
-VALID_BODY = "## HUMAN 판정 — M3R 게이트 (2026-07-09)\n\n판정: ...\n\n[RESUME]\n"
+VALID_BODY = "### GATE VERDICT\nid: P1-M3R-G1\nchoice: B\nrationale: ...\n"
 class TestContract(unittest.TestCase):
     def test_valid_verdict_passes(self):
         ok, reason = watcher.evaluate_comment(comment(100, "jiminc77", VALID_BODY), CFG, 50)
@@ -16,15 +16,15 @@ class TestContract(unittest.TestCase):
         ok, reason = watcher.evaluate_comment(comment(102, "jiminc77-agent", VALID_BODY), CFG, 50)
         self.assertFalse(ok); self.assertIn("C1", reason)
     def test_c2_wrong_first_line_rejected(self):
-        body = "M3R 결과 보고\n\n## HUMAN 판정 스타일 인용\n[RESUME]"
+        body = "M3R 결과 보고\n\n### GATE VERDICT 스타일 인용\nchoice: B"
         ok, reason = watcher.evaluate_comment(comment(103, "jiminc77", body), CFG, 50)
         self.assertFalse(ok); self.assertIn("C2", reason)
     def test_c2_blockquoted_marker_rejected(self):
-        body = "> ## HUMAN 판정 — 인용\n\n보고 본문 [RESUME]"
+        body = "> ### GATE VERDICT — 인용\n\n보고 본문 choice: B"
         ok, reason = watcher.evaluate_comment(comment(104, "jiminc77", body), CFG, 50)
         self.assertFalse(ok); self.assertIn("C2", reason)
     def test_c3_no_resume_token_rejected(self):
-        body = "## HUMAN 판정 — 중간 질문\n\n이건 논의용 코멘트."
+        body = "### GATE VERDICT\nid: x\nrationale: choice 필드 없음"
         ok, reason = watcher.evaluate_comment(comment(105, "jiminc77", body), CFG, 50)
         self.assertFalse(ok); self.assertIn("C3", reason)
     def test_c4_old_comment_rejected(self):

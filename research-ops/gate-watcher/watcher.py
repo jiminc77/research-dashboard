@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""research-ops gate-watcher (spec v2.2, 2026-07-07).
+"""research-ops gate-watcher (v3.0, 2026-07-07).
 
 v2.1: 게이트 issue 자동 발견 — issue_labels(우선) → issue_number(fallback).
+v3.0: 판정 계약을 PROTOCOL.md §2 GATE VERDICT 스키마로 통합 (구 "## HUMAN 판정
+      + [RESUME]" 계약 폐지). C2=첫 줄 "### GATE VERDICT", C3=choice: 필드 존재.
 v2.2: ledger 자동 발견 — ledger_glob에서 최신 mtime 선택 (gjc는 세션별
       _session-<id>/ 디렉토리에 ledger를 두므로 phase/세션이 바뀌어도 추적).
 
@@ -132,8 +134,8 @@ def evaluate_comment(comment: dict, cfg: dict, last_processed_id: int):
     first_line = stripped.splitlines()[0] if stripped else ""
     if not first_line.startswith(cfg["verdict_marker"]):
         return False, f"C2 reject: first_line={first_line[:40]!r}"
-    if cfg["resume_token"] not in body:
-        return False, "C3 reject: no [RESUME] token"
+    if cfg["verdict_field"] not in body:
+        return False, f"C3 reject: no {cfg['verdict_field']!r} field"
     if int(comment["id"]) <= int(last_processed_id):
         return False, f"C4 reject: id {comment['id']} <= last_processed {last_processed_id}"
     return True, "ok"
@@ -282,9 +284,18 @@ def run(cfg_path: str) -> None:
                 continue
             issue_no, issue_src = resolve_issue(cfg, token, log)
             if issue_no is None:
-                log.write("ARMED but no gate issue resolvable (labels/fallback both empty)")
+                if state.get("armed_since") is None:
+                    state.update(armed_since=time.time(), unresolved_notified=False)
+                    save_json(cfg["state_path"], state)
+                log.write("ARMED but no gate issue resolvable (label 미부착? — PROTOCOL §2 위반 가능)")
+                if (not state.get("unresolved_notified")) and time.time() - state["armed_since"] > cfg.get("unresolved_notify_s", 900):
+                    notify_human(cfg, log, "gate-watcher: ledger는 blocked인데 state:blocked-human 이슈가 없음 — 게이트 요청의 라벨/마커 누락 여부 확인 필요")
+                    state.update(unresolved_notified=True)
+                    save_json(cfg["state_path"], state)
                 time.sleep(cfg["armed_poll_s"])
                 continue
+            if state.get("armed_since") is not None:
+                state.update(armed_since=None, unresolved_notified=False)
             if state.get("active_issue") != issue_no:
                 state.update(active_issue=issue_no)
                 save_json(cfg["state_path"], state)

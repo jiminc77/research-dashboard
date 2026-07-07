@@ -149,3 +149,17 @@ jobs:
               echo "#$n default ${df} 채택"
             fi
           done
+
+  # (5) 사람 GATE VERDICT 게시 → blocked-human 해제 (기계 백업 — gjc 협조 불요)
+  verdict-label:
+    if: github.event_name == 'issue_comment' && contains(github.event.comment.body, '### GATE VERDICT') && github.event.comment.user.login == 'jiminc77'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Flip label on verdict
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          NUM: ${{ github.event.issue.number }}
+        run: |
+          set -euo pipefail
+          gh issue edit "$NUM" -R "$REPO" --remove-label "state:blocked-human" --add-label "state:ready" || echo "라벨 전환 실패(무시)"

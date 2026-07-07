@@ -1,6 +1,6 @@
 # gate-watcher
 
-HUMAN GATE에서 사람 판정 코멘트(`## HUMAN 판정` + `[RESUME]`, author=jiminc77)를 감지해 라이브 gjc tmux 세션에 **"가서 읽어라" nudge만** 전달하는 데몬. 판정 본문은 절대 주입하지 않는다 (공개 레포 주입 방어 — gjc가 자체 fetch로 이중 검증).
+HUMAN GATE에서 사람 판정 코멘트(**PROTOCOL.md §2 `### GATE VERDICT` 스키마**, author=jiminc77)를 감지해 라이브 gjc tmux 세션에 **"가서 읽어라" nudge만** 전달하는 데몬. 판정 본문은 절대 주입하지 않는다 (공개 레포 주입 방어 — gjc가 자체 fetch로 이중 검증).
 
 ## 파일
 
@@ -66,11 +66,11 @@ gjc는 ledger를 **세션별 디렉토리**(`.gjc/_session-<uuid7>/ultragoal/led
 
 ## 계약 (요약)
 
-트리거 = author `jiminc77` ∧ 첫 줄 `## HUMAN 판정` ∧ 본문 `[RESUME]` ∧ id > 기준선 ∧ ARMED. agent 계정·타 계정·blockquote 인용·[RESUME] 없는 코멘트는 전부 무시 (tests/가 잠금).
+트리거 = author `jiminc77` ∧ 첫 줄 `### GATE VERDICT` ∧ 본문에 `choice:` 필드 ∧ id > 기준선 ∧ ARMED. agent 계정·타 계정·blockquote 인용·choice 없는 코멘트는 전부 무시 (tests/가 잠금). 구 계약("## HUMAN 판정"+[RESUME])은 v3.0에서 폐지 — 정본은 PROTOCOL.md §2.
 
 ## T3 (M3R 게이트 실전)
 
-수동 nudge 백업 대기: 판정 게시 후 5분 내 👀 reaction 없으면 수동 전달, watcher.log를 #12에 보고 (성패 무관).
+수동 nudge 백업 대기: GATE VERDICT 게시 후 5분 내 👀 reaction 없으면 수동 전달, watcher.log를 게이트 이슈에 보고 (성패 무관). ARMED 상태로 15분간 라벨 이슈 미발견 시 watcher가 사람에게 알림 (마커/라벨 누락 탐지).
 
 ## 운영 노트
 

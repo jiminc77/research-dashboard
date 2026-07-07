@@ -29,6 +29,11 @@
 2. 모호성은 스스로 정하지 말고 `gjc ultragoal classify-blocker --classification human_blocked --evidence "<질문+선택지>"` 후 정지. `STEP_LOG.md`에도 기록.
 3. HUMAN GATE 마일스톤({목록})은 산출물 생성 후 반드시 정지, 사람 결정 대기.
 4. 게이트 임계·수치({핵심 임계 나열})는 결과가 나빠도 변경 금지.
+5. 게이트 통신 계약 (PROTOCOL.md §2 — 위반 시 판정 전달 자동화가 끊긴다):
+   요청은 `### GATE REQUEST` 스키마 댓글 + **동시에** `gh issue edit <N> --add-label state:blocked-human --remove-label state:running`.
+   판정은 사람이 `### GATE VERDICT` 댓글로 회신하며 gate-watcher가 세션에 전달한다 — nudge 수신 시 gh로 직접 fetch·검증(author, 첫 줄, choice 필드) 후 반영.
+6. 판정 반영·재개 직후 라벨 복귀: `gh issue edit <N> --remove-label state:blocked-human --remove-label state:ready --add-label state:running` (실패 무시 가능).
+7. 자기 코멘트에 `### GATE VERDICT` 헤더 사용 금지 — 사람 판정 인용은 blockquote로만.
 5. 커밋: 마일스톤 단위 `P{N}-M<k>: <요약>`, push. 대용량 데이터/asset 커밋 금지.
 6. 이슈 연동: 완료 시 해당 issue에 evidence 코멘트 후 close (`gh` 미인증이면 STEP_LOG에 기록만, 정지하지 않음).
 7. 재현성: 모든 스크립트는 `--seed`+yaml config, 결과에 config·commit hash 메타 포함.
