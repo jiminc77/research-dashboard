@@ -833,7 +833,7 @@ follow-ups:
 
     <div class="callout tip mt16">
       <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9"/></svg></span>
-      <p><strong>판정 후 워크스테이션에 손댈 필요 없음.</strong> 원격 데몬 <a href="https://github.com/jiminc77/research-dashboard/tree/main/research-ops/gate-watcher" target="_blank" rel="noopener"><code class="inl">gate-watcher</code></a>가 실행 세션의 blocked 상태를 감시하다 판정 코멘트를 감지하면 tmux 세션에 "가서 읽어라" 신호만 전달합니다(본문 주입 없음 — 세션이 직접 fetch·검증). 전달 확인 = 판정 코멘트의 👀 reaction, 30분 무응답 시 1회 재전달 후 알림.</p>
+      <p><strong>판정 후 워크스테이션에 손댈 필요 없음.</strong> 원격 데몬 <a href="https://github.com/jiminc77/research-dashboard/tree/main/research-ops/gate-watcher" target="_blank" rel="noopener"><code class="inl">gate-watcher</code></a>가 실행 세션의 blocked 상태를 감시하다 판정 코멘트를 감지하면 tmux 세션에 "가서 읽어라" 신호만 전달합니다(본문 주입 없음 — 세션이 직접 fetch·검증). 전달 확인 = 판정 코멘트의 👀 reaction, 30분 무응답 시 1회 재전달 후 알림. <strong>상시 가동</strong>(systemd, 재부팅 생존) — 상태 확인 <code class="inl">systemctl --user status gate-watcher</code>, 설치·업그레이드는 <a href="https://github.com/jiminc77/research-dashboard/tree/main/research-ops/gate-watcher" target="_blank" rel="noopener">gate-watcher README</a>.</p>
     </div>
 
     <div class="callout warn mt16 mb0">
@@ -939,6 +939,16 @@ follow-ups:
 curl -d "test" ntfy.sh/{topic}   <span class="cmt"># 폰에 뜨면 정상</span></code></pre>
         </div>
         <p style="font-size:13.5px;margin:12px 0 0;color:var(--body);"><code class="inl">curl</code> 줄은 <strong>아무 로컬 셸</strong>에서 실행 — topic 문자열만 알면 되고 인증 불필요. 구독은 <strong>폰/웹 ntfy 앱</strong>에서 그 topic을 구독(topic은 프로젝트마다 다름).<br>secret 위치: <strong>CODE repo → Settings → Secrets and variables → Actions → <code class="inl">NTFY_TOPIC</code></strong> (워크플로가 여기서 읽어 푸시).</p>
+      </div>
+      <div class="card">
+        <span class="pill mono" style="margin-bottom:10px;">판정을 달았는데 gjc가 안 깨어난다</span> <span class="who me">나</span>
+        <div class="code" style="margin:12px 0 0;">
+          <div class="code-top"><span class="fname">shell — 원격 워크스테이션</span><span class="lang">bash</span><span class="who me">나</span><button class="copy-btn" data-label="복사">복사</button></div>
+          <pre><code>systemctl --user status gate-watcher
+tail -20 ~/.local/state/gate-watcher/watcher.log
+systemctl --user restart gate-watcher   <span class="cmt"># 필요 시</span></code></pre>
+        </div>
+        <p style="font-size:13.5px;margin:12px 0 0;color:var(--body);">체크 순서: ① 판정 첫 줄이 정확히 <code class="inl">### GATE VERDICT</code>이고 <code class="inl">choice:</code> 줄이 있는지 ② 이슈에 <code class="inl">state:blocked-human</code> 라벨이 붙었는지(없으면 수동 부착) ③ 판정 코멘트에 👀가 달렸는지(달렸으면 전달됨 — gjc 세션 확인). 최후엔 tmux 수동 nudge.</p>
       </div>
       <div class="card">
         <span class="pill mono" style="margin-bottom:10px;">CI가 EVIDENCE를 ❌ 냈다</span> <span class="who auto">자동</span> <span class="who me">나</span>
