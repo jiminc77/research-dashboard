@@ -1,10 +1,10 @@
 # {PROJECT} P{N} — {단계 이름} 구현 명세 (gjc 실행용)
 
 작성일: {DATE} · 대상 실행자: gajae-code (gjc), ralplan → ultragoal
-연구 배경: `{MGMT_REPO}/projects/{project}/research/{PLAN_FILE}` (참고용 — 충돌 시 **본 명세가 우선**)
+연구 배경: `{MGMT_REPO}/projects/<slug>/research/{PLAN_FILE}` (참고용 — 충돌 시 **본 명세가 우선**)
 
 > 이 문서의 첫 `@goal:` 이전 내용은 **모든 goal에 적용되는 전역 컨텍스트·제약**이다.
-> 작성 지침·계약: `research-ops/PROTOCOL.md`, 세션 절차: `research-ops/ORCHESTRATOR.md`. 잘 채운 예시: `DGCC/P0.md`.
+> 작성 지침: `research-ops/WORKFLOW.md`, 세션 절차: `research-ops/ORCHESTRATOR.md`. 잘 채운 예시: reference 프로젝트의 `P0.md`.
 > 이전 단계에서 이월된 확정 수치·승계 리스크가 있으면 아래 §0/전역 규칙에 반드시 반영한다.
 
 ---
@@ -23,17 +23,12 @@
 - git 원격: `{CODE_REPO_URL}` (branch: `{BRANCH}`)
 - 금지: sudo, 시스템 패키지 변경, 드라이버/CUDA 변경, 타 사용자 디렉토리 접근
 
-## 2. 전역 규칙 (PROTOCOL.md 계약을 이 단계에 맞게 구체화)
+## 2. 전역 규칙 (WORKFLOW.md §5를 이 단계에 맞게 구체화)
 
 1. 명세에 없는 것 구현 금지. 특히 범위 밖: {이 Phase에서 만들면 안 되는 것 나열}.
 2. 모호성은 스스로 정하지 말고 `gjc ultragoal classify-blocker --classification human_blocked --evidence "<질문+선택지>"` 후 정지. `STEP_LOG.md`에도 기록.
 3. HUMAN GATE 마일스톤({목록})은 산출물 생성 후 반드시 정지, 사람 결정 대기.
 4. 게이트 임계·수치({핵심 임계 나열})는 결과가 나빠도 변경 금지.
-5. 게이트 통신 계약 (PROTOCOL.md §2 — 위반 시 판정 전달 자동화가 끊긴다):
-   요청은 `### GATE REQUEST` 스키마 댓글 + **동시에** `gh issue edit <N> --add-label state:blocked-human --remove-label state:running`.
-   판정은 사람이 `### GATE VERDICT` 댓글로 회신하며 gate-watcher가 세션에 전달한다 — nudge 수신 시 gh로 직접 fetch·검증(author, 첫 줄, choice 필드) 후 반영.
-6. 판정 반영·재개 직후 라벨 복귀: `gh issue edit <N> --remove-label state:blocked-human --remove-label state:ready --add-label state:running` (실패 무시 가능).
-7. 자기 코멘트에 `### GATE VERDICT` 헤더 사용 금지 — 사람 판정 인용은 blockquote로만.
 5. 커밋: 마일스톤 단위 `P{N}-M<k>: <요약>`, push. 대용량 데이터/asset 커밋 금지.
 6. 이슈 연동: 완료 시 해당 issue에 evidence 코멘트 후 close (`gh` 미인증이면 STEP_LOG에 기록만, 정지하지 않음).
 7. 재현성: 모든 스크립트는 `--seed`+yaml config, 결과에 config·commit hash 메타 포함.
@@ -61,7 +56,7 @@
 
 ## 5~8. (필요 시) 공통 인터페이스·스펙 정의
 
-{이 Phase가 쓰는 공통 자료구조·수식·프로토콜을 여기에. P0의 §5–§8 참고.}
+{이 Phase가 쓰는 공통 자료구조·수식·프로토콜을 여기에. reference 프로젝트 P0의 §5–§8 참고.}
 
 ---
 
