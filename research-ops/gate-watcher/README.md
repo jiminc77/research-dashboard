@@ -47,7 +47,16 @@ gjc는 ledger를 **세션별 디렉토리**(`.gjc/_session-<uuid7>/ultragoal/led
 
 첫 배포 검증(1회): 후보가 여럿이면 각 ledger를 `tail -1`·`stat -c %y`로 대조해 최신 mtime 파일이 실제 라이브 세션(최근 이벤트 날짜·현재 goal id)인지 확인 후 진행.
 
-## 게이트 issue 자동 발견 (v2.1)
+## 게이트 issue 자동 발견 (v2.1 · 라이브 정책 v2.4)
+
+**라이브는 labels-only** (`issue_number: 0` — fallback 비활성). 고정 fallback을 켜두면 게이트가 다른 이슈로 옮겨간 뒤 구 스레드의 판정 코멘트를 오배송할 수 있으므로 금지. fallback 메커니즘은 리허설(T2) 전용.
+
+라벨 수명주기 (closed loop):
+1. 부착 — gjc의 게이트 요청 코멘트에 `### GATE REQUEST` 문자열 포함 → `gate-notify.yml`이 `state:blocked-human` 자가 부착 (+ntfy). 마커 누락 시 백업: 사람이 수동 부착
+2. 발견 — watcher가 ARMED에서 해당 라벨의 open 이슈(최근 갱신순) 선택
+3. 복귀 — gjc가 판정 반영·재개 시 `gh issue edit N --remove-label state:blocked-human --add-label state:running` (라벨 방치 시 다음 게이트에서 stale 이슈가 후보에 남음)
+
+## (구) v2.1 동작
 
 대상 issue는 매 ARMED 폴링마다 자동 결정: **(1) `issue_labels` 매치** (open 이슈, 최근 갱신순, PR 제외) → **(2) `issue_number` fallback**. phase가 바뀌어도 config 수정 불필요 — 라벨 상태기계(`state:blocked-human`)를 쓰는 프로젝트는 완전 자동, 라벨 미운용 단계(현 DGCC M3R)는 fallback(#12)으로 동작. 어느 경로로 정해졌는지 `watcher.log`에 기록됨 (`gate issue resolved: #N (source=label|fallback)`).
 
