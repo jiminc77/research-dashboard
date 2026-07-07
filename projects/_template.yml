@@ -1,3 +1,13 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# 정책 (공개 레포 규약):
+# - 이 파일은 세션 A/B(오케스트레이터·gjc 감독)가 읽는 **입력용 설정**이다.
+# - 민감값({SSH_HOST}/{WORKDIR}/{MODEL_MAIN}/{MODEL_EXEC} 등)은 공개 레포 공개본에
+#   **채우지 않는다** — placeholder({...})를 그대로 유지한다. 세션 B용 실제 값은 사람이
+#   킥오프에서 제공하며 세션 B 지시서(SESSION_B.md)에만 들어간다. NTFY_TOPIC 은 secret 에만 둔다.
+# - 이 파일은 대시보드와 **용도가 분리**된다: dashboard/index.html 의 CONFIG.projects
+#   (하드코딩 프로젝트 레지스트리: name/owner/mgmtRepo/codeRepo/titlePrefix)는 사람이 관리하며
+#   이 project.yml 을 읽거나 참조하지 않는다. 둘을 혼동하지 말 것.
+# ─────────────────────────────────────────────────────────────────────────────
 # research-ops 프로젝트 설정 — 세션 A/B와 단계 전환이 읽는 진실
 project: "{PROJECT}"
 owner: "{OWNER}"
