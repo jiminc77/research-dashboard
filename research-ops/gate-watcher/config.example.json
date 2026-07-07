@@ -8,7 +8,8 @@
   "verdict_marker": "## HUMAN 판정",
   "resume_token": "[RESUME]",
   "tmux_session": "CONFIRM_ME_VIA_tmux_ls",
-  "ledger_path": "/home/simx2204/Workspaces/DGCC/.gjc/ultragoal/ledger.jsonl",
+  "ledger_glob": "/home/simx2204/Workspaces/DGCC/.gjc/_session-*/ultragoal/ledger.jsonl",
+  "ledger_path": "",
   "armed_substrings": [
     "human_blocked",
     "blocker_classified"

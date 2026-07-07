@@ -67,5 +67,31 @@ class TestIssueDiscovery(unittest.TestCase):
         self.assertIsNone(watcher.choose_issue(None, CFG))
 
 
+
+class TestLedgerDiscovery(unittest.TestCase):
+    def test_choose_newest_mtime(self):
+        paths = [("/a/ledger.jsonl", 100.0), ("/b/ledger.jsonl", 200.0), ("/c/ledger.jsonl", 150.0)]
+        self.assertEqual(watcher.choose_ledger(paths), "/b/ledger.jsonl")
+
+    def test_none_on_empty(self):
+        self.assertIsNone(watcher.choose_ledger([]))
+
+    def test_resolve_glob_prefers_newest(self):
+        import time as _t
+        d = tempfile.mkdtemp()
+        old_dir = os.path.join(d, "_session-old", "ultragoal"); os.makedirs(old_dir)
+        new_dir = os.path.join(d, "_session-new", "ultragoal"); os.makedirs(new_dir)
+        p_old = os.path.join(old_dir, "ledger.jsonl"); open(p_old, "w").write("{}")
+        p_new = os.path.join(new_dir, "ledger.jsonl"); open(p_new, "w").write("{}")
+        os.utime(p_old, (1000, 1000)); os.utime(p_new, (2000, 2000))
+        cfg = {"ledger_glob": os.path.join(d, "_session-*", "ultragoal", "ledger.jsonl"), "ledger_path": ""}
+        path, src = watcher.resolve_ledger(cfg)
+        self.assertEqual(path, p_new); self.assertEqual(src, "glob")
+
+    def test_resolve_fallback(self):
+        path, src = watcher.resolve_ledger({"ledger_glob": "/nonexistent/_s-*/l.jsonl", "ledger_path": "/x/l.jsonl"})
+        self.assertEqual((path, src), ("/x/l.jsonl", "fallback"))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

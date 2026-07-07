@@ -25,8 +25,8 @@ cp config.example.json ~/.config/gate-watcher/config.json
 #  - tmux_session: `tmux ls`로 라이브 gjc 세션 이름 확인 후 기입 (첫 arm 전 사람 확인 1회)
 #  - baseline_comment_id: 과거 판정 소급 방지선 — 현재 최대 id로:
 #    curl -s "https://api.github.com/repos/jiminc77/DGCC/issues/12/comments?per_page=100" | jq '[.[].id] | max'
-#  - armed_substrings: 실제 ledger와 대조:
-#    grep -c "human_blocked" /home/simx2204/Workspaces/DGCC/.gjc/ultragoal/ledger.jsonl
+#  - armed_substrings: 실제 ledger와 대조 (glob이 고른 최신 파일 기준):
+#    grep -c "human_blocked" "$(ls -t /home/simx2204/Workspaces/DGCC/.gjc/_session-*/ultragoal/ledger.jsonl | head -1)"
 
 # 2) 토큰 (jiminc77-agent fine-grained PAT: DGCC+research-dashboard / Issues RW)
 printf 'GITHUB_TOKEN=%s\n' '<PAT>' > ~/.config/gate-watcher/env && chmod 600 ~/.config/gate-watcher/env
@@ -40,6 +40,12 @@ systemctl --user daemon-reload && systemctl --user enable --now gate-watcher
 loginctl enable-linger $USER
 journalctl --user -u gate-watcher -f
 ```
+
+## Ledger 자동 발견 (v2.2)
+
+gjc는 ledger를 **세션별 디렉토리**(`.gjc/_session-<uuid7>/ultragoal/ledger.jsonl`)에 둔다. watcher는 `ledger_glob` 매치 중 **mtime 최신** 파일을 감시 대상으로 자동 선택하고, 선택/변경 시 로그에 남긴다 (`ledger resolved: ... (source=glob)`). phase/세션이 새로 떠도 config 수정 불필요 — 죽은 과거 세션의 ledger는 mtime이 멈춰 있어 자연히 배제된다. `ledger_path`는 glob 미사용 시의 fallback.
+
+첫 배포 검증(1회): 후보가 여럿이면 각 ledger를 `tail -1`·`stat -c %y`로 대조해 최신 mtime 파일이 실제 라이브 세션(최근 이벤트 날짜·현재 goal id)인지 확인 후 진행.
 
 ## 게이트 issue 자동 발견 (v2.1)
 
