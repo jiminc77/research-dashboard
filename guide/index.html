@@ -628,7 +628,7 @@
 
     <div class="callout tip mb0" style="margin-bottom:24px;">
       <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16v-5M12 8h.01" stroke-linecap="round"/><circle cx="12" cy="12" r="9"/></svg></span>
-      <p>세션 A가 STEP 0에서 자동 실행: <code class="inl">bootstrap_project.sh</code>(라벨 18종·마일스톤) → CODE repo <code class="inl">.github/workflows/</code>에 <strong>pr-verify · phase-transition · gate-notify · evidence-verify</strong> 4종 + <code class="inl">.github/immutables.txt</code> 복사 → <code class="inl">projects/{name}/</code> + <code class="inl">project.yml</code> 생성 → 대시보드 <code class="inl">CONFIG.projects</code>에 항목 추가(<code class="inl">docsBase</code> 포함).</p>
+      <p>STEP 0 셋업: 라벨 18종·마일스톤 생성 + CODE repo <code class="inl">.github/workflows/</code>에 <strong>pr-verify · phase-transition · gate-notify · evidence-verify</strong> 4종 + <code class="inl">.github/immutables.txt</code> 복사(셸이 필요한 이 단계들은 <span class="who me">나</span>가 로컬 셸에서 — <code class="inl">bootstrap_project.sh</code>) → 세션 A는 <code class="inl">projects/{name}/project.yml</code>을 branch+PR로 올림(민감값 공란) → 대시보드 <code class="inl">CONFIG.projects</code> 등록은 <span class="who me">나</span>가 별도로(필드 name/owner/mgmtRepo/codeRepo/titlePrefix — <code class="inl">project.yml</code>과 용도 분리).</p>
     </div>
 
     <div class="callout note" style="margin-bottom:24px;">
@@ -704,7 +704,7 @@
 
     <!-- ===== manual fallback ===== -->
     <details class="manual">
-      <summary>커맨드로 직접 부트스트랩 (참고)</summary>
+      <summary>커맨드로 직접 부트스트랩 — 셸 세션 A / 사람용 (참고)</summary>
       <div class="manual-body">
         <div class="code" style="margin-top:16px;">
           <div class="code-top"><span class="fname">shell — 라벨·마일스톤 + 워크플로 4종</span><span class="lang">bash</span><span class="who me">나</span><button class="copy-btn" data-label="복사">복사</button></div>
@@ -727,7 +727,7 @@ git -C {CODE_REPO_LOCAL} add -A \
 <span class="cmt"># 3) ntfy topic secret (프로젝트마다 고유 topic) → 폰 ntfy 앱에서 그 topic 구독</span>
 gh secret set NTFY_TOPIC -R {OWNER}/{CODE_REPO}   <span class="cmt"># 값: {project}-gates-{랜덤}</span></code></pre>
         </div>
-        <p class="lead" style="margin:0;color:var(--body);">이후 <code class="inl">projects/{name}/project.yml</code>(<a href="https://github.com/jiminc77/research-dashboard/blob/main/projects/_template.yml" target="_blank" rel="noopener">_template.yml</a>)과 <code class="inl">dashboard/index.html</code> <code class="inl">CONFIG.projects</code> 항목(<code class="inl">docsBase</code> 포함)을 추가하고, 계획서 정형화 세션으로 <code class="inl">P0.md</code>까지 진행합니다. 위 위저드가 이 전부를 세션 A에 위임하는 지시서를 만들어 줍니다.</p>
+        <p class="lead" style="margin:0;color:var(--body);">이후 <code class="inl">projects/{name}/project.yml</code>(<a href="https://github.com/jiminc77/research-dashboard/blob/main/projects/_template.yml" target="_blank" rel="noopener">_template.yml</a>, 민감값 공란)을 올리고, 대시보드 <code class="inl">dashboard/index.html</code> <code class="inl">CONFIG.projects</code> 항목(필드 name/owner/mgmtRepo/codeRepo/titlePrefix — <code class="inl">project.yml</code>과 별개 레지스트리)을 추가한 뒤, 계획서 정형화 세션으로 <code class="inl">P0.md</code>까지 진행합니다. 위 위저드가 이 전부를 세션 A에 위임하는 지시서를 만들어 줍니다.</p>
       </div>
     </details>
   </div>
@@ -833,7 +833,7 @@ follow-ups:
 
     <div class="callout tip mt16">
       <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9"/></svg></span>
-      <p><strong>판정 후 워크스테이션에 손댈 필요 없음.</strong> 원격 데몬 <a href="https://github.com/jiminc77/research-dashboard/tree/main/research-ops/gate-watcher" target="_blank" rel="noopener"><code class="inl">gate-watcher</code></a>가 실행 세션의 blocked 상태를 감시하다 판정 코멘트를 감지하면 tmux 세션에 "가서 읽어라" 신호만 전달합니다(본문 주입 없음 — 세션이 직접 fetch·검증). 전달 확인 = 판정 코멘트의 👀 reaction, 30분 무응답 시 1회 재전달 후 알림. <strong>상시 가동</strong>(systemd, 재부팅 생존) — 상태 확인 <code class="inl">systemctl --user status gate-watcher</code>, 설치·업그레이드는 <a href="https://github.com/jiminc77/research-dashboard/tree/main/research-ops/gate-watcher" target="_blank" rel="noopener">gate-watcher README</a>.</p>
+      <p><strong>판정 후 워크스테이션에 손댈 필요 없음.</strong> 원격 데몬 <a href="https://github.com/jiminc77/research-dashboard/tree/main/research-ops/gate-watcher" target="_blank" rel="noopener"><code class="inl">gate-watcher</code></a>가 실행 세션의 blocked 상태를 감시하다 판정 코멘트를 감지하면 tmux 세션에 "가서 읽어라" 신호만 전달합니다(본문 주입 없음 — 세션이 직접 fetch·검증). 전달 확인 = 판정 코멘트의 👀 reaction, 30분 무응답 시 1회 재전달 후 알림. <strong>상시 가동</strong>(systemd, 재부팅 생존) — 상태 확인 <code class="inl">systemctl --user status gate-watcher</code>, 설치·업그레이드는 <a href="https://github.com/jiminc77/research-dashboard/tree/main/research-ops/gate-watcher" target="_blank" rel="noopener">gate-watcher README</a>. <strong>watcher 경보</strong>: 데몬이 죽거나 멈추면 폰으로 알려주는 보조 유닛(OnFailure 훅 + 5분 liveness 타이머)은 <a href="https://github.com/jiminc77/research-dashboard/tree/main/research-ops/gate-watcher/alerts" target="_blank" rel="noopener">gate-watcher/alerts</a> 참고.</p>
     </div>
 
     <div class="callout warn mt16 mb0">
@@ -904,7 +904,7 @@ follow-ups:
         </tbody>
       </table>
     </div>
-    
+
   </div>
 </section>
 
@@ -1101,17 +1101,17 @@ repoLine + '\n' +
 '- gjc 모델: default/planner/architect=' + v.modelMain + ' · executor/critic=' + v.modelExec + '\n' +
 '- ntfy topic: ' + v.ntfy + '\n' +
 '\n' +
-'STEP 0 — 초기 세팅 (전부 네가 실행하고 결과를 표로 보고하라):\n' +
-'1) GitHub 인증 확인 — 이 지시서를 실행하는 너(세션 A)는 gh CLI 없는 LLM 세션이다: 사람에게서 fine-grained PAT(두 레포 Contents RW + Issues RW)를 받아 REST API로 쓴다. (사람이 로컬 셸에서 직접 밟는 경우에만 `gh auth login` 후 `gh auth status`.)\n' +
-'2) 라벨 상태기계 18종을 관리·구현 레포에, phase 마일스톤을 구현 레포에 생성 (research-ops/scripts/bootstrap_project.sh 참조)\n' +
-'3) 관리 레포 research-ops/workflows/ 의 pr-verify.yml · phase-transition.yml · gate-notify.yml · evidence-verify.yml 4종과 .github/immutables.txt 를 구현 레포 .github/ 에 커밋\n' +
-'4) NTFY_TOPIC secret 등록은 내 몫이다 — `gh secret set NTFY_TOPIC -R ' + v.owner + '/' + v.code + '` 와 topic 값(' + v.ntfy + '), 폰 ntfy 앱 구독법을 보여주고 완료 확인을 받아라\n' +
-'5) 관리 레포 projects/' + slug + '/project.yml 에 이 설정 전체를 커밋 (projects/_template.yml 참조 — 이후 모든 단계 세션이 이 파일을 읽는다)\n' +
-'6) 관리 레포 dashboard/index.html 의 CONFIG.projects 에 ' + project + ' 항목을 추가 커밋 (titlePrefix "[' + project + '] " · docsBase "projects/' + slug + '")\n' +
-'7) 셋업 검증 리포트 출력\n' +
+'STEP 0 — 초기 세팅 (너는 no-shell 웹 pro 세션 A다. 셸이 필요한 단계는 [사람] 표시 — 사람에게 안내하고 완료 확인을 받아라. 나머지는 branch+PR 로 게시하고 결과를 표로 보고):\n' +
+'1) 인증: 너(세션 A)는 gh CLI 없는 LLM 세션이다 — 사람에게서 fine-grained PAT(두 레포 Contents RW + Issues RW)를 받아 REST API로 쓴다. 게시는 branch+PR 로만(main 직접 금지), pr-verify green 후 사람이 merge.\n' +
+'2) [사람, 로컬 셸] 라벨 상태기계 18종(양 레포)·phase 마일스톤(구현 레포) 생성 — research-ops/scripts/bootstrap_project.sh (셸 스크립트). 완료 확인을 받아라.\n' +
+'3) [사람, 로컬 셸] research-ops/workflows/ 의 pr-verify.yml · phase-transition.yml · gate-notify.yml · evidence-verify.yml 4종 + .github/immutables.txt 를 구현 레포 .github/ 로 복사·커밋(gjc가 CODE main 관리). 완료 확인을 받아라.\n' +
+'4) [사람, 로컬 셸] NTFY_TOPIC secret 등록 — `gh secret set NTFY_TOPIC -R ' + v.owner + '/' + v.code + '` (topic 값 ' + v.ntfy + '). 폰 ntfy 앱 구독법을 보여주고 완료 확인을 받아라.\n' +
+'5) 관리 레포 projects/' + slug + '/project.yml 을 projects/_template.yml 뼈대로 작성해 branch+PR 로 올려라 — 민감값(ssh_host/workdir/모델)은 공란 유지(placeholder), 세션 B 값은 사람이 제공. 이후 모든 단계 세션이 이 파일을 읽는다.\n' +
+'6) [사람] 대시보드 등록: dashboard/index.html 의 CONFIG.projects 는 사람이 관리하는 하드코딩 레지스트리다(project.yml 과 별개, 서로 참조 안 함) — 사람에게 ' + project + ' 항목 추가를 안내하라. 필드는 name/owner/mgmtRepo/codeRepo/titlePrefix("[' + project + '] "). (docsBase 같은 필드는 없다.)\n' +
+'7) 셋업 검증 리포트 출력([사람] 셸 단계 완료 여부 포함)\n' +
 '\n' +
-'STEP 1 — 이 메시지에 첨부된 계획서 초안을 plan_refinement 절차로 학회 수준 정형화 → projects/' + slug + '/research/ 에 커밋 → 내 승인 대기\n' +
-'STEP 2~ — ORCHESTRATOR.md 절차대로 P0 준비: 단계 회고(해당 시) → P0.md 명세 → dev 이슈 발행 → 마지막에 세션 B 실행 지시서(SESSION_B.md 템플릿에 값 채움)를 복사 블록으로 출력하고 정지\n' +
+'STEP 1 — 이 메시지에 첨부된 계획서 초안을 plan_refinement 절차로 학회 수준 정형화 → projects/' + slug + '/research/ 에 branch+PR 로 올림 → 내 승인 대기\n' +
+'STEP 2~ — ORCHESTRATOR.md 절차대로 P0 준비: 단계 회고(해당 시) → P0.md 명세 → dev 이슈 발행(모두 branch+PR, pr-verify green 후 사람 merge) → 마지막에 세션 B 실행 지시서(SESSION_B.md 템플릿에 값 채움)를 복사 블록으로 출력하고 정지\n' +
 '\n' +
 '게이트 모드: 내가 "이슈 확인"이라고 하면 ORCHESTRATOR.md §게이트 코파일럿 절차를 수행하라 (상황 요약 → 선택지 분석 → VERDICT 초안. 판정은 내가 한다).';
   }
