@@ -20,6 +20,8 @@ cfg = json.load(open(f"{here}/config.example.json"))
 cfg.update({
     "repo": "jiminc77/research-dashboard",
     "issue_number": int(issue),
+    "issue_labels": [],
+    "ledger_glob": "",
     "tmux_session": "gw-rehearsal",
     "ledger_path": f"{work}/ledger.jsonl",
     "baseline_comment_id": 0,

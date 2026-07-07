@@ -93,5 +93,20 @@ class TestLedgerDiscovery(unittest.TestCase):
         self.assertEqual((path, src), ("/x/l.jsonl", "fallback"))
 
 
+
+class TestHermeticOverrides(unittest.TestCase):
+    """리허설/목업 계약: 자동 발견을 비우면 fallback만 쓴다 (v2.3 회귀 방지)."""
+
+    def test_empty_glob_uses_ledger_path(self):
+        path, src = watcher.resolve_ledger({"ledger_glob": "", "ledger_path": "/mock/ledger.jsonl"})
+        self.assertEqual((path, src), ("/mock/ledger.jsonl", "fallback"))
+
+    def test_empty_labels_uses_issue_number(self):
+        class _NoNetLog:
+            def write(self, msg): pass
+        n, src = watcher.resolve_issue({"issue_labels": [], "issue_number": 99, "repo": "x/y"}, "tok", _NoNetLog())
+        self.assertEqual((n, src), (99, "fallback"))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
