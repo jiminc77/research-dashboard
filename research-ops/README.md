@@ -59,3 +59,9 @@ projects/<slug>/
 - 상태·증거·게이트 계약: `PROTOCOL.md`
 - 웹 pro 런타임 계약: `templates/pro_orchestrator_prompt.md`
 - 기준 예시(reference): **DGCC** — `DGCC/P0.md`, dashboard P0–P7 이슈, 완료·확정 수치 기록.
+
+## 계정 규율 (#22)
+
+- **사람 = `jiminc77`** — `### GATE VERDICT`는 이 계정만 유효 (gate-notify `verdict-guard`가 비-사람 판정을 무효 처리·원복).
+- **에이전트 = `jiminc77-agent`** — 세션 A·gjc·gate-watcher 등 자동화 주체는 이 계정의 PAT로 활동한다. 사람 PAT를 에이전트 세션에 넣지 않는다.
+- 분리가 유지되는 한 verdict-guard 가 실효 상태다: 에이전트가 판정을 시도하면 자동 거부된다.
