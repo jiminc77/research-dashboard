@@ -1,12 +1,18 @@
 {
   "repo": "jiminc77/DGCC",
   "issue_number": 12,
+  "issue_labels": [
+    "state:blocked-human"
+  ],
   "human_login": "jiminc77",
   "verdict_marker": "## HUMAN 판정",
   "resume_token": "[RESUME]",
   "tmux_session": "CONFIRM_ME_VIA_tmux_ls",
   "ledger_path": "/home/simx2204/Workspaces/DGCC/.gjc/ultragoal/ledger.jsonl",
-  "armed_substrings": ["human_blocked", "blocker_classified"],
+  "armed_substrings": [
+    "human_blocked",
+    "blocker_classified"
+  ],
   "baseline_comment_id": 0,
   "token_env": "GITHUB_TOKEN",
   "disarmed_poll_s": 30,

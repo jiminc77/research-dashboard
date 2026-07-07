@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""research-ops gate-watcher (spec v2, 2026-07-07).
+"""research-ops gate-watcher (spec v2.1, 2026-07-07).
+
+v2.1: 게이트 issue 자동 발견 — issue_labels(우선) → issue_number(fallback).
+phase가 바뀌어도 config 수정 없이 동작 (라벨 상태기계 도입 시 완전 자동).
 
 HUMAN GATE에서 사람 판정 코멘트를 감지해 라이브 gjc tmux 세션에
 "가서 읽어라" nudge만 전달한다. 판정 본문은 절대 주입하지 않는다.
@@ -14,6 +17,7 @@ import subprocess
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
 
@@ -104,10 +108,44 @@ def evaluate_comment(comment: dict, cfg: dict, last_processed_id: int):
     return True, "ok"
 
 
-def find_verdict(cfg: dict, token: str, last_processed_id: int, log: Log):
+
+def choose_issue(items, cfg):
+    """라벨 질의 결과에서 게이트 issue 선택 (PR 제외, updated desc 첫 항목). 순수 함수 — 테스트 잠금."""
+    for it in items or []:
+        if "pull_request" in it:
+            continue
+        return int(it["number"])
+    return None
+
+
+def resolve_issue(cfg: dict, token: str, log: Log):
+    """게이트 issue 결정: (1) issue_labels 매치 (open, 최근 갱신순) → (2) issue_number fallback.
+
+    Returns (issue_number | None, source_str)
+    """
+    labels = cfg.get("issue_labels") or []
+    if labels:
+        q = urllib.parse.quote(",".join(labels))
+        url = (
+            f"https://api.github.com/repos/{cfg['repo']}/issues"
+            f"?state=open&labels={q}&sort=updated&direction=desc&per_page=10"
+        )
+        try:
+            n = choose_issue(gh_api(url, token), cfg)
+            if n is not None:
+                return n, "label"
+        except Exception as e:  # noqa: BLE001
+            log.write(f"issue discovery API error (label path): {e}")
+    n = cfg.get("issue_number")
+    if n:
+        return int(n), "fallback"
+    return None, "none"
+
+
+def find_verdict(cfg: dict, token: str, issue_number: int, last_processed_id: int, log: Log):
     url = (
         f"https://api.github.com/repos/{cfg['repo']}/issues/"
-        f"{cfg['issue_number']}/comments?per_page=100"
+        f"{issue_number}/comments?per_page=100"
     )
     comments = gh_api(url, token)  # 오래된 것 → 최신 순
     candidate = None
@@ -120,8 +158,8 @@ def find_verdict(cfg: dict, token: str, last_processed_id: int, log: Log):
     return candidate
 
 
-def deliver_nudge(cfg: dict, comment_id: int) -> None:
-    msg = cfg["nudge_template"].format(issue=cfg["issue_number"], cid=comment_id)
+def deliver_nudge(cfg: dict, issue_number: int, comment_id: int) -> None:
+    msg = cfg["nudge_template"].format(issue=issue_number, cid=comment_id)
     subprocess.run(
         ["tmux", "send-keys", "-t", cfg["tmux_session"], msg, "Enter"],
         check=True,
@@ -162,6 +200,7 @@ def default_state(cfg: dict) -> dict:
         "delivered_id": None,
         "delivered_at": None,
         "redelivered": False,
+        "active_issue": None,
     }
 
 
@@ -176,7 +215,8 @@ def run(cfg_path: str) -> None:
     state = load_json(cfg["state_path"], default_state(cfg))
     log.write(
         f"start mode={state['mode']} last_processed_id={state['last_processed_id']} "
-        f"issue=#{cfg['issue_number']} session={cfg['tmux_session']!r}"
+        f"labels={cfg.get('issue_labels')} fallback_issue={cfg.get('issue_number')} "
+        f"session={cfg['tmux_session']!r}"
     )
 
     while True:
@@ -199,8 +239,17 @@ def run(cfg_path: str) -> None:
                 save_json(cfg["state_path"], state)
                 log.write("DISARM (ledger resumed without delivery)")
                 continue
+            issue_no, issue_src = resolve_issue(cfg, token, log)
+            if issue_no is None:
+                log.write("ARMED but no gate issue resolvable (labels/fallback both empty)")
+                time.sleep(cfg["armed_poll_s"])
+                continue
+            if state.get("active_issue") != issue_no:
+                state.update(active_issue=issue_no)
+                save_json(cfg["state_path"], state)
+                log.write(f"gate issue resolved: #{issue_no} (source={issue_src})")
             try:
-                cand = find_verdict(cfg, token, state["last_processed_id"], log)
+                cand = find_verdict(cfg, token, issue_no, state["last_processed_id"], log)
             except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError) as e:
                 log.write(f"GitHub API error: {e}")
                 time.sleep(cfg["armed_poll_s"])
@@ -208,7 +257,7 @@ def run(cfg_path: str) -> None:
             if cand is not None:
                 cid = int(cand["id"])
                 try:
-                    deliver_nudge(cfg, cid)
+                    deliver_nudge(cfg, issue_no, cid)
                     state.update(
                         mode="WAIT_ACK",
                         delivered_id=cid,
@@ -244,7 +293,7 @@ def run(cfg_path: str) -> None:
             elapsed = time.time() - (state.get("delivered_at") or time.time())
             if elapsed > cfg["ack_timeout_s"] and not state.get("redelivered"):
                 try:
-                    deliver_nudge(cfg, state["delivered_id"])
+                    deliver_nudge(cfg, state.get("active_issue") or int(cfg.get("issue_number") or 0), state["delivered_id"])
                     state.update(redelivered=True)
                     save_json(cfg["state_path"], state)
                     log.write(f"REDELIVERED nudge for comment {state['delivered_id']}")

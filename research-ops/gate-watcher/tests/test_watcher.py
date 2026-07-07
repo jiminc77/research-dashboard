@@ -52,5 +52,20 @@ class TestLedger(unittest.TestCase):
         self.assertFalse(watcher.is_blocked(watcher.ledger_tail(p), CFG)); os.unlink(p)
     def test_missing_file_safe(self):
         self.assertEqual(watcher.ledger_tail("/nonexistent/ledger.jsonl"), "")
+
+class TestIssueDiscovery(unittest.TestCase):
+    def test_choose_first_open_issue(self):
+        items = [{"number": 31, "title": "gate"}, {"number": 12, "title": "old"}]
+        self.assertEqual(watcher.choose_issue(items, CFG), 31)
+
+    def test_skip_pull_requests(self):
+        items = [{"number": 33, "pull_request": {"url": "x"}}, {"number": 31}]
+        self.assertEqual(watcher.choose_issue(items, CFG), 31)
+
+    def test_none_on_empty(self):
+        self.assertIsNone(watcher.choose_issue([], CFG))
+        self.assertIsNone(watcher.choose_issue(None, CFG))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

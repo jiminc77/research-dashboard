@@ -41,6 +41,10 @@ loginctl enable-linger $USER
 journalctl --user -u gate-watcher -f
 ```
 
+## 게이트 issue 자동 발견 (v2.1)
+
+대상 issue는 매 ARMED 폴링마다 자동 결정: **(1) `issue_labels` 매치** (open 이슈, 최근 갱신순, PR 제외) → **(2) `issue_number` fallback**. phase가 바뀌어도 config 수정 불필요 — 라벨 상태기계(`state:blocked-human`)를 쓰는 프로젝트는 완전 자동, 라벨 미운용 단계(현 DGCC M3R)는 fallback(#12)으로 동작. 어느 경로로 정해졌는지 `watcher.log`에 기록됨 (`gate issue resolved: #N (source=label|fallback)`).
+
 ## 동작 (spec §3)
 
 `DISARMED`(ledger만 30초 감시, API 무호출) → 꼬리에 `human_blocked`/`blocker_classified` → `ARMED`(3분 이슈 폴링) → C1–C5 충족 → tmux nudge + 👀 reaction → `WAIT_ACK` → ledger 재개 → `DISARMED`. 30분 무응답 시 1회 재전달, 재실패 시 사람 알림 후 해제.
@@ -56,4 +60,5 @@ journalctl --user -u gate-watcher -f
 ## 운영 노트
 
 - C4 구현 = `last_processed_id` 단조 증가 — ARM 이전 게시 판정도 소급 탐지(레이스 안전), `baseline_comment_id`가 과거 이력 차단.
+- phase 전환 시: 라벨 도입 전까지는 fallback `issue_number`만 새 게이트 이슈로 갱신 (라벨 도입 후엔 그것도 불필요).
 - 라이브 gjc 규약 (issue #12 공지): gjc 코멘트 첫 줄에 `## HUMAN` 금지, 판정 인용은 blockquote로만.
