@@ -100,7 +100,7 @@
   /* ---------- Hero ---------- */
   .hero {
     position: relative; overflow: hidden;
-    padding: 96px 0 88px;
+    padding: 72px 0 64px;
     border-bottom: 1px solid var(--hairline);
   }
   .hero::before {
@@ -120,11 +120,11 @@
   }
   .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
   .hero h1 {
-    font-size: 64px; font-weight: 600; line-height: 1.05; letter-spacing: -1.92px;
-    color: var(--ink); margin: 0 0 20px; max-width: 15ch;
+    font-size: 56px; font-weight: 600; line-height: 1.05; letter-spacing: -1.68px;
+    color: var(--ink); margin: 0 0 18px; max-width: 15ch;
   }
-  .hero .sub { font-size: 18px; line-height: 1.5; color: var(--body); max-width: 60ch; margin-bottom: 28px; }
-  .hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 48px; }
+  .hero .sub { font-size: 18px; line-height: 1.5; color: var(--body); max-width: 62ch; margin-bottom: 26px; }
+  .hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 40px; }
 
   /* stylized terminal (hero artifact) */
   .term {
@@ -155,17 +155,25 @@
   .c-white { color: #ffffff; }
 
   /* ---------- Section rhythm ---------- */
-  section { padding: 96px 0; border-bottom: 1px solid var(--hairline); }
-  .sec-head { max-width: 62ch; margin-bottom: 40px; }
+  section { padding: 88px 0; border-bottom: 1px solid var(--hairline); }
+  .sec-head { max-width: 66ch; margin-bottom: 40px; }
   .sec-label {
     display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.88px;
     text-transform: uppercase; color: var(--muted); margin-bottom: 14px;
   }
-  h2.sec-title { font-size: 36px; line-height: 1.15; letter-spacing: -1.08px; margin-bottom: 14px; }
+  h2.sec-title { font-size: 34px; line-height: 1.15; letter-spacing: -1.02px; margin-bottom: 14px; }
   .sec-head p { font-size: 17px; color: var(--body); }
   h3.sub-title { font-size: 22px; line-height: 1.25; letter-spacing: -0.5px; margin: 0 0 8px; }
   /* 카드·그리드·표 직후의 소제목은 확실히 띄운다 (다크 카드 뒤 밀착 방지) */
   .grid + .sub-title, .card + .sub-title, .tbl-wrap + .sub-title, pre + .sub-title, .code + .sub-title { margin-top: 48px; }
+
+  /* section number chip on the head */
+  .sec-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 12px; font-weight: 700; letter-spacing: 0;
+    color: #fff; background: var(--primary); border-radius: 8px;
+    min-width: 26px; height: 24px; padding: 0 8px; margin-bottom: 14px;
+  }
 
   /* ---------- Badges ---------- */
   .pill {
@@ -194,9 +202,9 @@
     white-space: nowrap; vertical-align: middle;
   }
   .who.me   { background: #e3f0ff; color: #0d5cba; }   /* 나 — 직접 실행 (blue) */
-  .who.auto { background: #dff3e6; color: #157a3a; }   /* 자동 — Actions/스크립트 (green) */
+  .who.auto { background: #f0f0f3; color: #555a63; }   /* 자동 — Actions/스크립트 (grey) */
   .who.gjc  { background: #f0e6fb; color: #6d3aa0; }   /* gjc — 구현 에이전트 (purple) */
-  .who.sa   { background: #fbeacd; color: #92600b; }   /* 세션 A — 웹 pro/Claude (amber) */
+  .who.sa   { background: #dff3e6; color: #146c33; }   /* 세션 A — 회고·명세 (green) */
   /* legend line under hero */
   .who-legend {
     display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px;
@@ -327,6 +335,15 @@
   .tbl tr:last-child td { border-bottom: none; }
   .tbl .desc { color: var(--body); }
   .tbl-wrap { border: 1px solid var(--hairline-strong); border-radius: 12px; overflow: hidden; }
+
+  /* schedule matrix (언제 무엇을 하나) */
+  .matrix td.when { width: 26%; }
+  .matrix td.when strong { display: block; font-size: 14.5px; color: var(--ink); margin-bottom: 2px; }
+  .matrix td.when .sub { font-size: 12px; color: var(--muted); }
+  .matrix td.when a { font-size: 12px; }
+  .matrix ul { margin: 0; padding-left: 17px; }
+  .matrix ul li { font-size: 13.5px; color: var(--body); padding: 2px 0; }
+  .matrix col.c-when { width: 26%; }
 
   /* inline code */
   code.inl {
@@ -466,15 +483,17 @@
   }
   @media (max-width: 768px) {
     .nav-links a:not(.btn) { display: none; }
-    .hero { padding: 64px 0 56px; }
-    .hero h1 { font-size: 40px; letter-spacing: -1.2px; }
+    .hero { padding: 56px 0 48px; }
+    .hero h1 { font-size: 38px; letter-spacing: -1.14px; }
     .hero .sub { font-size: 16px; }
-    section { padding: 64px 0; }
-    h2.sec-title { font-size: 28px; letter-spacing: -0.84px; }
+    section { padding: 60px 0; }
+    h2.sec-title { font-size: 27px; letter-spacing: -0.81px; }
     .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
     .split { grid-template-columns: 1fr; }
     .form-grid { grid-template-columns: 1fr; }
     .ft-grid { flex-direction: column; gap: 28px; }
+    .matrix col.c-when { width: auto; }
+    .matrix td.when { width: auto; }
   }
   @media (max-width: 440px) {
     .hero h1 { font-size: 32px; }
@@ -490,10 +509,12 @@
   <div class="nav-inner">
     <div class="brand"><span class="glyph">R</span> research-ops</div>
     <div class="nav-links">
+      <a href="#overview">개요</a>
+      <a href="#setup">최초 1회</a>
       <a href="#new">새 프로젝트</a>
-      <a href="#phase">단계 실행</a>
-      <a href="#gate">게이트</a>
-      <a href="#next">단계 넘기기</a>
+      <a href="#loop">단계 루프</a>
+      <a href="#trouble">문제 해결</a>
+      <a href="#ref">레퍼런스</a>
       <a class="btn btn-primary" href="https://jiminc77.github.io/research-dashboard/dashboard/" target="_blank" rel="noopener">라이브 대시보드</a>
     </div>
   </div>
@@ -504,16 +525,9 @@
   <div class="wrap">
     <span class="eyebrow"><span class="dot"></span> 1인 연구자 · GitHub 기반 AI 에이전트 워크플로</span>
     <h1>research-ops 사용법</h1>
-    <p class="sub">할 일과 커맨드만. 프로젝트 시작 → 단계 실행 → 게이트 판정 → 단계 넘기기 → 보기 → 검증 대처. 상태는 GitHub 라벨에, 규약은 <code class="inl">research-ops/PROTOCOL.md</code>에 있습니다.</p>
-    <div class="who-legend">
-      <span>배지:</span>
-      <span class="who me">나</span> 직접 실행 <span class="sep">·</span>
-      <span class="who auto">자동</span> Actions/스크립트 <span class="sep">·</span>
-      <span class="who gjc">gjc</span> 구현 에이전트 <span class="sep">·</span>
-      <span class="who sa">세션 A</span> 회고·명세 세션
-    </div>
+    <p class="sub">GitHub를 상태 저장소로 쓰는 1인 연구 운영. 위에서 아래로 한 번 읽으면 처음부터 세팅할 수 있게 정리했습니다. 상태는 GitHub 라벨에, 규약은 <code class="inl">research-ops/PROTOCOL.md</code>에 있습니다.</p>
     <div class="hero-cta">
-      <a class="btn btn-primary" href="#new">셋업부터 시작 →</a>
+      <a class="btn btn-primary" href="#setup">최초 1회 세팅부터 →</a>
       <a class="btn btn-secondary" href="https://github.com/jiminc77/research-dashboard" target="_blank" rel="noopener">
         <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
         MGMT 레포
@@ -524,12 +538,12 @@
     <div class="term" role="img" aria-label="research-ops 상태 요약 터미널">
       <div class="term-bar">
         <span class="tl r"></span><span class="tl y"></span><span class="tl g"></span>
-        <span class="ttl">research-ops — status.sh — jiminc77/DGCC</span>
+        <span class="ttl">research-ops — status.sh — jiminc77/{project}</span>
       </div>
       <div class="term-body">
 <pre><span class="c-dim">$</span> <span class="c-white">bash research-ops/scripts/status.sh</span>
 
-<span class="c-blue">DGCC</span> <span class="c-dim">·</span> phase <span class="c-white">P1</span> <span class="c-dim">·</span> milestone <span class="c-white">…</span>
+<span class="c-blue">{project}</span> <span class="c-dim">·</span> phase <span class="c-white">P1</span> <span class="c-dim">·</span> milestone <span class="c-white">…</span>
 <span class="c-dim">──────────────────────────────────────────────</span>
   <span class="c-green">✔ #14</span>  M0 baseline sweep        <span class="c-green">state:done</span>
   <span class="c-green">✔ #15</span>  M1 threshold fit         <span class="c-green">state:done</span>
@@ -543,101 +557,178 @@
     </div>
 
     <div class="toc mt24">
-      <a href="#new">1 · 새 프로젝트</a>
-      <a href="#phase">2 · 단계 실행</a>
-      <a href="#gate">3 · 게이트 판정</a>
-      <a href="#next">4 · 단계 넘기기</a>
-      <a href="#view">5 · 보기</a>
-      <a href="#troubleshoot">6 · 검증이 막을 때</a>
+      <a href="#overview">개요</a>
+      <a href="#setup">최초 1회</a>
+      <a href="#new">새 프로젝트</a>
+      <a href="#loop">단계 루프</a>
+      <a href="#trouble">문제 해결</a>
+      <a href="#ref">레퍼런스</a>
     </div>
   </div>
 </header>
 
-<!-- ===================== 1줄 구조 + 상태기계 ===================== -->
+<!-- ===================== §0 개요 ===================== -->
+<span id="overview" class="anchor"></span>
 <section>
   <div class="wrap">
     <div class="sec-head">
-      <span class="sec-label">한 눈에</span>
-      <h2 class="sec-title">구조 · 주체 · 상태기계</h2>
-      <p>레포 2개(MGMT <code class="inl">research-dashboard</code> = 문서·킷·대시보드 · CODE = 프로젝트별 구현). <strong>나</strong>는 <strong>게이트 판정</strong>만. dev 이슈는 항상 <code class="inl">state:*</code> 라벨 정확히 1개.</p>
+      <span class="sec-label">개요</span>
+      <h2 class="sec-title">딱 두 가지만</h2>
+      <p>레포는 2개다 — MGMT <code class="inl">research-dashboard</code>(문서·킷·대시보드) + CODE(프로젝트별 구현). <strong>누가 무엇을 하는가</strong>와 <strong>언제 무엇을 하는가</strong>, 이 둘만 잡으면 나머지는 순서대로 따라가면 된다.</p>
     </div>
 
-    <div class="grid grid-4">
+    <h3 class="sub-title">1 · 역할 넷</h3>
+    <div class="grid grid-4 mt16">
+      <div class="card role">
+        <div class="k"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 20a6.5 6.5 0 0113 0" stroke-linecap="round"/></svg></span><h4>나 <span class="who me" style="font-weight:600;">나</span></h4></div>
+        <p>킥오프·민감값 제공 · HUMAN GATE 판정 · PR merge. 정본은 <strong>issue 코멘트뿐</strong>.</p>
+      </div>
       <div class="card role">
         <div class="k"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h16M4 18h10" stroke-linecap="round"/></svg></span><h4>세션 A <span class="who sa" style="font-weight:600;">세션 A</span></h4></div>
         <p>회고·리포트·차기 <code class="inl">P{k}.md</code>·이슈. 웹 pro 또는 Claude 세션. 쓰기는 <strong>branch+PR로만</strong>.</p>
       </div>
       <div class="card role">
         <div class="k"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 9l-4 3 4 3M16 9l4 3-4 3M13 6l-2 12" stroke-linecap="round" stroke-linejoin="round"/></svg></span><h4>gjc <span class="who gjc" style="font-weight:600;">gjc</span></h4></div>
-        <p>코드 구현. <code class="inl">ralplan</code>→<code class="inl">ultragoal</code>. <strong>phase 실행 중엔 CODE repo main에 직접 push</strong>.</p>
-      </div>
-      <div class="card role">
-        <div class="k"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 20a6.5 6.5 0 0113 0" stroke-linecap="round"/></svg></span><h4>나 <span class="who me" style="font-weight:600;">나</span></h4></div>
-        <p>HUMAN GATE 판정 · PR merge. 정본은 <strong>issue 코멘트뿐</strong>.</p>
+        <p>코드 구현. <code class="inl">ralplan</code>→<code class="inl">ultragoal</code>. phase 실행 중엔 <strong>CODE main에 직접 push</strong>.</p>
       </div>
       <div class="card role">
         <div class="k"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" stroke-linejoin="round"/></svg></span><h4>Actions <span class="who auto" style="font-weight:600;">자동</span></h4></div>
-        <p>gate-notify(ntfy) · evidence-verify(CI) · phase-transition(킥오프 자동) · <strong>pr-verify(PR 검증)</strong> · gate-watcher(판정 → 실행 세션 자동 전달).</p>
+        <p>gate-notify(ntfy) · evidence-verify(CI) · phase-transition(킥오프) · pr-verify · gate-watcher(판정 전달).</p>
       </div>
     </div>
 
-    <div class="subsec">
-      <span class="sec-label">State Machine</span>
-      <h3 class="sub-title">라벨 상태기계</h3>
-      <div class="card mt16">
-        <div class="flow">
-          <span class="pill st-ready mono">state:ready</span><span class="arrow">→</span>
-          <span class="pill st-running mono">state:running</span><span class="arrow">→</span>
-          <span class="pill st-verify mono">state:verify</span><span class="arrow">→</span>
-          <span class="pill st-done mono">state:done</span>
-        </div>
-        <div class="flow-branch">
-          <span>분기:</span>
-          <span class="pill st-bhuman mono">state:blocked-human</span>
-          <span style="color:var(--muted);">HUMAN GATE 대기 (GATE REQUEST)</span>
-          <span style="color:var(--muted-soft);">·</span>
-          <span class="pill st-btech mono">state:blocked-tech</span>
-          <span style="color:var(--muted);">CI 실패 / 3-strike</span>
-        </div>
-      </div>
+    <h3 class="sub-title" style="margin-top:56px;">2 · 언제 무엇을 하나</h3>
+    <p class="lead" style="margin:0 0 16px;">이 표가 이 문서의 목차다. 각 셀에서 해당 섹션으로 간다.</p>
+    <div class="tbl-wrap">
+      <table class="tbl matrix">
+        <colgroup><col class="c-when" /><col /><col /></colgroup>
+        <thead><tr><th>언제</th><th>사람이 하는 것</th><th>자동인 것</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="when"><strong>최초 1회</strong><span class="sub">시스템 준비 · ~20분</span><br><a href="#setup">§ 최초 1회 →</a></td>
+            <td>
+              <ul>
+                <li><span class="who me">나</span> agent PAT 발급 + <code class="inl">gate-watcher</code>·경보 설치</li>
+                <li><span class="who me">나</span> MGMT 브랜치 보호 + 폰 ntfy 앱</li>
+              </ul>
+            </td>
+            <td>
+              <ul>
+                <li><span class="who auto">자동</span> 이후 <code class="inl">gate-watcher</code> systemd로 상시 가동(재부팅 생존)</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td class="when"><strong>프로젝트마다</strong><span class="sub">착수 · ~10분</span><br><a href="#new">§ 새 프로젝트 →</a></td>
+            <td>
+              <ul>
+                <li><span class="who me">나</span> 마법사로 지시서 A 생성 → 새 세션 A에 계획서와 함께 붙여넣기</li>
+                <li><span class="who me">나</span> secret 승인 · 폰 topic 구독 · 워크스테이션 전환</li>
+              </ul>
+            </td>
+            <td>
+              <ul>
+                <li><span class="who sa">세션 A</span> 라벨·워크플로·설정·대시보드 셋업 + <code class="inl">P0.md</code></li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td class="when"><strong>단계마다</strong><span class="sub">반복 루프</span><br><a href="#loop">§ 단계 루프 →</a></td>
+            <td>
+              <ul>
+                <li><span class="who me">나</span> gjc 1회 부팅 · <code class="inl">### GATE VERDICT</code> 판정 · PR merge</li>
+                <li><span class="who me">나</span> "P{k} 완료. 다음 단계" 한 줄로 넘김</li>
+              </ul>
+            </td>
+            <td>
+              <ul>
+                <li><span class="who gjc">gjc</span> 자율 실행 · <span class="who auto">자동</span> CI 검증 · ntfy 푸시 · 킥오프 이슈</li>
+              </ul>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </section>
 
-<!-- ===================== 1. NEW PROJECT ===================== -->
+<!-- ===================== §1 최초 1회 ===================== -->
+<span id="setup" class="anchor"></span>
+<section style="background:var(--canvas-soft);">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">§1</span>
+      <h2 class="sec-title">최초 1회 — 시스템 준비</h2>
+      <p>처음 한 번, 약 20분. 전부 <strong>나</strong>가 직접 한다. 아래 넷을 순서대로. 레포·프로젝트 셋업은 프로젝트마다(§ 새 프로젝트)에서 하고, 여기서는 내 계정·워크스테이션·폰만 준비한다.</p>
+    </div>
+
+    <ol class="steps">
+      <li>
+        <span class="num">1</span>
+        <h4>계정 규율 — agent PAT 발급</h4>
+        <p><strong>사람 = <code class="inl">jiminc77</code></strong>, <strong>에이전트 = <code class="inl">jiminc77-agent</code></strong>로 나눈다. gjc·세션 A·gate-watcher 등 자동화 주체는 agent PAT로만 활동한다 — 이 분리가 유지되는 한 <code class="inl">### GATE VERDICT</code>를 비-사람이 흉내 내면 verdict-guard가 자동 무효·원복한다(실효 조건).</p>
+        <div class="code" style="margin:12px 0 0;">
+          <div class="code-top"><span class="fname">shell — agent PAT를 파일로 저장 (secret, 커밋 금지)</span><span class="lang">bash</span><span class="who me">나</span><button class="copy-btn" data-label="복사">복사</button></div>
+          <pre><code><span class="cmt"># github.com/settings/tokens 에서 jiminc77-agent 로 발급</span>
+<span class="cmt"># (두 레포 Contents RW + Issues RW, 스코프 최소)</span>
+mkdir -p ~/.config/gh-agent
+printf '%s\n' "&lt;PASTE_AGENT_PAT&gt;" > ~/.config/gh-agent/token
+chmod 600 ~/.config/gh-agent/token</code></pre>
+        </div>
+        <p class="note" style="margin:10px 0 0;">확인: <code class="inl">GH_TOKEN="$(cat ~/.config/gh-agent/token)" gh api user -q .login</code> → <code class="inl">jiminc77-agent</code></p>
+      </li>
+      <li>
+        <span class="num">2</span>
+        <h4>워크스테이션 — gate-watcher + 경보 설치</h4>
+        <p>원격 워크스테이션에 systemd 데몬을 올린다. 이후 판정 코멘트를 감지하면 살아있는 gjc tmux에 "가서 읽어라" 신호만 전달한다(본문 주입 없음). 죽거나 멈추면 폰으로 경보하는 보조 유닛도 함께 건다.</p>
+        <div class="code" style="margin:12px 0 0;">
+          <div class="code-top"><span class="fname">shell — 원격 워크스테이션</span><span class="lang">bash</span><span class="who me">나</span><button class="copy-btn" data-label="복사">복사</button></div>
+          <pre><code><span class="cmt"># 1) gate-watcher 데몬 (재부팅 자동 생존)</span>
+cp ~/Workspaces/research-dashboard/research-ops/gate-watcher/gate-watcher.service \
+   ~/.config/systemd/user/
+systemctl --user daemon-reload
+systemctl --user enable --now gate-watcher
+loginctl enable-linger $USER
+
+<span class="cmt"># 2) 경보 유닛 3개 + OnFailure drop-in (죽으면 즉시 · 비활성이면 5분 내 ntfy)</span>
+cd ~/Workspaces/research-dashboard/research-ops/gate-watcher/alerts
+cp gate-watcher-onfailure.service gate-watcher-liveness.service \
+   gate-watcher-liveness.timer ~/.config/systemd/user/
+systemctl --user edit gate-watcher   <span class="cmt"># [Unit] 아래 OnFailure=gate-watcher-onfailure.service</span>
+systemctl --user daemon-reload
+systemctl --user enable --now gate-watcher-liveness.timer</code></pre>
+        </div>
+        <p class="note" style="margin:10px 0 0;">확인: <code class="inl">systemctl --user status gate-watcher</code> · 유닛 원본은 <a href="https://github.com/jiminc77/research-dashboard/tree/main/research-ops/gate-watcher" target="_blank" rel="noopener">gate-watcher</a> / <a href="https://github.com/jiminc77/research-dashboard/tree/main/research-ops/gate-watcher/alerts" target="_blank" rel="noopener">alerts</a> README.</p>
+      </li>
+      <li>
+        <span class="num">3</span>
+        <h4>MGMT 브랜치 보호</h4>
+        <p>MGMT 게시는 branch+PR로만, <code class="inl">pr-verify</code> green 후 <span class="who me">나</span>가 merge한다(직접 main push 금지). MGMT <code class="inl">Settings → Branches → Add rule</code> → <code class="inl">main</code>에 <strong>Require a pull request</strong> + <strong>Require status checks</strong>에서 required check로 <code class="inl">pr-verify</code> 지정. (CODE 레포 브랜치 보호는 gjc 직접 push 의존이 사라지는 P1 종료 시 도입 — § 단계 루프 참고.)</p>
+        <p class="note" style="margin:10px 0 0;">확인: MGMT에 아무 브랜치로 PR을 열면 <code class="inl">pr-verify</code>가 required로 걸리는지.</p>
+      </li>
+      <li>
+        <span class="num">4</span>
+        <h4>폰 — ntfy 앱 설치</h4>
+        <p>게이트·킥오프·watcher 경보가 전부 <a href="https://ntfy.sh/" target="_blank" rel="noopener">ntfy</a>로 온다. 폰(또는 웹)에 ntfy 앱만 깔아 둔다 — 프로젝트별 topic 구독은 프로젝트 착수 때 한다(§ 새 프로젝트).</p>
+        <p class="note" style="margin:10px 0 0;">확인: <code class="inl">curl -d "test" ntfy.sh/&lt;아무_topic&gt;</code> → 그 topic을 구독한 폰에 뜨면 정상.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ===================== §2 새 프로젝트 ===================== -->
 <span id="new" class="anchor"></span>
 <section>
   <div class="wrap">
     <div class="sec-head">
-      <span class="pill" style="margin-bottom:14px;">1</span>
-      <h2 class="sec-title">새 프로젝트 시작하기</h2>
-      <p>레포 2개 준비 → 폼 채우기 → 지시서 복사 → 계획서 초안 첨부해 새 세션 A에 붙여넣기. 세션 A가 셋업(라벨·워크플로·설정·대시보드)부터 계획서 정형화·P0까지 수행합니다.</p>
+      <span class="sec-num">§2</span>
+      <h2 class="sec-title">새 프로젝트</h2>
+      <p>프로젝트마다, 약 10분. 마법사로 지시서를 만들어 계획서 초안과 함께 새 세션 A에 붙여넣으면, 세션 A가 셋업(라벨·워크플로·설정·대시보드)부터 계획서 정형화·P0까지 수행한다.</p>
     </div>
 
-    <!-- checklist first -->
-    <div class="card mb0" style="margin-bottom:24px;">
-      <span class="pill" style="margin-bottom:14px;">셋업 순서 (프로젝트당 1회)</span>
-      <ul class="check">
-        <li><span class="who me">나</span> <strong>레포 2개</strong> — MGMT(<code class="inl">research-dashboard</code>, 공용) + <strong>CODE repo</strong>(없으면 세션 A가 생성)</li>
-        <li><span class="who me">나</span> 아래 <strong>위저드</strong>에 값 채우고 <strong>지시서 A</strong> 생성 → 복사</li>
-        <li><span class="who me">나</span> 새 세션 A에 <strong>계획서 초안 첨부</strong>해 붙여넣기 → <span class="who sa">세션 A</span>가 STEP 0 셋업 실행</li>
-        <li><span class="who me">나</span> 세션 A가 안내하는 <code class="inl">NTFY_TOPIC</code> secret 등록 + 폰 ntfy 앱에서 그 topic 구독</li>
-        <li><span class="who me">나</span> 계획서 <strong>HUMAN 승인</strong> → <span class="who sa">세션 A</span>가 <code class="inl">P0.md</code> 작성·dev 이슈 발행</li>
-      </ul>
-    </div>
-
-    <div class="callout tip mb0" style="margin-bottom:24px;">
-      <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16v-5M12 8h.01" stroke-linecap="round"/><circle cx="12" cy="12" r="9"/></svg></span>
-      <p>STEP 0 셋업: 라벨 18종·마일스톤 생성 + CODE repo <code class="inl">.github/workflows/</code>에 <strong>pr-verify · phase-transition · gate-notify · evidence-verify</strong> 4종 + <code class="inl">.github/immutables.txt</code> 복사(셸이 필요한 이 단계들은 <span class="who me">나</span>가 로컬 셸에서 — <code class="inl">bootstrap_project.sh</code>) → 세션 A는 <code class="inl">projects/{name}/project.yml</code>을 branch+PR로 올림(민감값 공란) → 대시보드 <code class="inl">CONFIG.projects</code> 등록은 <span class="who me">나</span>가 별도로(필드 name/owner/mgmtRepo/codeRepo/titlePrefix — <code class="inl">project.yml</code>과 용도 분리).</p>
-    </div>
-
-    <div class="callout note" style="margin-bottom:24px;">
-      <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16v-5M12 8h.01" stroke-linecap="round"/><circle cx="12" cy="12" r="9"/></svg></span>
-      <p><strong>인증 — 실행 주체로 갈린다.</strong> 세션 A(위저드 지시서를 받는 LLM 세션·샌드박스)는 <code class="inl">gh</code>가 없다 → <strong>내가</strong> 준 <strong>fine-grained PAT</strong>(두 레포 Contents RW + Issues RW)로 <strong>REST API</strong>를 쓴다. 아래 <code class="inl">gh auth status</code>류 커맨드는 <strong>내가 로컬 셸</strong>에서 직접 부트스트랩할 때만(전제: <code class="inl">gh</code> 설치 + <code class="inl">gh auth login</code> 완료).</p>
-    </div>
-
-    <!-- ===== SETUP WIZARD ===== -->
-    <div class="wizard">
+    <h3 class="sub-title">1 · 마법사에 값 채우고 지시서 A 생성</h3>
+    <!-- ===== SETUP WIZARD (logic preserved verbatim) ===== -->
+    <div class="wizard mt16">
       <div class="form-grid">
         <div class="field">
           <label for="w-owner">OWNER <span class="hint">필수</span></label>
@@ -702,72 +793,138 @@
       </div>
     </div>
 
-    <!-- ===== manual fallback ===== -->
-    <details class="manual">
-      <summary>커맨드로 직접 부트스트랩 — 셸 세션 A / 사람용 (참고)</summary>
-      <div class="manual-body">
-        <div class="code" style="margin-top:16px;">
-          <div class="code-top"><span class="fname">shell — 라벨·마일스톤 + 워크플로 4종</span><span class="lang">bash</span><span class="who me">나</span><button class="copy-btn" data-label="복사">복사</button></div>
-          <pre><code><span class="cmt"># 0) 전제: gh 로그인 (두 레포 Contents RW + Issues RW)</span>
-gh auth status
+    <h3 class="sub-title" style="margin-top:56px;">2 · 세션 A가 자동으로 하는 일</h3>
+    <p class="lead" style="margin:0 0 12px;">지시서 A를 붙여넣으면 세션 A가 아래를 순서대로 수행한다. 게시는 전부 branch+PR, <code class="inl">pr-verify</code> green 후 내가 merge.</p>
+    <div class="card">
+      <ul class="check">
+        <li>라벨 상태기계 18종(양 레포)·phase 마일스톤(CODE 레포) 생성</li>
+        <li>워크플로 4종(<code class="inl">pr-verify · phase-transition · gate-notify · evidence-verify</code>) + <code class="inl">.github/immutables.txt</code>를 CODE 레포로 복사·커밋</li>
+        <li><code class="inl">NTFY_TOPIC</code> secret 등록 안내(<code class="inl">gh secret set NTFY_TOPIC -R {OWNER}/{CODE_REPO}</code>)</li>
+        <li>MGMT <code class="inl">projects/{slug}/project.yml</code> 작성(민감값 공란) → branch+PR</li>
+        <li>대시보드 <code class="inl">CONFIG.projects</code> 등록 안내(name/owner/mgmtRepo/codeRepo/titlePrefix — <code class="inl">project.yml</code>과 별개 레지스트리)</li>
+        <li>계획서 초안을 학회 수준으로 정형화 → 내 승인 후 <code class="inl">P0.md</code> 명세·dev 이슈 발행</li>
+      </ul>
+    </div>
 
-<span class="cmt"># 1) 라벨 18종(양 레포) + CODE phase 마일스톤 — 멱등 (--labels-only 로 라벨만 재보정)</span>
-bash research-ops/scripts/bootstrap_project.sh \
-  {OWNER} research-dashboard {CODE_REPO} {PROJECT} \
-  "P0:환경파일럿,P1:베이스라인,P2:제안기법,P3:평가"
-
-<span class="cmt"># 2) 워크플로 4종 + 불변값 매니페스트를 CODE repo 로 복사·커밋</span>
-cp research-ops/workflows/{pr-verify,phase-transition,gate-notify,evidence-verify}.yml \
-   {CODE_REPO_LOCAL}/.github/workflows/
-cp .github/immutables.txt {CODE_REPO_LOCAL}/.github/immutables.txt
-git -C {CODE_REPO_LOCAL} add -A \
-  && git -C {CODE_REPO_LOCAL} commit -m "ci: research-ops workflows" \
-  && git -C {CODE_REPO_LOCAL} push
-
-<span class="cmt"># 3) ntfy topic secret (프로젝트마다 고유 topic) → 폰 ntfy 앱에서 그 topic 구독</span>
-gh secret set NTFY_TOPIC -R {OWNER}/{CODE_REPO}   <span class="cmt"># 값: {project}-gates-{랜덤}</span></code></pre>
-        </div>
-        <p class="lead" style="margin:0;color:var(--body);">이후 <code class="inl">projects/{name}/project.yml</code>(<a href="https://github.com/jiminc77/research-dashboard/blob/main/projects/_template.yml" target="_blank" rel="noopener">_template.yml</a>, 민감값 공란)을 올리고, 대시보드 <code class="inl">dashboard/index.html</code> <code class="inl">CONFIG.projects</code> 항목(필드 name/owner/mgmtRepo/codeRepo/titlePrefix — <code class="inl">project.yml</code>과 별개 레지스트리)을 추가한 뒤, 계획서 정형화 세션으로 <code class="inl">P0.md</code>까지 진행합니다. 위 위저드가 이 전부를 세션 A에 위임하는 지시서를 만들어 줍니다.</p>
+    <h3 class="sub-title" style="margin-top:56px;">3 · 사람 확인 세 가지</h3>
+    <div class="grid grid-3 mt16">
+      <div class="card">
+        <span class="pill" style="margin-bottom:10px;">1 · secret 승인</span> <span class="who me">나</span>
+        <p style="font-size:14px;margin:0;">세션 A가 안내하는 대로 CODE 레포에 <code class="inl">NTFY_TOPIC</code> secret을 등록·승인한다. 위치: <strong>CODE repo → Settings → Secrets and variables → Actions</strong>.</p>
       </div>
-    </details>
+      <div class="card">
+        <span class="pill" style="margin-bottom:10px;">2 · 폰 topic 구독</span> <span class="who me">나</span>
+        <p style="font-size:14px;margin:0;">폰 ntfy 앱에서 이 프로젝트의 새 topic을 구독한다(topic은 프로젝트마다 다름). 이 채널로 게이트·킥오프 푸시가 온다.</p>
+      </div>
+      <div class="card">
+        <span class="pill" style="margin-bottom:10px;">3 · 워크스테이션 전환</span> <span class="who me">나</span>
+        <p style="font-size:14px;margin:0 0 8px;">레포 쪽은 세션 A가 자동. 사람은 워크스테이션 넷만 만진다:</p>
+        <ol style="font-size:13px;margin:0;padding-left:17px;color:var(--body);">
+          <li><code class="inl">~/.config/gate-watcher/env</code>의 <code class="inl">NTFY_TOPIC</code>만 새 topic으로 — 경보 유닛·타이머는 그대로</li>
+          <li>watcher 설정을 새 프로젝트(CODE repo·ledger)로 바꾸고 <code class="inl">systemctl --user restart gate-watcher</code></li>
+          <li>폰 ntfy 앱에서 새 topic 구독</li>
+          <li>gjc 인증(<code class="inl">GH_TOKEN</code>, agent 계정)은 <strong>단계·프로젝트 경계에서만</strong> 교체 — 실행 중 전환 금지 (SESSION_B.md §1)</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="callout note mt24 mb0">
+      <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16v-5M12 8h.01" stroke-linecap="round"/><circle cx="12" cy="12" r="9"/></svg></span>
+      <p>스크립트를 직접 실행하는 셸 셋업 경로(<code class="inl">bootstrap_project.sh</code> 등)는 <a href="https://github.com/jiminc77/research-dashboard/blob/main/research-ops/README.md" target="_blank" rel="noopener">research-ops/README.md</a> 참조.</p>
+    </div>
   </div>
 </section>
 
-<!-- ===================== 2. RUN A PHASE ===================== -->
-<span id="phase" class="anchor"></span>
+<!-- ===================== §3 단계 루프 ===================== -->
+<span id="loop" class="anchor"></span>
 <section style="background:var(--canvas-soft);">
   <div class="wrap">
     <div class="sec-head">
-      <span class="pill" style="margin-bottom:14px;">2</span>
-      <h2 class="sec-title">단계(Phase) 실행하기</h2>
-      <p><code class="inl">P{k}.md</code>와 dev 이슈는 세션 A(웹 pro)가 GitHub 앱으로 직접 만듭니다(§4 흐름). <strong>이슈가 생겨도 gjc는 자동 시작되지 않습니다</strong> — 내가 원격 워크스테이션에서 1회 부팅해야 실행이 시작되고, 이후 gjc가 자율 실행합니다.</p>
+      <span class="sec-num">§3</span>
+      <h2 class="sec-title">단계 루프 — 단계마다 반복</h2>
+      <p>세션 A가 <code class="inl">P{k}.md</code>·dev 이슈를 만든다 → 내가 gjc를 1회 부팅 → gjc가 자율 실행하며 증거·게이트를 게시 → 게이트는 내가 판정 → 단계 끝나면 킥오프 이슈가 자동 생성돼 다음 단계로.</p>
     </div>
 
-    <div class="code" style="margin:0;">
-        <div class="code-top"><span class="fname">gjc 부팅 (원격 워크스테이션)</span><span class="lang">bash</span><span class="who me">나</span><button class="copy-btn" data-label="복사">복사</button></div>
-        <pre><code>ssh {SSH_HOST} && cd {WORKDIR} && git pull
+    <h3 class="sub-title">1 · 흐름 한 눈에</h3>
+    <div class="card mt16" style="margin-bottom:0;">
+      <div class="flow">
+        <span class="pill mono">P{k}.md · dev 이슈 <span class="who sa" style="margin-left:4px;">세션 A</span></span><span class="arrow">→</span>
+        <span class="pill mono">gjc 부팅 <span class="who me" style="margin-left:4px;">나</span></span><span class="arrow">→</span>
+        <span class="pill mono">자율 실행 · EVIDENCE <span class="who gjc" style="margin-left:4px;">gjc</span></span><span class="arrow">→</span>
+        <span class="pill mono">GATE VERDICT <span class="who me" style="margin-left:4px;">나</span></span><span class="arrow">→</span>
+        <span class="pill mono">킥오프 이슈 <span class="who auto" style="margin-left:4px;">자동</span></span>
+      </div>
+      <div class="flow-branch">
+        <span>dev 이슈는 항상 <code class="inl">state:*</code> 라벨 정확히 1개:</span>
+        <span class="pill st-ready mono">ready</span><span class="arrow">→</span>
+        <span class="pill st-running mono">running</span><span class="arrow">→</span>
+        <span class="pill st-verify mono">verify</span><span class="arrow">→</span>
+        <span class="pill st-done mono">done</span>
+        <span style="color:var(--muted-soft);">·</span>
+        <span class="pill st-bhuman mono">blocked-human</span>
+        <span class="pill st-btech mono">blocked-tech</span>
+      </div>
+    </div>
+
+    <h3 class="sub-title" style="margin-top:56px;">2 · 단계 시작 — 두 갈래</h3>
+    <div class="split mt16">
+      <div class="startcard">
+        <span class="pill tag" style="margin-bottom:2px;">A · gjc 부팅</span> <span class="who me">나</span>
+        <h3>새 단계 실행 시작</h3>
+        <p>이슈가 생겨도 gjc는 자동 시작되지 않는다. 원격 워크스테이션에서 1회 부팅하면 이후 자율 실행한다. 인증은 agent PAT를 주입한 뒤 tmux를 연다(단계 경계에서만 교체).</p>
+        <div class="code" style="margin:8px 0 0;">
+          <div class="code-top"><span class="fname">gjc 부팅 (원격 워크스테이션)</span><span class="lang">bash</span><span class="who me">나</span><button class="copy-btn" data-label="복사">복사</button></div>
+          <pre><code>ssh {SSH_HOST} && cd {WORKDIR} && git pull
 tmux new -s gjc-P{k}
 gjc ralplan --interactive "P{k}.md 명세로 실행 계획"
 gjc ultragoal create-goals --brief-file P{k}.md</code></pre>
+        </div>
       </div>
-
-    <h3 class="sub-title mt32" style="font-size:19px;">라벨 상태기계 — 누가 어떤 전이를 하는가</h3>
-    <div class="tbl-wrap mt16">
-      <table class="tbl">
-        <thead><tr><th>전이</th><th>주체</th><th>트리거</th></tr></thead>
-        <tbody>
-          <tr><td><span class="m">생성 → ready</span></td><td class="desc"><span class="who sa">세션 A</span> 생성 시 부착</td><td class="desc">이슈 생성과 동시</td></tr>
-          <tr><td><span class="m">ready → running</span></td><td class="desc"><span class="who gjc">gjc</span></td><td class="desc">goal 착수</td></tr>
-          <tr><td><span class="m">running → verify</span></td><td class="desc"><span class="who gjc">gjc</span></td><td class="desc"><code class="inl">### EVIDENCE</code> 게시</td></tr>
-          <tr><td><span class="m">verify → done</span></td><td class="desc"><span class="who auto">자동</span> CI + <span class="who gjc">gjc</span> close</td><td class="desc">CI VERIFIED ✅ 후 close</td></tr>
-          <tr><td><span class="m">running → blocked-human</span></td><td class="desc"><span class="who gjc">gjc</span></td><td class="desc"><code class="inl">### GATE REQUEST</code> 게시(동시)</td></tr>
-          <tr><td><span class="m">verify → blocked-tech</span></td><td class="desc"><span class="who auto">자동</span> CI</td><td class="desc">CI 재검증 실패</td></tr>
-          <tr><td><span class="m">blocked-human → ready</span></td><td class="desc"><span class="who me">나</span> 또는 <span class="who auto">자동</span></td><td class="desc">GATE VERDICT / soft deadline 경과</td></tr>
-        </tbody>
-      </table>
+      <div class="startcard b">
+        <span class="pill tag" style="margin-bottom:2px;">B · 다음 단계로 넘기기</span> <span class="who me">나</span>
+        <h3>단계 종료 → 자동 킥오프</h3>
+        <p>마지막 <code class="inl">phase:P{k}</code> open 이슈를 close하면 <code class="inl">phase-transition</code>이 <strong>"[P{k+1}] 세션 A 킥오프"</strong> 이슈를 만들고 폰에 푸시한다. 그 이슈를 열고, 안의 두 옵션 중 하나로 세션 A를 실행한다:</p>
+        <p style="margin:0;"><strong>(a) Claude/Cowork</strong> — 이슈 본문 프롬프트를 새 세션 A에 붙여넣기. <strong>(b) 웹 pro</strong> — 이슈의 완성본 프롬프트를 그대로 복붙(파라미터 치환 완료; 실패 시 <a href="https://github.com/jiminc77/research-dashboard/blob/main/research-ops/templates/pro_orchestrator_prompt.md" target="_blank" rel="noopener">계약 프롬프트</a> 폴백). 산출물 4종을 PR로 올리면 <code class="inl">pr-verify</code> green 후 <span class="who me" style="margin-left:2px;">나</span>가 merge.</p>
+      </div>
     </div>
 
-    <div class="grid grid-2 mt16">
+    <details class="manual" style="margin-top:24px;">
+      <summary>gjc 수동 킥오프 상세 — 부팅 시퀀스(전환 이슈 없이 열 때)</summary>
+      <div class="manual-body">
+        <p class="lead" style="margin:16px 0 0;color:var(--body);"><strong>tmux를 열기 전에 agent PAT를 주입</strong>한다. gjc는 <code class="inl">jiminc77-agent</code> 명의로 활동한다(verdict-guard 실효 조건). 단계마다 <strong>새 gjc 세션 1개</strong>를 띄운다(기존 세션 재사용 금지). 모델은 gjc 안에서 default/planner/architect=main · executor/critic=exec로 설정하고, <code class="inl">ralplan</code> 대화형 계획을 사람과 확정한 뒤에만 <code class="inl">ultragoal</code>로 진행한다. 전체 시퀀스·감독 규약은 <a href="https://github.com/jiminc77/research-dashboard/blob/main/research-ops/SESSION_B.md" target="_blank" rel="noopener">SESSION_B.md</a> 참조.</p>
+      </div>
+    </details>
+
+    <h3 class="sub-title" style="margin-top:56px;">3 · 게이트 대응</h3>
+    <p class="lead" style="margin:0 0 16px;">ntfy 푸시가 오면 이슈를 열어 <code class="inl">### GATE VERDICT</code> 코멘트를 남긴다. <strong>판정은 오직 나, 사람 계정(<code class="inl">jiminc77</code>)으로만</strong> — 게시 후 실행 세션 재개 전달은 gate-watcher가 자동으로 한다.</p>
+    <div class="grid grid-2">
+      <div class="card">
+        <span class="pill" style="margin-bottom:10px;">SOFT</span> <span class="who auto">자동</span>
+        <p style="font-size:14.5px;margin:0;"><code class="inl">default</code>·<code class="inl">deadline</code> 포함. <strong>deadline 지나면 gate-notify가 default 자동 채택</strong>. 다르게 가려면 그 전에 VERDICT로 override.</p>
+      </div>
+      <div class="card">
+        <span class="pill st-bhuman" style="margin-bottom:10px;">HARD</span> <span class="who auto">자동</span> 리마인더 · <span class="who me">나</span> 판정
+        <p style="font-size:14.5px;margin:0;"><strong>무기한 대기</strong>, 6h마다 리마인더. go/no-go·임계값 변경·데이터 폐기·아키텍처 방향은 항상 hard.</p>
+      </div>
+    </div>
+    <div class="code mt16" style="margin-bottom:0;">
+      <div class="code-top"><span class="fname">### GATE VERDICT (내가 이슈에 남김)</span><span class="lang">comment</span><span class="who me">나</span><button class="copy-btn" data-label="복사">복사</button></div>
+      <pre><code><span class="kw">### GATE VERDICT</span>
+id: P1-M3-G1              <span class="cmt"># GATE REQUEST 의 id 그대로</span>
+choice: B
+rationale: guard 여유 확인, 되돌릴 수 있음. M4로 진행.
+follow-ups:
+- <span class="cmt">추가 지시 (없으면 생략)</span>
+<span class="cmt"># 게시하면 gate-notify가 blocked-human → ready 로 되돌리고 gjc가 집행</span></code></pre>
+    </div>
+    <div class="callout warn mt16">
+      <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v5M12 16h.01" stroke-linecap="round"/><circle cx="12" cy="12" r="9"/></svg></span>
+      <p>첫 줄이 정확히 <code class="inl">### GATE VERDICT</code>여야 하고 <code class="inl">choice:</code> 줄이 반드시 있어야 한다. 사전등록 임계를 <strong>바꾸는 판정</strong>은 게이트 통과가 아니라 MGMT <code class="inl">[Decision]</code> 이슈를 거친다. 안 깨어나면 <a href="#trouble">§ 문제 해결</a>.</p>
+    </div>
+
+    <h3 class="sub-title" style="margin-top:56px;">4 · gjc의 증거·진행 게시</h3>
+    <p class="lead" style="margin:0 0 16px;">gjc가 게시하는 형식(참고 — 각 블록 상단 배지가 주체). 완료 신호는 EVIDENCE, 진행 보고는 PROGRESS 코멘트 1개를 편집한다.</p>
+    <div class="grid grid-2">
       <div class="code" style="margin:0;">
         <div class="code-top"><span class="fname">### EVIDENCE (완료 신호)</span><span class="lang">comment</span><span class="who gjc">gjc</span><button class="copy-btn" data-label="복사">복사</button></div>
         <pre><code><span class="kw">### EVIDENCE</span>
@@ -791,211 +948,145 @@ updated: 2026-07-06T09:12Z
 <span class="cmt"># 진행 보고는 이 댓글을 편집 (≥4h 간격)</span></code></pre>
       </div>
     </div>
-
     <div class="callout warn mt16 mb0">
       <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v5M12 16h.01" stroke-linecap="round"/><circle cx="12" cy="12" r="9"/></svg></span>
-      <p><strong>guard 이상치면 primary가 PASS여도 정지.</strong> gjc는 <code class="inl">ok:false</code>를 보면 EVIDENCE 대신 GATE REQUEST(class:hard)로 전환합니다. 3-strike(같은 문제 3회 실패)면 <code class="inl">state:blocked-tech</code> + HALT.</p>
+      <p><strong>guard 이상치면 primary가 PASS여도 정지.</strong> gjc는 <code class="inl">ok:false</code>를 보면 EVIDENCE 대신 GATE REQUEST(class:hard)로 전환한다. 3-strike(같은 문제 3회 실패)면 <code class="inl">state:blocked-tech</code> + HALT.</p>
     </div>
   </div>
 </section>
 
-<!-- ===================== 3. GATE ===================== -->
-<span id="gate" class="anchor"></span>
+<!-- ===================== §4 문제 해결 ===================== -->
+<span id="trouble" class="anchor"></span>
 <section>
   <div class="wrap">
     <div class="sec-head">
-      <span class="pill" style="margin-bottom:14px;">3</span>
-      <h2 class="sec-title">게이트 판정하기</h2>
-      <p>ntfy 푸시가 도착하면 이슈를 열어 <code class="inl">### GATE VERDICT</code> 코멘트. 판정은 오직 나, 정본은 issue 코멘트뿐 — <strong>게시 후 실행 세션 재개 전달은 자동입니다(gate-watcher)</strong>.</p>
+      <span class="sec-num">§4</span>
+      <h2 class="sec-title">문제 해결</h2>
+      <p>실행 중 자주 막히는 세 가지. 커맨드는 그대로 실행하면 된다.</p>
     </div>
 
-    <div class="grid grid-2">
+    <div class="grid grid-3">
       <div class="card">
-        <span class="pill" style="margin-bottom:10px;">SOFT</span> <span class="who auto">자동</span>
-        <p style="font-size:14.5px;margin:0;"><code class="inl">default</code>·<code class="inl">deadline</code> 포함. <strong>deadline 지나면 gate-notify가 default 자동 채택</strong>. 다르게 가려면 그 전에 VERDICT로 override.</p>
-      </div>
-      <div class="card">
-        <span class="pill st-bhuman" style="margin-bottom:10px;">HARD</span> <span class="who auto">자동</span> 리마인더 · <span class="who me">나</span> 판정
-        <p style="font-size:14.5px;margin:0;"><strong>무기한 대기</strong>, 6h마다 리마인더. go/no-go·임계값 변경·데이터 폐기·아키텍처 방향은 항상 hard.</p>
-      </div>
-    </div>
-
-    <div class="code mt16" style="margin-bottom:0;">
-      <div class="code-top"><span class="fname">### GATE VERDICT (내가 이슈에 남김)</span><span class="lang">comment</span><span class="who me">나</span><button class="copy-btn" data-label="복사">복사</button></div>
-      <pre><code><span class="kw">### GATE VERDICT</span>
-id: P1-M3-G1              <span class="cmt"># GATE REQUEST 의 id 그대로</span>
-choice: B
-rationale: guard 여유 확인, 되돌릴 수 있음. M4로 진행.
-follow-ups:
-- <span class="cmt">추가 지시 (없으면 생략)</span>
-<span class="cmt"># 게시하면 gate-notify가 blocked-human → ready 로 되돌리고 gjc가 집행</span></code></pre>
-    </div>
-
-    <div class="callout tip mt16">
-      <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9"/></svg></span>
-      <p><strong>판정 후 워크스테이션에 손댈 필요 없음.</strong> 원격 데몬 <a href="https://github.com/jiminc77/research-dashboard/tree/main/research-ops/gate-watcher" target="_blank" rel="noopener"><code class="inl">gate-watcher</code></a>가 실행 세션의 blocked 상태를 감시하다 판정 코멘트를 감지하면 tmux 세션에 "가서 읽어라" 신호만 전달합니다(본문 주입 없음 — 세션이 직접 fetch·검증). 전달 확인 = 판정 코멘트의 👀 reaction, 30분 무응답 시 1회 재전달 후 알림. <strong>상시 가동</strong>(systemd, 재부팅 생존) — 상태 확인 <code class="inl">systemctl --user status gate-watcher</code>, 설치·업그레이드는 <a href="https://github.com/jiminc77/research-dashboard/tree/main/research-ops/gate-watcher" target="_blank" rel="noopener">gate-watcher README</a>. <strong>watcher 경보</strong>: 데몬이 죽거나 멈추면 폰으로 알려주는 보조 유닛(OnFailure 훅 + 5분 liveness 타이머)은 <a href="https://github.com/jiminc77/research-dashboard/tree/main/research-ops/gate-watcher/alerts" target="_blank" rel="noopener">gate-watcher/alerts</a> 참고.</p>
-    </div>
-
-    <div class="callout warn mt16 mb0">
-      <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L2 18a2 2 0 001.7 3h16.6a2 2 0 001.7-3L14 3.9a2 2 0 00-3.4 0z" stroke-linejoin="round"/></svg></span>
-      <p>사전등록 임계를 <strong>바꾸는 판정</strong>은 게이트 통과가 아니라 <strong>MGMT <code class="inl">[Decision]</code> 이슈</strong>를 거쳐야 합니다. ntfy가 안 오면 <a href="#troubleshoot">7 · 검증이 막을 때</a>의 ntfy 점검을 보세요.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ===================== 4. NEXT PHASE ===================== -->
-<span id="next" class="anchor"></span>
-<section style="background:var(--canvas-soft);">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="pill" style="margin-bottom:14px;">4</span>
-      <h2 class="sec-title">단계 넘어가기</h2>
-      <p>마지막 <code class="inl">phase:P{k}</code>(현재 단계 라벨, 예: <code class="inl">phase:P1</code>) open 이슈를 close하면 <strong>킥오프 이슈가 자동 생성</strong>됩니다. 세션 A가 산출물 4종을 PR로 올리고, pr-verify green 후 <strong>내가</strong> merge합니다.</p>
-    </div>
-
-    <ol class="steps">
-      <li>
-        <span class="num">1</span>
-        <h4><span class="who auto">자동</span>킥오프 이슈 자동 생성 → ntfy 푸시</h4>
-        <p><code class="inl">phase-transition</code>이 <strong>"[P{k+1}] 세션 A 킥오프"</strong> 이슈를 만들고 폰에 푸시합니다. 그 이슈를 엽니다.</p>
-      </li>
-      <li>
-        <span class="num">2</span>
-        <h4><span class="who me">나</span>복붙<span class="who sa" style="margin-left:2px;">세션 A</span>세션 A 실행 — 이슈 안의 두 옵션 중 하나</h4>
-        <p><strong>(a) Claude/Cowork 경로</strong> — 이슈 본문의 프롬프트를 새 세션 A에 붙여넣기. &nbsp;<strong>(b) 웹 pro 경로</strong> — GitHub 쓰기 앱이 붙은 웹 pro에 <strong>킥오프 이슈의 완성본 프롬프트(<code class="inl">웹 pro 프롬프트 (완성본 — 그대로 복붙)</code> 접기 블록)를 그대로 복붙</strong>합니다. 파라미터는 이미 전부 치환돼 있어 손댈 필요가 없습니다(치환 실패 시엔 <a href="https://github.com/jiminc77/research-dashboard/blob/main/research-ops/templates/pro_orchestrator_prompt.md" target="_blank" rel="noopener">계약 프롬프트</a> + 파라미터 블록으로 폴백).</p>
-      </li>
-      <li>
-        <span class="num">3</span>
-        <h4><span class="who sa">세션 A</span>세션 A가 산출물 4종을 PR로</h4>
-        <p><code class="inl">P{k}_report.html</code> · <code class="inl">status.json</code> · <code class="inl">P{k+1}.md</code> · 차기 dev 이슈들. 쓰기는 <strong>branch+PR로만</strong>(MGMT 1 PR + CODE 1 PR). PR 본문에 evidence 링크 + 불변값 이월 확인.</p>
-      </li>
-      <li>
-        <span class="num">4</span>
-        <h4><span class="who auto">자동</span>pr-verify green<span class="who me" style="margin-left:2px;">나</span>merge</h4>
-        <p class="mb0"><code class="inl">pr-verify</code> 체크가 초록이 된 것을 확인하고 <strong>내가 merge</strong>합니다. 세션은 스스로 merge하지 않습니다. 실패하면 <a href="#troubleshoot">7</a> 참고.</p>
-      </li>
-    </ol>
-
-    <div class="callout tip mt24 mb0">
-      <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9"/></svg></span>
-      <p><strong>branch protection 켜는 시점 = P1 종료(sign-off).</strong> gjc의 직접 push 의존이 사라지면 CODE repo <code class="inl">Settings → Branches → Add rule</code> → <code class="inl">main</code>에 <strong>Require a pull request</strong> + <strong>Require status checks</strong>에서 <code class="inl">pr-verify</code> 지정. (P1 실행 중엔 켜지 않음 — gjc 직접 push가 막힘.)</p>
-    </div>
-  </div>
-</section>
-
-
-
-<!-- ===================== 5. VIEW ===================== -->
-<span id="view" class="anchor"></span>
-<section style="background:var(--canvas-soft);">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="pill" style="margin-bottom:14px;">5</span>
-      <h2 class="sec-title">보기</h2>
-      <p>실시간 대시보드(무인증 API 렌더, 수동 갱신 없음) · 계획서 LIVE 페이지 · 단계 리포트.</p>
-    </div>
-    <div class="tbl-wrap">
-      <table class="tbl">
-        <thead><tr><th>페이지</th><th>URL</th></tr></thead>
-        <tbody>
-          <tr><td class="desc"><strong>대시보드</strong> — phase·이슈·게이트 실시간, 계획서 LIVE·단계 리포트 링크</td><td><a href="https://jiminc77.github.io/research-dashboard/dashboard/" target="_blank" rel="noopener">…/research-dashboard/dashboard/</a></td></tr>
-          <tr><td class="desc"><strong>계획서 LIVE</strong> — 연구계획 + status.json 상태 오버레이 (DGCC)</td><td><a href="https://jiminc77.github.io/research-dashboard/projects/dgcc/research/DGCC_research_plan.html" target="_blank" rel="noopener">…/projects/dgcc/research/DGCC_research_plan.html</a></td></tr>
-          <tr><td class="desc"><strong>단계 리포트</strong> — <code class="inl">P{k}_report.html</code> (예: DGCC P0)</td><td><a href="https://jiminc77.github.io/research-dashboard/projects/dgcc/reports/P0_report.html" target="_blank" rel="noopener">…/projects/dgcc/reports/P0_report.html</a></td></tr>
-        </tbody>
-      </table>
-    </div>
-
-  </div>
-</section>
-
-<!-- ===================== 7. TROUBLESHOOT ===================== -->
-<span id="troubleshoot" class="anchor"></span>
-<section>
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="pill" style="margin-bottom:14px;">6</span>
-      <h2 class="sec-title">검증이 막을 때</h2>
-      <p><code class="inl">pr-verify</code>는 PR에서만 돌고, 변경 파일 종류별로 4종 린터를 조건 실행합니다. 실패 원인과 대처.</p>
-    </div>
-    <div class="tbl-wrap">
-      <table class="tbl">
-        <thead><tr><th>실패 검사</th><th>트리거 파일</th><th>대처</th></tr></thead>
-        <tbody>
-          <tr><td><span class="m">리포트 계약</span><br><span class="desc" style="font-size:12px;">lint_report.sh</span></td><td><span class="m">*_report.html</span></td><td class="desc">섹션 id 6종(<code class="inl">summary·goals·gates·constants·risks·artifacts</code>)·판정 배지(GO/NO-GO/PARTIAL)·self-contained·어투 계약 충족.</td></tr>
-          <tr><td><span class="m">@goal 구조</span><br><span class="desc" style="font-size:12px;">lint_spec.sh</span></td><td><span class="m">루트 P[0-9]*.md</span></td><td class="desc"><code class="inl">@goal:</code>를 <strong>column 0</strong>(줄 맨 앞)으로. 들여쓰기·빈 블록·제목 중복 금지.</td></tr>
-          <tr><td><span class="m">불변값 매니페스트</span><br><span class="desc" style="font-size:12px;">check_immutables.sh</span></td><td><span class="m">.github/immutables.txt</span></td><td class="desc">사전등록 수치를 명세에 verbatim 유지. 매니페스트를 바꿨으면 <strong>PR 본문에 <code class="inl">[Decision]</code> 인용</strong> 필수.</td></tr>
-          <tr><td><span class="m">status 스키마</span><br><span class="desc" style="font-size:12px;">lint_status.sh</span></td><td><span class="m">status.json</span></td><td class="desc"><code class="inl">.project</code>(문자열)·<code class="inl">.phases[].state ∈ {done,current,next,backlog,blocked}</code>·<code class="inl">.decisions[]={issue,title,url}</code>.</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="grid grid-2 mt24">
-      <div class="card">
-        <span class="pill mono" style="margin-bottom:10px;">ntfy 푸시가 안 온다</span> <span class="who me">나</span>
+        <span class="pill mono" style="margin-bottom:10px;">ntfy가 안 온다</span> <span class="who me">나</span>
         <div class="code" style="margin:12px 0 0;">
           <div class="code-top"><span class="fname">shell</span><span class="lang">bash</span><span class="who me">나</span><button class="copy-btn" data-label="복사">복사</button></div>
           <pre><code>gh secret list -R {OWNER}/{CODE_REPO} \
   | grep NTFY_TOPIC
 curl -d "test" ntfy.sh/{topic}   <span class="cmt"># 폰에 뜨면 정상</span></code></pre>
         </div>
-        <p style="font-size:13.5px;margin:12px 0 0;color:var(--body);"><code class="inl">curl</code> 줄은 <strong>아무 로컬 셸</strong>에서 실행 — topic 문자열만 알면 되고 인증 불필요. 구독은 <strong>폰/웹 ntfy 앱</strong>에서 그 topic을 구독(topic은 프로젝트마다 다름).<br>secret 위치: <strong>CODE repo → Settings → Secrets and variables → Actions → <code class="inl">NTFY_TOPIC</code></strong> (워크플로가 여기서 읽어 푸시).</p>
+        <p style="font-size:13px;margin:12px 0 0;color:var(--body);"><code class="inl">curl</code> 줄은 아무 로컬 셸에서 실행(topic 문자열만 알면 됨, 인증 불필요). 구독은 폰/웹 ntfy 앱에서 그 topic(프로젝트마다 다름). secret 위치: <strong>CODE repo → Settings → Secrets and variables → Actions → <code class="inl">NTFY_TOPIC</code></strong>.</p>
       </div>
       <div class="card">
-        <span class="pill mono" style="margin-bottom:10px;">판정을 달았는데 gjc가 안 깨어난다</span> <span class="who me">나</span>
+        <span class="pill mono" style="margin-bottom:10px;">gjc가 안 깨어난다</span> <span class="who me">나</span>
         <div class="code" style="margin:12px 0 0;">
           <div class="code-top"><span class="fname">shell — 원격 워크스테이션</span><span class="lang">bash</span><span class="who me">나</span><button class="copy-btn" data-label="복사">복사</button></div>
           <pre><code>systemctl --user status gate-watcher
 tail -20 ~/.local/state/gate-watcher/watcher.log
-systemctl --user restart gate-watcher   <span class="cmt"># 필요 시</span>
-
-<span class="cmt"># 아예 안 떠 있으면 — 기동 (최초 설치 포함, 이후 재부팅 자동 생존)</span>
-cp ~/Workspaces/research-dashboard/research-ops/gate-watcher/gate-watcher.service \
-   ~/.config/systemd/user/
-systemctl --user daemon-reload
-systemctl --user enable --now gate-watcher
-loginctl enable-linger $USER</code></pre>
+systemctl --user restart gate-watcher   <span class="cmt"># 필요 시</span></code></pre>
         </div>
-        <p style="font-size:13.5px;margin:12px 0 0;color:var(--body);">체크 순서: ① 판정 첫 줄이 정확히 <code class="inl">### GATE VERDICT</code>이고 <code class="inl">choice:</code> 줄이 있는지 ② 이슈에 <code class="inl">state:blocked-human</code> 라벨이 붙었는지(없으면 수동 부착) ③ 판정 코멘트에 👀가 달렸는지(달렸으면 전달됨 — gjc 세션 확인). 최후엔 tmux 수동 nudge.</p>
-      </div>
-          </div>
-
-    <div class="grid grid-2 mt24">
-      <div class="card">
-        <span class="pill mono" style="margin-bottom:10px;">watcher 경보·생존감시 — 1회 설치</span> <span class="who me">나</span>
-        <div class="code" style="margin:12px 0 0;">
-          <div class="code-top"><span class="fname">shell — 원격 워크스테이션</span><span class="lang">bash</span><span class="who me">나</span><button class="copy-btn" data-label="복사">복사</button></div>
-          <pre><code><span class="cmt"># 0) topic 환경파일 (secret — 커밋 금지)</span>
-mkdir -p ~/.config/gate-watcher
-printf 'NTFY_TOPIC=%s\n' "{topic}" > ~/.config/gate-watcher/env
-
-<span class="cmt"># 1) 경보 유닛 3개 + OnFailure drop-in</span>
-cd ~/Workspaces/research-dashboard/research-ops/gate-watcher/alerts
-cp gate-watcher-onfailure.service gate-watcher-liveness.service \
-   gate-watcher-liveness.timer ~/.config/systemd/user/
-systemctl --user edit gate-watcher   <span class="cmt"># [Unit] 아래 OnFailure=gate-watcher-onfailure.service</span>
-
-<span class="cmt"># 2) 활성화 + 확인</span>
-systemctl --user daemon-reload
-systemctl --user enable --now gate-watcher-liveness.timer
-systemctl --user list-timers gate-watcher-liveness.timer</code></pre>
-        </div>
-        <p style="font-size:13.5px;margin:12px 0 0;color:var(--body);">watcher가 <strong>죽으면(OnFailure)</strong> 즉시, <strong>비활성이면(liveness)</strong> 5분 내 ntfy 경보. 유닛 원본: <code class="inl">research-ops/gate-watcher/alerts/</code>.</p>
+        <p style="font-size:13px;margin:12px 0 0;color:var(--body);">체크 순서: ① 판정 첫 줄이 정확히 <code class="inl">### GATE VERDICT</code>이고 <code class="inl">choice:</code> 줄이 있는지 ② 이슈에 <code class="inl">state:blocked-human</code> 라벨이 붙었는지(없으면 수동 부착) ③ 판정 코멘트에 👀가 달렸는지(달렸으면 전달됨). 최후엔 tmux 수동 nudge.</p>
       </div>
       <div class="card">
-        <span class="pill mono" style="margin-bottom:10px;">프로젝트 전환 시 — 워크스테이션 4가지</span> <span class="who me">나</span>
-        <p style="font-size:13.5px;margin:12px 0 0;color:var(--body);">레포 쪽(라벨·워크플로·secret·대시보드 등록)은 <strong>세션 A가 자동</strong>. 사람이 만지는 건 워크스테이션뿐:</p>
-        <ol style="font-size:13.5px;margin:10px 0 0;padding-left:18px;color:var(--body);">
-          <li><code class="inl">~/.config/gate-watcher/env</code> 의 <code class="inl">NTFY_TOPIC</code>만 새 topic으로 — 경보 유닛·타이머는 프로젝트 무관, 그대로</li>
-          <li>watcher 설정을 새 프로젝트(CODE repo·ledger)로 바꾸고 <code class="inl">systemctl --user restart gate-watcher</code></li>
-          <li>폰 ntfy 앱에서 새 topic 구독</li>
-          <li>gjc 인증(<code class="inl">GH_TOKEN</code>, agent 계정)은 <strong>단계·프로젝트 경계에서만</strong> 교체 — 실행 중 전환 금지 (SESSION_B.md §1)</li>
-        </ol>
+        <span class="pill mono" style="margin-bottom:10px;">watcher가 죽었다 · 경보</span> <span class="who me">나</span>
+        <p style="font-size:13px;margin:12px 0 0;color:var(--body);">경보 유닛이 걸려 있으면 <strong>죽으면(OnFailure)</strong> 즉시, <strong>비활성이면(liveness)</strong> 5분 내 ntfy로 알려준다. 재기동·경보 설치는 <a href="#setup">§ 최초 1회</a>의 gate-watcher 카드와 동일 커맨드. 유닛 원본: <a href="https://github.com/jiminc77/research-dashboard/tree/main/research-ops/gate-watcher/alerts" target="_blank" rel="noopener">gate-watcher/alerts</a>.</p>
       </div>
     </div>
 
     <div class="callout warn mt24 mb0">
       <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zM8 11V7a4 4 0 018 0v4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-      <p><strong>계정 규율(#22):</strong> 에이전트(gjc·세션 A·gate-watcher)는 <strong><code class="inl">jiminc77-agent</code> 계정 PAT</strong>로 <code class="inl">gh</code>·REST를 씁니다 — 사람 PAT를 에이전트에 넣지 않아야 <strong>verdict-guard가 실효</strong>합니다(비-사람 판정 자동 무효·원복). gjc 인증 교체는 <strong>단계 경계에서만</strong>(부팅 시 <code class="inl">GH_TOKEN</code> 주입 — SESSION_B.md §1). 스코프 좁혀 발급하고 유출 의심 시 <a href="https://github.com/settings/tokens" target="_blank" rel="noopener">즉시 revoke</a>.</p>
+      <p><strong>계정 규율(#22):</strong> 에이전트(gjc·세션 A·gate-watcher)는 <code class="inl">jiminc77-agent</code> PAT로 활동한다 — 사람 PAT를 에이전트에 넣지 않아야 <strong>verdict-guard가 실효</strong>한다. gjc 인증 교체는 <strong>단계 경계에서만</strong>. 유출 의심 시 <a href="https://github.com/settings/tokens" target="_blank" rel="noopener">즉시 revoke</a>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== §5 레퍼런스 ===================== -->
+<span id="ref" class="anchor"></span>
+<section style="background:var(--canvas-soft);">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">§5</span>
+      <h2 class="sec-title">레퍼런스</h2>
+      <p>라벨 상태기계, 워크플로 킷, PR·린터 규율, 그리고 원문 링크. 규약의 진실은 <a href="https://github.com/jiminc77/research-dashboard/blob/main/research-ops/PROTOCOL.md" target="_blank" rel="noopener">PROTOCOL.md</a>다.</p>
+    </div>
+
+    <h3 class="sub-title">라벨 상태기계 — 누가 어떤 전이를 하나</h3>
+    <div class="card mt16">
+      <div class="flow">
+        <span class="pill st-ready mono">state:ready</span><span class="arrow">→</span>
+        <span class="pill st-running mono">state:running</span><span class="arrow">→</span>
+        <span class="pill st-verify mono">state:verify</span><span class="arrow">→</span>
+        <span class="pill st-done mono">state:done</span>
+      </div>
+      <div class="flow-branch">
+        <span>분기:</span>
+        <span class="pill st-bhuman mono">state:blocked-human</span>
+        <span style="color:var(--muted);">HUMAN GATE 대기 (GATE REQUEST)</span>
+        <span style="color:var(--muted-soft);">·</span>
+        <span class="pill st-btech mono">state:blocked-tech</span>
+        <span style="color:var(--muted);">CI 실패 / 3-strike</span>
+      </div>
+    </div>
+    <div class="tbl-wrap mt16">
+      <table class="tbl">
+        <thead><tr><th>전이</th><th>주체</th><th>트리거</th></tr></thead>
+        <tbody>
+          <tr><td><span class="m">생성 → ready</span></td><td class="desc"><span class="who sa">세션 A</span> 생성 시 부착</td><td class="desc">이슈 생성과 동시</td></tr>
+          <tr><td><span class="m">ready → running</span></td><td class="desc"><span class="who gjc">gjc</span></td><td class="desc">goal 착수</td></tr>
+          <tr><td><span class="m">running → verify</span></td><td class="desc"><span class="who gjc">gjc</span></td><td class="desc"><code class="inl">### EVIDENCE</code> 게시</td></tr>
+          <tr><td><span class="m">verify → done</span></td><td class="desc"><span class="who auto">자동</span> CI + <span class="who gjc">gjc</span> close</td><td class="desc">CI VERIFIED ✅ 후 close</td></tr>
+          <tr><td><span class="m">running → blocked-human</span></td><td class="desc"><span class="who gjc">gjc</span></td><td class="desc"><code class="inl">### GATE REQUEST</code> 게시(동시)</td></tr>
+          <tr><td><span class="m">verify → blocked-tech</span></td><td class="desc"><span class="who auto">자동</span> CI</td><td class="desc">CI 재검증 실패</td></tr>
+          <tr><td><span class="m">blocked-human → ready</span></td><td class="desc"><span class="who me">나</span> 또는 <span class="who auto">자동</span></td><td class="desc">GATE VERDICT / soft deadline 경과</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="sub-title" style="margin-top:56px;">킷 파일</h3>
+    <div class="tbl-wrap mt16">
+      <table class="tbl">
+        <thead><tr><th>경로</th><th>무엇</th></tr></thead>
+        <tbody>
+          <tr><td><code>ORCHESTRATOR.md</code></td><td class="desc">세션 A 실행 지시서 — 개념·절차 정본. 여기서 시작.</td></tr>
+          <tr><td><code>PROTOCOL.md</code></td><td class="desc">상태·증거·게이트 계약(라벨 상태기계·GATE·EVIDENCE 스키마).</td></tr>
+          <tr><td><code>SESSION_B.md</code></td><td class="desc">세션 B(gjc 감독) 지시서 템플릿.</td></tr>
+          <tr><td><code>templates/</code></td><td class="desc"><code>pro_orchestrator_prompt.md</code>(웹 pro 계약) · <code>phase_spec.md</code> · <code>plan_*</code> · <code>issue_*</code>.</td></tr>
+          <tr><td><code>scripts/</code></td><td class="desc"><code>bootstrap_project.sh</code> · <code>setup_phase.sh</code> · <code>status.sh</code> · <code>lint_*.sh</code> — 셸용.</td></tr>
+          <tr><td><code>workflows/</code></td><td class="desc">CODE 레포로 복사하는 워크플로 4종(<code>pr-verify · phase-transition · gate-notify · evidence-verify</code>).</td></tr>
+          <tr><td><code>gate-watcher/</code></td><td class="desc">원격 systemd 데몬(리턴 경로) + <code>alerts/</code>(경보 유닛).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="sub-title" style="margin-top:56px;">PR · 린터 규율</h3>
+    <div class="card mt16">
+      <p style="margin:0 0 8px;"><strong>게시는 branch+PR로만</strong>, <code class="inl">pr-verify</code> green 후 <span class="who me">나</span>가 merge(직접 main push 금지). MGMT에는 <code class="inl">pr-verify</code>만, CODE는 실행 중 gjc가 main 직접 push. <code class="inl">pr-verify</code>는 변경 파일 종류별로 4종 린터를 조건 실행한다:</p>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>검사</th><th>트리거 파일</th><th>규칙</th></tr></thead>
+          <tbody>
+            <tr><td><span class="m">lint_report.sh</span></td><td><span class="m">*_report.html</span></td><td class="desc">섹션 id 6종(<code class="inl">summary·goals·gates·constants·risks·artifacts</code>)·판정 배지(GO/NO-GO/PARTIAL)·self-contained.</td></tr>
+            <tr><td><span class="m">lint_spec.sh</span></td><td><span class="m">루트 P[0-9]*.md</span></td><td class="desc"><code class="inl">@goal:</code>를 <strong>column 0</strong>(줄 맨 앞)으로. 들여쓰기·빈 블록·제목 중복 금지.</td></tr>
+            <tr><td><span class="m">check_immutables.sh</span></td><td><span class="m">.github/immutables.txt</span></td><td class="desc">사전등록 수치를 명세에 verbatim 유지. 바꿨으면 PR 본문에 <code class="inl">[Decision]</code> 인용 필수.</td></tr>
+            <tr><td><span class="m">lint_status.sh</span></td><td><span class="m">status.json</span></td><td class="desc"><code class="inl">.project</code>·<code class="inl">.phases[].state ∈ {done,current,next,backlog,blocked}</code>·<code class="inl">.decisions[]={issue,title,url}</code>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <h3 class="sub-title" style="margin-top:56px;">보기 · 문서 링크</h3>
+    <div class="tbl-wrap mt16">
+      <table class="tbl">
+        <thead><tr><th>대상</th><th>URL</th></tr></thead>
+        <tbody>
+          <tr><td class="desc"><strong>대시보드</strong> — phase·이슈·게이트 실시간(무인증 API 렌더)</td><td><a href="https://jiminc77.github.io/research-dashboard/dashboard/" target="_blank" rel="noopener">…/research-dashboard/dashboard/</a></td></tr>
+          <tr><td class="desc"><strong>계획서 LIVE</strong> — 연구계획 + status.json 오버레이</td><td><span class="m">…/projects/{slug}/research/*.html</span></td></tr>
+          <tr><td class="desc"><strong>단계 리포트</strong> — <code class="inl">P{k}_report.html</code></td><td><span class="m">…/projects/{slug}/reports/P{k}_report.html</span></td></tr>
+          <tr><td class="desc"><strong>PROTOCOL.md</strong> — 상태·증거·게이트 계약</td><td><a href="https://github.com/jiminc77/research-dashboard/blob/main/research-ops/PROTOCOL.md" target="_blank" rel="noopener">…/research-ops/PROTOCOL.md</a></td></tr>
+          <tr><td class="desc"><strong>ORCHESTRATOR.md</strong> — 세션 A 정본</td><td><a href="https://github.com/jiminc77/research-dashboard/blob/main/research-ops/ORCHESTRATOR.md" target="_blank" rel="noopener">…/research-ops/ORCHESTRATOR.md</a></td></tr>
+          <tr><td class="desc"><strong>SESSION_B.md</strong> — gjc 감독 지시서</td><td><a href="https://github.com/jiminc77/research-dashboard/blob/main/research-ops/SESSION_B.md" target="_blank" rel="noopener">…/research-ops/SESSION_B.md</a></td></tr>
+          <tr><td class="desc"><strong>pro_orchestrator_prompt.md</strong> — 웹 pro 런타임 계약</td><td><a href="https://github.com/jiminc77/research-dashboard/blob/main/research-ops/templates/pro_orchestrator_prompt.md" target="_blank" rel="noopener">…/templates/pro_orchestrator_prompt.md</a></td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </section>
@@ -1010,12 +1101,12 @@ systemctl --user list-timers gate-watcher-liveness.timer</code></pre>
       </div>
       <div class="ft-col">
         <h5>사용법</h5>
-        <a href="#new">1 · 새 프로젝트</a>
-        <a href="#phase">2 · 단계 실행</a>
-        <a href="#gate">3 · 게이트 판정</a>
-        <a href="#next">4 · 단계 넘기기</a>
-        <a href="#view">5 · 보기</a>
-        <a href="#troubleshoot">6 · 검증이 막을 때</a>
+        <a href="#overview">개요</a>
+        <a href="#setup">최초 1회</a>
+        <a href="#new">새 프로젝트</a>
+        <a href="#loop">단계 루프</a>
+        <a href="#trouble">문제 해결</a>
+        <a href="#ref">레퍼런스</a>
       </div>
       <div class="ft-col">
         <h5>레포 &amp; 규약</h5>
