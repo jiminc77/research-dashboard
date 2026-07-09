@@ -1232,7 +1232,7 @@ repoLine + '\n' +
 '3) [사람, 로컬 셸] research-ops/workflows/ 의 pr-verify.yml · phase-transition.yml · gate-notify.yml · evidence-verify.yml 4종 + .github/immutables.txt 를 구현 레포 .github/ 로 복사·커밋(gjc가 CODE main 관리). 완료 확인을 받아라.\n' +
 '4) [사람, 로컬 셸] NTFY_TOPIC secret 등록 — `gh secret set NTFY_TOPIC -R ' + v.owner + '/' + v.code + '` (topic 값 ' + v.ntfy + '). 폰 ntfy 앱 구독법을 보여주고 완료 확인을 받아라.\n' +
 '5) 관리 레포 projects/' + slug + '/project.yml 을 projects/_template.yml 뼈대로 작성해 branch+PR 로 올려라 — 민감값(ssh_host/workdir/모델)은 공란 유지(placeholder), 세션 B 값은 사람이 제공. 이후 모든 단계 세션이 이 파일을 읽는다.\n' +
-'6) [사람] 대시보드 등록: dashboard/index.html 의 CONFIG.projects 는 사람이 관리하는 하드코딩 레지스트리다(project.yml 과 별개, 서로 참조 안 함) — 사람에게 ' + project + ' 항목 추가를 안내하라. 필드는 name/owner/mgmtRepo/codeRepo/titlePrefix("[' + project + '] "). (docsBase 같은 필드는 없다.)\n' +
+'6) 대시보드 등록은 자동: 5)의 project.yml 이 merge 되면 MGMT Actions(dashboard-data)가 projects/<slug>/project.yml 레지스트리를 스캔해 dashboard/data.json 을 갱신한다 — 사람이 할 일 없음. (선택) CODE 레포에 research-ops/workflows/dashboard-ping.yml 을 복사하고 DASHBOARD_PING_TOKEN secret(MGMT Contents:RW PAT, ' + project + ' 의 agent 계정 명의 권장)을 넣으면 이슈 이벤트 시 즉시 반영.\n' +
 '7) 셋업 검증 리포트 출력([사람] 셸 단계 완료 여부 포함)\n' +
 '\n' +
 'STEP 1 — 이 메시지에 첨부된 계획서 초안을 plan_refinement 절차로 학회 수준 정형화 → projects/' + slug + '/research/ 에 branch+PR 로 올림 → 내 승인 대기\n' +

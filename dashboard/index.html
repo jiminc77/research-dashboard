@@ -305,19 +305,24 @@
 <footer id="foot">불러오는 중…</footer>
 
 <script>
-/* ===== CONFIG — 프로젝트 추가는 여기만 ===== */
-const CONFIG = {
-  projects: [
-    { name:"DGCC", owner:"jiminc77", mgmtRepo:"research-dashboard", codeRepo:"DGCC", titlePrefix:"", docsBase:"projects/dgcc" }
-    // 다중 프로젝트: { name:"XYZ", owner:"jiminc77", mgmtRepo:"research-dashboard", codeRepo:"XYZ", titlePrefix:"[XYZ] ", docsBase:"projects/xyz" }
-  ]
-};
-const REFRESH_MS = 5*60*1000;   // 5분 자동 새로고침
+/* ===== 데이터 소스 (v2 — 정적 파이프라인) =====
+   1순위: 같은 오리진 ./data.json — Actions(dashboard-data.yml)가 15분마다 갱신.
+          브라우저는 GitHub API 를 호출하지 않는다 (rate limit 무관, 탭 수 무관).
+   2순위: data.json 이 없거나(404/파싱 실패) generated_at 이 12h 초과면 GitHub REST 라이브 폴백.
+          폴백의 프로젝트 레지스트리는 마지막 성공 data.json(localStorage 캐시)을 쓴다.
+   레지스트리 원천은 projects/<slug>/project.yml — data.json 은 그 파생물이다.
+   (구 CONFIG.projects 하드코딩 제거 — 프로젝트 추가는 project.yml 생성만으로 끝.) */
 const API = "https://api.github.com";
+const DATA_URL = "./data.json";
+const DATA_KEY = "roData:v1";            // 마지막 성공 data.json 캐시 (폴백 레지스트리 겸용)
+const STALE_MS = 12*3600*1000;           // generated_at 이 이보다 오래면 파이프라인 이상 → 폴백
+const REFRESH_STATIC_MS = 5*60*1000;     // 정적 경로 폴링 (same-origin, 무비용)
+const REFRESH_LIVE_MS = 10*60*1000;      // 라이브 폴백 폴링 (비인증 60 req/hr 보호)
 
 /* ===== 상태 ===== */
 let curIdx = 0;
 let timer = null;
+let registry = [];                        // data.json 의 projects[]
 
 /* ===== 유틸 ===== */
 const $ = id => document.getElementById(id);
@@ -345,17 +350,21 @@ function phaseOf(issue){
   return phaseFromTitle(issue.title);
 }
 
-/* 게이트 대기 판정: state:blocked-human 라벨 OR (하위호환) 본문/제목에 human_blocked·HUMAN GATE 텍스트 */
+/* 게이트 대기 판정: state:blocked-human 라벨 OR (하위호환) 텍스트 신호.
+   정적 데이터는 body 를 싣지 않는 대신 빌더가 같은 규칙으로 계산한 legacy_gate_text 를 준다. */
 function isGateWaiting(issue){
   if(issue.state!=="open") return false;
   if(hasLabel(issue,"state:blocked-human")) return true;
   // state 라벨이 하나라도 있으면 라벨을 신뢰 (텍스트 추정은 라벨 없는 구형 이슈 전용)
   if((issue.labels||[]).some(x=>String(typeof x==="string"?x:x.name).startsWith("state:"))) return false;
+  if(typeof issue.legacy_gate_text === "boolean") return issue.legacy_gate_text;
   const hay = ((issue.title||"")+" "+(issue.body||"")).toLowerCase();
   return hay.includes("human_blocked") || hay.includes("human gate") || hay.includes("### gate request");
 }
 
-/* ===== 조건부 fetch (ETag) + localStorage 캐시 ===== */
+/* ===== 조건부 fetch (ETag) + localStorage 캐시 — 라이브 폴백 전용 =====
+   주의: 비인증 요청은 304 응답도 rate limit 을 소모한다(실측). ETag 는 대역폭 절약일 뿐이므로
+   예산 보호는 호출 수 축소·visibilitychange 폴링 중단·10분 주기로만 이뤄진다. */
 let rateRemaining = "–";
 async function ghGet(url){
   const key = "roapi:"+url;
@@ -387,12 +396,6 @@ async function ghGet(url){
   return { data, fromCache:false };
 }
 
-/* per_page=100 단순 조회 (100개 초과는 캐시·rate-limit 절약 위해 첫 페이지만; 단일 연구 규모에 충분) */
-async function fetchAll(base){
-  const r = await ghGet(base);
-  return r;
-}
-
 /* ===== 렌더 ===== */
 function renderIssueRow(issue, {showChip}={}){
   const h = hoursSince(issue.updated_at);
@@ -410,28 +413,28 @@ function renderIssueRow(issue, {showChip}={}){
 }
 function renderEmpty(el){ el.innerHTML = `<div class="empty">없음</div>`; }
 
-/* 📄 단계 리포트 (MGMT {docsBase}/reports/*_report.html) — GitHub Contents API 결과를 링크로 */
-function renderReports(p, entries, research){
+/* 📄 단계 리포트 — 파일명 배열 기반 (정적/라이브 공용). P 숫자 정렬 (P2 < P10). */
+function renderReports(p, reportNames, researchNames){
   const el = $("reports");
   if(!el) return;
-  const base = p.docsBase || "docs";
-  const pages = `https://${p.owner}.github.io/${p.mgmtRepo}/${base}`;
+  const pages = `https://${p.owner}.github.io/${p.mgmt_repo}/${p.docs_base}`;
   const rows = [];
   // 연구 계획서 — living page (상태 오버레이 포함)
-  (research||[]).filter(e=>e && e.type==="file" && /_research_plan\.html$/.test(e.name||""))
-    .forEach(f=>rows.push(`<div class="row"><a class="title" href="${esc(pages)}/research/${esc(f.name)}" target="_blank">${esc(p.name)} 연구 계획서 <span class="ext">↗</span></a><span class="doctag">LIVE</span></div>`));
-  // 단계 리포트 — 페이지
-  (entries||[]).filter(e=>e && e.type==="file" && /_report\.html$/.test(e.name||""))
-    .sort((a,b)=>a.name.localeCompare(b.name))
-    .forEach(f=>{
-      const m=(f.name||"").match(/^P(\d+)_report\.html$/i);
-      const label=m?`P${m[1]} 단계 리포트`:f.name.replace(/\.html$/,"");
-      rows.push(`<div class="row"><a class="title" href="${esc(pages)}/reports/${esc(f.name)}" target="_blank">${esc(label)} <span class="ext">↗</span></a></div>`);
+  (researchNames||[]).filter(n=>/_research_plan\.html$/.test(n||""))
+    .forEach(n=>rows.push(`<div class="row"><a class="title" href="${esc(pages)}/research/${esc(n)}" target="_blank">${esc(p.name)} 연구 계획서 <span class="ext">↗</span></a><span class="doctag">LIVE</span></div>`));
+  // 단계 리포트 — P 뒤 숫자 기준 정렬 (localeCompare 는 P10 < P2 로 어긋난다)
+  const pNum = n => { const m=(n||"").match(/^P(\d+)/i); return m?+m[1]:1e9; };
+  (reportNames||[]).filter(n=>/_report\.html$/.test(n||""))
+    .sort((a,b)=>pNum(a)-pNum(b) || a.localeCompare(b))
+    .forEach(n=>{
+      const m=(n||"").match(/^P(\d+)_report\.html$/i);
+      const label=m?`P${m[1]} 단계 리포트`:n.replace(/\.html$/,"");
+      rows.push(`<div class="row"><a class="title" href="${esc(pages)}/reports/${esc(n)}" target="_blank">${esc(label)} <span class="ext">↗</span></a></div>`);
     });
   el.innerHTML = rows.length ? rows.join("") : `<div class="empty">없음</div>`;
 }
 
-function render(codeIssues, mgmtIssues, milestones, note){
+function render(codeIssues, mgmtIssues, note){
   // 헤더 진행률: state 라벨 기준 done/total (라벨 없으면 closed로 보조)
   const devs = codeIssues.filter(i => hasLabel(i,"type:dev") || TITLE_RE.test(i.title||""));
   const total = devs.length || codeIssues.length;
@@ -506,57 +509,107 @@ function render(codeIssues, mgmtIssues, milestones, note){
     </div>`;
   }).join("") : `<div class="empty">없음</div>`;
 
-  // footer + badges
-  $("rateBadge").textContent = "rate "+rateRemaining;
-  $("cacheBadge").hidden = !note.fromCache;
-  $("foot").innerHTML = `<span class="rate">마지막 갱신 ${new Date().toLocaleString('ko-KR')} · GitHub API 잔여 ${rateRemaining}</span>`
-    + (note.rateLimited ? ` · <span style="color:var(--warning)">rate-limit — 캐시 표시 중</span>` : "");
+  // footer + badges — 데이터 소스별
+  if(note.mode === "static"){
+    const gen = new Date(note.generated);
+    const mins = Math.max(0, Math.round((Date.now()-gen.getTime())/60000));
+    $("rateBadge").textContent = "static";
+    $("rateBadge").title = "data.json generated_at " + note.generated;
+    $("cacheBadge").hidden = true;
+    $("foot").innerHTML = `<span class="rate">정적 데이터 · ${gen.toLocaleString('ko-KR')} 생성 (${mins}분 전) · 렌더 ${new Date().toLocaleString('ko-KR')}</span>`;
+  } else {
+    $("rateBadge").textContent = "rate "+rateRemaining;
+    $("cacheBadge").hidden = !note.fromCache;
+    $("foot").innerHTML = `<span class="rate">라이브 API 폴백 · 마지막 갱신 ${new Date().toLocaleString('ko-KR')} · GitHub API 잔여 ${rateRemaining}</span>`
+      + (note.rateLimited ? ` · <span style="color:var(--warning)">rate-limit — 캐시 표시 중</span>` : "");
+  }
 }
 
 /* ===== 로드 ===== */
-async function load(){
-  const p = CONFIG.projects[curIdx];
-  $("foot").textContent = "불러오는 중…";
-  let fromCache=false, rateLimited=false;
+function cachedData(){ try { return JSON.parse(localStorage.getItem(DATA_KEY)||"null"); } catch(e){ return null; } }
+
+function setRegistry(ps){
+  registry = Array.isArray(ps) ? ps : [];
+  if(curIdx >= registry.length) curIdx = 0;
+  const sel = $("projSel");
+  // 프로젝트가 하나뿐이면 셀렉터를 숨긴다 (선택할 게 없음)
+  if(registry.length <= 1){ sel.hidden = true; return; }
+  sel.hidden = false;
+  sel.innerHTML = registry.map((p,i)=>`<option value="${i}"${i===curIdx?" selected":""}>${esc(p.name)}</option>`).join("");
+}
+
+async function loadStatic(){
+  let d = null;
   try {
-    const codeR = await fetchAll(`${API}/repos/${p.owner}/${p.codeRepo}/issues?state=all&per_page=100`);
-    const mgmtR = await fetchAll(`${API}/repos/${p.owner}/${p.mgmtRepo}/issues?state=all&per_page=100`);
-    let milestones=[];
-    try { milestones = (await fetchAll(`${API}/repos/${p.owner}/${p.codeRepo}/milestones?state=all`)).data; } catch(e){}
-    fromCache = codeR.fromCache || mgmtR.fromCache;
-    rateLimited = codeR.rateLimited || mgmtR.rateLimited;
+    const res = await fetch(DATA_URL, { cache: "no-store" });
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    d = await res.json();
+  } catch(e){ return false; }
+  if(!d || !Array.isArray(d.projects) || !d.projects.length) return false;
+  try { localStorage.setItem(DATA_KEY, JSON.stringify(d)); } catch(e){}
+  setRegistry(d.projects);
+  if(Date.now() - new Date(d.generated_at).getTime() > STALE_MS) return false; // 파이프라인 이상 → 라이브 폴백
+  const p = registry[curIdx];
+  render(p.code_issues||[], p.mgmt_issues||[], { mode:"static", generated:d.generated_at });
+  renderReports(p, p.reports||[], p.research||[]);
+  scheduleRefresh(REFRESH_STATIC_MS);
+  return true;
+}
+
+async function loadLive(){
+  if(!registry.length){
+    const c = cachedData();
+    if(c && Array.isArray(c.projects)) setRegistry(c.projects);
+  }
+  if(!registry.length){
+    $("foot").innerHTML = `<span style="color:var(--error)">./data.json 없음 — Actions 의 dashboard-data 워크플로 상태를 확인하세요</span>`;
+    return;
+  }
+  const p = registry[curIdx];
+  try {
+    const [codeR, mgmtR] = await Promise.all([
+      ghGet(`${API}/repos/${p.owner}/${p.code_repo}/issues?state=all&per_page=100`),
+      ghGet(`${API}/repos/${p.owner}/${p.mgmt_repo}/issues?state=all&per_page=100`),
+    ]);
     // /issues 는 PR도 포함 → 제외
     const codeIssues = (codeR.data||[]).filter(i=>!i.pull_request);
     const mgmtIssues = (mgmtR.data||[]).filter(i=>!i.pull_request);
-    render(codeIssues, mgmtIssues, milestones, {fromCache, rateLimited});
+    render(codeIssues, mgmtIssues, {
+      mode:"live",
+      fromCache: codeR.fromCache || mgmtR.fromCache,
+      rateLimited: codeR.rateLimited || mgmtR.rateLimited,
+    });
     // 단계 리포트 (독립 fetch — 실패해도 나머지 대시보드는 유지)
     try {
-      const base = p.docsBase || "docs";
-      const repR = await fetchAll(`${API}/repos/${p.owner}/${p.mgmtRepo}/contents/${base}/reports`);
-      let resR = {data: []};
-      try { resR = await fetchAll(`${API}/repos/${p.owner}/${p.mgmtRepo}/contents/${base}/research`); } catch(_e){}
-      renderReports(p, Array.isArray(repR.data) ? repR.data : [], Array.isArray(resR.data) ? resR.data : []);
+      const [repR, resR] = await Promise.all([
+        ghGet(`${API}/repos/${p.owner}/${p.mgmt_repo}/contents/${p.docs_base}/reports`).catch(()=>({data:[]})),
+        ghGet(`${API}/repos/${p.owner}/${p.mgmt_repo}/contents/${p.docs_base}/research`).catch(()=>({data:[]})),
+      ]);
+      const names = x => (Array.isArray(x.data)?x.data:[]).filter(e=>e&&e.type==="file").map(e=>e.name);
+      renderReports(p, names(repR), names(resR));
     } catch(e){ renderReports(p, [], []); }
+    scheduleRefresh(REFRESH_LIVE_MS);
   } catch(e){
     $("foot").innerHTML = `<span style="color:var(--error)">로드 실패: ${esc(String(e.message||e))}</span> · 새로고침 재시도`;
   }
 }
 
-/* ===== 초기화 ===== */
-function initProjects(){
-  const sel = $("projSel");
-  // 프로젝트가 하나뿐이면 셀렉터를 숨긴다 (선택할 게 없음)
-  if (CONFIG.projects.length <= 1){ sel.hidden = true; return; }
-  sel.hidden = false;
-  sel.innerHTML = CONFIG.projects.map((p,i)=>`<option value="${i}">${esc(p.name)}</option>`).join("");
-  sel.onchange = () => { curIdx = +sel.value; load(); };
+async function load(){
+  $("foot").textContent = "불러오는 중…";
+  if(await loadStatic()) return;
+  await loadLive();
 }
-$("refreshBtn").onclick = load;
-function scheduleRefresh(){ if(timer) clearInterval(timer); timer=setInterval(load, REFRESH_MS); }
 
-initProjects();
+/* ===== 초기화 ===== */
+$("projSel").onchange = e => { curIdx = +e.target.value; load(); };
+$("refreshBtn").onclick = load;
+function scheduleRefresh(ms){ if(timer) clearInterval(timer); timer = setInterval(load, ms); }
+/* 백그라운드 탭은 폴링 중단 — 복귀 시 즉시 갱신 (라이브 폴백의 예산 보호에 특히 중요) */
+document.addEventListener("visibilitychange", () => {
+  if(document.hidden){ if(timer) clearInterval(timer); timer = null; }
+  else load();
+});
 load();
-scheduleRefresh();
 </script>
 </body>
 </html>
