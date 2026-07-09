@@ -17,7 +17,7 @@
 
 - `research-ops/` — 재사용 키트 (계약 · 지시서 · 템플릿 · 스크립트). 프로젝트 독립.
 - `projects/{name}/` — 프로젝트별 문서 (연구계획서 · 명세 요약 · 게이트 리포트 · `status.json`). 예: `projects/dgcc/`. 설정은 `projects/{name}/project.yml` (`_template.yml` 참조).
-- `dashboard/` · `guide/` — GitHub Pages 정적 페이지. 상태는 API로 실시간 렌더 — 수동 갱신 없음.
+- `dashboard/` · `guide/` — GitHub Pages 정적 페이지. 상태는 Actions(`dashboard-data`)가 15분마다 굽는 `dashboard/data.json`으로 렌더(이슈 이벤트 시 `dashboard-ping`이 즉시 갱신) — 수동 갱신 없음.
 - 이슈 2종 — `[Milestone]` 단계 관리 · `[Decision]` 기준 변경 기록.
 
 ## 진행 중 프로젝트

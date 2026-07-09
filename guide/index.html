@@ -673,9 +673,11 @@
 <span class="cmt"># (두 레포 Contents RW + Issues RW, 스코프 최소)</span>
 mkdir -p ~/.config/gh-agent
 printf '%s\n' "&lt;PASTE_AGENT_PAT&gt;" > ~/.config/gh-agent/token
-chmod 600 ~/.config/gh-agent/token</code></pre>
+chmod 600 ~/.config/gh-agent/token
+<span class="cmt"># 게시 래퍼 safe-comment.sh 의 계정 게이트가 요구하는 기대 로그인</span>
+echo 'export AGENT_LOGIN=jiminc77-agent' >> ~/.bashrc</code></pre>
         </div>
-        <p class="note" style="margin:10px 0 0;">확인: <code class="inl">GH_TOKEN="$(cat ~/.config/gh-agent/token)" gh api user -q .login</code> → <code class="inl">jiminc77-agent</code></p>
+        <p class="note" style="margin:10px 0 0;">확인: <code class="inl">GH_TOKEN="$(cat ~/.config/gh-agent/token)" gh api user -q .login</code> → <code class="inl">jiminc77-agent</code>. <code class="inl">safe-comment.sh</code>는 <code class="inl">AGENT_LOGIN</code>과 현재 gh 신원이 일치해야만 게시를 허용한다.</p>
       </li>
       <li>
         <span class="num">2</span>
@@ -800,8 +802,8 @@ systemctl --user enable --now gate-watcher-liveness.timer</code></pre>
         <li>라벨 상태기계 18종(양 레포)·phase 마일스톤(CODE 레포) 생성</li>
         <li>워크플로 4종(<code class="inl">pr-verify · phase-transition · gate-notify · evidence-verify</code>) + <code class="inl">.github/immutables.txt</code>를 CODE 레포로 복사·커밋</li>
         <li><code class="inl">NTFY_TOPIC</code> secret 등록 안내(<code class="inl">gh secret set NTFY_TOPIC -R {OWNER}/{CODE_REPO}</code>)</li>
-        <li>MGMT <code class="inl">projects/{slug}/project.yml</code> 작성(민감값 공란) → branch+PR</li>
-        <li>대시보드 <code class="inl">CONFIG.projects</code> 등록 안내(name/owner/mgmtRepo/codeRepo/titlePrefix — <code class="inl">project.yml</code>과 별개 레지스트리)</li>
+        <li>MGMT <code class="inl">projects/{slug}/project.yml</code> 작성 — 민감값(ssh_host/workdir/모델)은 공란, <strong><code class="inl">human_login</code>·<code class="inl">agent_login</code>은 실제 값으로 채움</strong>(safe-comment.sh·audit_actors.sh·gate-watcher가 읽는 계정 계약 정본) → branch+PR</li>
+        <li>별도 대시보드 등록 없음 — <code class="inl">project.yml</code>이 유일한 레지스트리다. merge되면 <code class="inl">dashboard-data</code> Actions가 스캔해 <code class="inl">dashboard/data.json</code>을 굽는다(<code class="inl">CONFIG.projects</code> 하드코딩·titlePrefix 폐지)</li>
         <li>계획서 초안을 학회 수준으로 정형화 → 내 승인 후 <code class="inl">P0.md</code> 명세·dev 이슈 발행</li>
       </ul>
     </div>
@@ -994,7 +996,7 @@ systemctl --user restart gate-watcher   <span class="cmt"># 필요 시</span></c
 
     <div class="callout warn mt24 mb0">
       <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zM8 11V7a4 4 0 018 0v4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-      <p><strong>계정 규율(#22):</strong> 에이전트(gjc·세션 A·gate-watcher)는 <code class="inl">jiminc77-agent</code> PAT로 활동한다 — 사람 PAT를 에이전트에 넣지 않아야 <strong>verdict-guard가 실효</strong>한다. gjc 인증 교체는 <strong>단계 경계에서만</strong>. 유출 의심 시 <a href="https://github.com/settings/tokens" target="_blank" rel="noopener">즉시 revoke</a>.</p>
+      <p><strong>계정 규율(#22):</strong> 에이전트(gjc·세션 A·gate-watcher)는 <code class="inl">jiminc77-agent</code> PAT로 활동한다 — 사람 PAT를 에이전트에 넣지 않아야 <strong>verdict-guard가 실효</strong>한다. 게시 전 <code class="inl">scripts/safe-comment.sh</code>가 <code class="inl">gh api user == AGENT_LOGIN</code>을 강제하고(불일치 거부), 사후 감사는 <code class="inl">scripts/audit_actors.sh &lt;owner/repo&gt; &lt;issue&gt;</code>. gjc 인증 교체는 <strong>단계 경계에서만</strong>. 유출 의심 시 <a href="https://github.com/settings/tokens" target="_blank" rel="noopener">즉시 revoke</a>.</p>
     </div>
   </div>
 </section>
@@ -1051,7 +1053,7 @@ systemctl --user restart gate-watcher   <span class="cmt"># 필요 시</span></c
           <tr><td><code>SESSION_B.md</code></td><td class="desc">세션 B(gjc 감독) 지시서 템플릿.</td></tr>
           <tr><td><code>templates/</code></td><td class="desc"><code>pro_orchestrator_prompt.md</code>(웹 pro 계약) · <code>phase_spec.md</code> · <code>plan_*</code> · <code>issue_*</code>.</td></tr>
           <tr><td><code>scripts/</code></td><td class="desc"><code>bootstrap_project.sh</code> · <code>setup_phase.sh</code> · <code>status.sh</code> · <code>lint_*.sh</code> — 셸용.</td></tr>
-          <tr><td><code>workflows/</code></td><td class="desc">CODE 레포로 복사하는 워크플로 4종(<code>pr-verify · phase-transition · gate-notify · evidence-verify</code>).</td></tr>
+          <tr><td><code>workflows/</code></td><td class="desc">CODE 레포로 복사하는 워크플로 — 핵심 4종(<code>pr-verify · phase-transition · gate-notify · evidence-verify</code>) + 선택 <code>dashboard-ping</code>(이슈 이벤트 시 대시보드 즉시 갱신, <code class="inl">DASHBOARD_PING_TOKEN</code> 필요).</td></tr>
           <tr><td><code>gate-watcher/</code></td><td class="desc">원격 systemd 데몬(리턴 경로) + <code>alerts/</code>(경보 유닛).</td></tr>
         </tbody>
       </table>
@@ -1078,7 +1080,7 @@ systemctl --user restart gate-watcher   <span class="cmt"># 필요 시</span></c
       <table class="tbl">
         <thead><tr><th>대상</th><th>URL</th></tr></thead>
         <tbody>
-          <tr><td class="desc"><strong>대시보드</strong> — phase·이슈·게이트 실시간(무인증 API 렌더)</td><td><a href="https://jiminc77.github.io/research-dashboard/dashboard/" target="_blank" rel="noopener">…/research-dashboard/dashboard/</a></td></tr>
+          <tr><td class="desc"><strong>대시보드</strong> — phase·이슈·게이트(<code class="inl">data.json</code> 정적, Actions 15분 갱신; 404·12h 초과 시 라이브 API 폴백)</td><td><a href="https://jiminc77.github.io/research-dashboard/dashboard/" target="_blank" rel="noopener">…/research-dashboard/dashboard/</a></td></tr>
           <tr><td class="desc"><strong>계획서 LIVE</strong> — 연구계획 + status.json 오버레이</td><td><span class="m">…/projects/{slug}/research/*.html</span></td></tr>
           <tr><td class="desc"><strong>단계 리포트</strong> — <code class="inl">P{k}_report.html</code></td><td><span class="m">…/projects/{slug}/reports/P{k}_report.html</span></td></tr>
           <tr><td class="desc"><strong>PROTOCOL.md</strong> — 상태·증거·게이트 계약</td><td><a href="https://github.com/jiminc77/research-dashboard/blob/main/research-ops/PROTOCOL.md" target="_blank" rel="noopener">…/research-ops/PROTOCOL.md</a></td></tr>
@@ -1227,11 +1229,11 @@ repoLine + '\n' +
 '- ntfy topic: ' + v.ntfy + '\n' +
 '\n' +
 'STEP 0 — 초기 세팅 (너는 no-shell 웹 pro 세션 A다. 셸이 필요한 단계는 [사람] 표시 — 사람에게 안내하고 완료 확인을 받아라. 나머지는 branch+PR 로 게시하고 결과를 표로 보고):\n' +
-'1) 인증: 너(세션 A)는 gh CLI 없는 LLM 세션이다 — 사람에게서 fine-grained PAT(두 레포 Contents RW + Issues RW)를 받아 REST API로 쓴다. 게시는 branch+PR 로만(main 직접 금지), pr-verify green 후 사람이 merge.\n' +
+'1) 인증: 너(세션 A)는 gh CLI 없는 LLM 세션이다 — 사람에게서 fine-grained PAT(두 레포 Contents RW + Issues RW)를 받아 REST API로 쓴다. 이 PAT 는 반드시 agent 계정(project.yml 의 agent_login, 예: jiminc77-agent) 명의여야 한다(PROTOCOL 계정 계약 — 세션 A 의 모든 게시는 agent 계정으로). 게시는 branch+PR 로만(main 직접 금지), pr-verify green 후 사람이 merge.\n' +
 '2) [사람, 로컬 셸] 라벨 상태기계 18종(양 레포)·phase 마일스톤(구현 레포) 생성 — research-ops/scripts/bootstrap_project.sh (셸 스크립트). 완료 확인을 받아라.\n' +
 '3) [사람, 로컬 셸] research-ops/workflows/ 의 pr-verify.yml · phase-transition.yml · gate-notify.yml · evidence-verify.yml 4종 + .github/immutables.txt 를 구현 레포 .github/ 로 복사·커밋(gjc가 CODE main 관리). 완료 확인을 받아라.\n' +
 '4) [사람, 로컬 셸] NTFY_TOPIC secret 등록 — `gh secret set NTFY_TOPIC -R ' + v.owner + '/' + v.code + '` (topic 값 ' + v.ntfy + '). 폰 ntfy 앱 구독법을 보여주고 완료 확인을 받아라.\n' +
-'5) 관리 레포 projects/' + slug + '/project.yml 을 projects/_template.yml 뼈대로 작성해 branch+PR 로 올려라 — 민감값(ssh_host/workdir/모델)은 공란 유지(placeholder), 세션 B 값은 사람이 제공. 이후 모든 단계 세션이 이 파일을 읽는다.\n' +
+'5) 관리 레포 projects/' + slug + '/project.yml 을 projects/_template.yml 뼈대로 작성해 branch+PR 로 올려라 — 민감값(ssh_host/workdir/모델)은 공란 유지(placeholder), 세션 B 값은 사람이 제공. human_login/agent_login 은 실제 값으로 채운다(계정 계약 정본 — safe-comment.sh·audit_actors.sh·gate-watcher 가 이 값을 읽는다). 이후 모든 단계 세션이 이 파일을 읽는다.\n' +
 '6) 대시보드 등록은 자동: 5)의 project.yml 이 merge 되면 MGMT Actions(dashboard-data)가 projects/<slug>/project.yml 레지스트리를 스캔해 dashboard/data.json 을 갱신한다 — 사람이 할 일 없음. (선택) CODE 레포에 research-ops/workflows/dashboard-ping.yml 을 복사하고 DASHBOARD_PING_TOKEN secret(MGMT Contents:RW PAT, ' + project + ' 의 agent 계정 명의 권장)을 넣으면 이슈 이벤트 시 즉시 반영.\n' +
 '7) 셋업 검증 리포트 출력([사람] 셸 단계 완료 여부 포함)\n' +
 '\n' +
