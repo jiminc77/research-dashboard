@@ -67,8 +67,9 @@
 ### STEP 0 — 자기 점검 & 설정 로드
 - **자기 변형 판별**(웹 pro / 셸) → 이후 STEP 의 변형 표시를 그에 맞게 따른다.
 - 규약 로드: `ORCHESTRATOR.md`(이 문서) · `PROTOCOL.md` · `templates/`. [웹 pro] 추가로 `pro_orchestrator_prompt.md`.
-- **설정 로드**: MGMT `projects/<slug>/project.yml` 을 읽는다 (code_repo·phases·모델·ntfy 토픽명 등 비민감값). 없으면 신규 프로젝트 — 아래 신규 셋업.
-- **신규 프로젝트 셋업**(최초 1회, 이미 있으면 건너뜀): 라벨 상태기계·phase 마일스톤 생성, CODE `.github/workflows/` 에 워크플로 4종 + `.github/immutables.txt` 배치, `projects/<slug>/project.yml` 생성(민감값 공란). [셸] `bootstrap_project.sh` 사용 가능. [웹 pro] REST/PR 로. **대시보드 등록은 별개** — dashboard `CONFIG.projects` 는 사람이 관리하는 하드코딩 레지스트리다(§자동화 참고).
+- **설정 로드**: MGMT `projects/<slug>/project.yml` 을 읽는다 (code_repo·phases·human_login/agent_login·모델·ntfy 토픽명 등 비민감값). 없으면 신규 프로젝트 — 아래 신규 셋업.
+- **계정 프리플라이트**: 자신이 게시 주체인 변형([셸])이면 `gh api user -q .login` 이 project.yml 의 `agent_login` 과 일치하는지 확인 — 불일치(특히 human_login)면 **STOP**, 사람에게 agent PAT(GH_TOKEN) 주입을 요청한다 (PROTOCOL §2 계정 계약).
+- **신규 프로젝트 셋업**(최초 1회, 이미 있으면 건너뜀): 라벨 상태기계·phase 마일스톤 생성, CODE `.github/workflows/` 에 워크플로 4종 + `.github/immutables.txt` 배치, `projects/<slug>/project.yml` 생성(민감값 공란). [셸] `bootstrap_project.sh` 사용 가능. [웹 pro] REST/PR 로. **대시보드 등록은 자동** — `project.yml` 이 main 에 merge 되면 dashboard-data 워크플로가 data.json 레지스트리에 반영한다(별도 등록 없음, §자동화 참고).
 - 라벨·마일스톤이 **이미 생성된 재개**면 셋업을 건너뛰고 상태 요약(§5)부터.
 
 ### STEP 1 — 입력 수집
@@ -162,7 +163,7 @@ CODE 레포 `.github/workflows/` (4종):
 
 데몬·기타:
 - **gate-watcher (리턴 경로)** — 원격 워크스테이션 systemd 데몬. 사람이 GATE VERDICT 를 게시하면 살아있는 gjc tmux 세션에 "가서 읽어라" 신호를 넣는다(본문 주입 없음). 설치·경보는 `gate-watcher/`.
-- **대시보드** — `dashboard/index.html` 은 **GitHub Issues API 만** 사용. `CONFIG.projects`(하드코딩 레지스트리: name/owner/mgmtRepo/codeRepo/titlePrefix)에 사람이 프로젝트를 등록한다. **`project.yml` 은 세션 A/B 입력용이며 대시보드와 용도가 분리**되어 있다(서로 참조하지 않음).
+- **대시보드** — MGMT Actions **`dashboard-data.yml`** 이 `projects/*/project.yml` 을 스캔해 이슈 전량+리포트 목록을 `dashboard/data.json` 으로 굽는다(15분 스케줄+dispatch). `dashboard/index.html` 은 그 파일만 읽으며(브라우저 GitHub API 직호출·CONFIG 하드코딩 폐지), data.json 이 없거나 12h 초과로 오래면 라이브 API 폴백. CODE 레포에 `dashboard-ping.yml`(킷)을 설치하면 이슈 이벤트 시 즉시 갱신. **레지스트리 원천은 project.yml 하나다.**
 
 ---
 
