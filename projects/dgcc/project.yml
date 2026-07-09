@@ -4,17 +4,14 @@ project: "DGCC"
 owner: "jiminc77"
 mgmt_repo: "research-dashboard"
 code_repo: "DGCC"
+# 계정 계약 — 판정(사람)·게시(에이전트) 주체 (PROTOCOL §2). safe-comment.sh(AGENT_LOGIN)·
+# audit_actors.sh·gate-watcher(human_login)가 이 값과 일치해야 한다.
+human_login: "jiminc77"
+agent_login: "jiminc77-agent"
 docs_base: "projects/dgcc"
 phases: "P0:환경·파일럿,P1:베이스라인,P2:Probing게이트,P3:구조비교게이트,P4:본학습,P5:기제분석,P6:OOD·ablation,P7:집필"
-phase_status:
-  P0: "done (2026-07-03 sign-off, GO)"
-  P1: "current"
-  P2: "backlog"
-  P3: "backlog"
-  P4: "backlog"
-  P5: "backlog"
-  P6: "backlog"
-  P7: "backlog"
+# 단계 상태는 여기 적지 않는다 — 진실은 CODE state:* 라벨, 표시용 파생은 research/status.json.
+# (구 phase_status 블록은 소비자 0 + status.json 과 drift 하여 제거 — 2026-07-09)
 ssh_host: "{SSH_HOST}"
 workdir: "{WORKDIR}"
 gjc:

@@ -90,6 +90,16 @@ follow-ups:
 - <추가 지시나 후속 작업, 없으면 생략>
 ```
 
+### 계정 계약 (actor contract)
+
+- **판정(GATE VERDICT)은 사람 계정(`human_login`)만** 게시한다 — gate-watcher C1 이 author 를 검증한다.
+- **에이전트(세션 A·gjc·자동화)의 모든 게시는 에이전트 계정(`agent_login`)으로만** 한다. 사람 PAT 를
+  에이전트 세션에 넣지 않는다 (SESSION_B '계정 규율'). 두 값의 정본은 `projects/<slug>/project.yml`.
+- 강제 장치: `scripts/safe-comment.sh` 가 게시 전 `gh api user` == `AGENT_LOGIN` 을 검증하고 불일치면
+  거부한다. 사후 감사는 `scripts/audit_actors.sh <owner/repo> <issue_no>`.
+- 계정이 섞이면(에이전트가 사람 토큰으로 게시) C1 의 author 검증이 위조 가능해진다 — **이 분리는
+  게이트 보안의 전제**이지 스타일 규칙이 아니다.
+
 ### 판정 전달 자동화 (gate-watcher)
 
 원격 데몬 `research-ops/gate-watcher/`가 실행 세션의 ledger(blocked)를 감시하다, `state:blocked-human` 라벨이 붙은 open 이슈에서 **GATE VERDICT 코멘트(author=사람 계정, 첫 줄 `### GATE VERDICT`, `choice:` 필드)**를 감지하면 실행 세션 tmux에 "가서 읽어라" 신호만 전달한다(본문 주입 없음 — 세션이 직접 fetch·재검증). 전달 확인 = 판정 코멘트의 👀 reaction. 판정 게시 시 `gate-notify`의 verdict-label job이 `blocked-human → ready`를 기계적으로 전환한다(집행 세션은 착수 시 `running`으로). **구 계약("## HUMAN 판정" + [RESUME])은 폐지 — 본 스키마가 유일한 판정 형식이다.**
