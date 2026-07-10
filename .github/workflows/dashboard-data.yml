@@ -3,8 +3,11 @@
 #
 # 트리거: 15분 스케줄 · 수동(workflow_dispatch) · CODE 레포의 repository_dispatch(dashboard-refresh)
 #         · projects/** 변경 push.
-# 안전:  pr-verify 는 pull_request 전용이라 이 봇 커밋은 어떤 CI 도 트리거하지 않는다.
-#        내용(generated_at 제외)이 같으면 커밋하지 않되, 6h 하트비트 커밋으로 신선도를 보증한다
+# 게시:  비보호 `data` 브랜치에 force-push — main 은 봇도 건드리지 않는다.
+#        (main 의 branch protection 은 PR 필수이고 개인 레포라 bypass allowance 미지원 —
+#         GH006 로 봇 push 가 거부되므로, 보호 규칙을 존중한 채 별도 브랜치로 게시한다.
+#         대시보드는 raw.githubusercontent.com 의 data 브랜치 경로를 읽는다: CORS *, CDN ~5분.)
+#        내용(generated_at 제외)이 같으면 게시하지 않되, 6h 하트비트로 신선도를 보증한다
 #        (dashboard 는 generated_at 이 12h 넘으면 라이브 API 폴백 — 절반 주기로 여유).
 # 러너는 ubuntu 고정 — date -d(GNU) 사용.
 name: dashboard-data
@@ -36,25 +39,25 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: python3 research-ops/scripts/build_dashboard_data.py
 
-      - name: Commit if content changed (6h heartbeat)
+      - name: Publish to data branch if content changed (6h heartbeat)
         run: |
           set -euo pipefail
+          git fetch -q origin data || true
+          old_json="$(git show origin/data:dashboard/data.json 2>/dev/null || echo '{}')"
           new_hash="$(jq -S 'del(.generated_at)' dashboard/data.json | sha256sum | cut -d' ' -f1)"
-          old_json="$(git show HEAD:dashboard/data.json 2>/dev/null || echo '{}')"
           old_hash="$(printf '%s' "$old_json" | jq -S 'del(.generated_at)' | sha256sum | cut -d' ' -f1)"
           if [ "$new_hash" = "$old_hash" ]; then
             old_gen="$(printf '%s' "$old_json" | jq -r '.generated_at // "1970-01-01T00:00:00+00:00"')"
             age=$(( $(date -u +%s) - $(date -u -d "$old_gen" +%s || echo 0) ))
             if [ "$age" -lt 21600 ]; then
-              git checkout -- dashboard/data.json
               echo "no content change (heartbeat fresh, age ${age}s)"
               exit 0
             fi
-            echo "no content change — 6h heartbeat commit"
+            echo "no content change — 6h heartbeat publish"
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add dashboard/data.json
-          git commit -m "[skip ci] dashboard: refresh data.json"
-          git push origin HEAD:main \
-            || { git pull --rebase origin main && git push origin HEAD:main; }
+          git commit -m "dashboard: refresh data.json"
+          # data 브랜치는 스냅샷 용도 — 항상 main+1 커밋으로 force 갱신 (히스토리 무증가)
+          git push -f origin HEAD:refs/heads/data

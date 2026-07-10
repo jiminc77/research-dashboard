@@ -306,14 +306,19 @@
 
 <script>
 /* ===== 데이터 소스 (v2 — 정적 파이프라인) =====
-   1순위: 같은 오리진 ./data.json — Actions(dashboard-data.yml)가 15분마다 갱신.
+   1순위: 비보호 data 브랜치의 raw data.json — Actions(dashboard-data.yml)가 15분마다 갱신.
+          main 은 봇도 건드리지 않는다(branch protection 존중). CORS *, CDN ~5분.
           브라우저는 GitHub API 를 호출하지 않는다 (rate limit 무관, 탭 수 무관).
-   2순위: data.json 이 없거나(404/파싱 실패) generated_at 이 12h 초과면 GitHub REST 라이브 폴백.
+   2순위: ./data.json — 콜드스타트 폴백 (data 브랜치가 아직 없을 때, main 의 초기본).
+   3순위: 전부 없거나 generated_at 이 12h 초과면 GitHub REST 라이브 폴백.
           폴백의 프로젝트 레지스트리는 마지막 성공 data.json(localStorage 캐시)을 쓴다.
    레지스트리 원천은 projects/<slug>/project.yml — data.json 은 그 파생물이다.
    (구 CONFIG.projects 하드코딩 제거 — 프로젝트 추가는 project.yml 생성만으로 끝.) */
 const API = "https://api.github.com";
-const DATA_URL = "./data.json";
+const DATA_URLS = [
+  "https://raw.githubusercontent.com/jiminc77/research-dashboard/data/dashboard/data.json",
+  "./data.json"
+];
 const DATA_KEY = "roData:v1";            // 마지막 성공 data.json 캐시 (폴백 레지스트리 겸용)
 const STALE_MS = 12*3600*1000;           // generated_at 이 이보다 오래면 파이프라인 이상 → 폴백
 const REFRESH_STATIC_MS = 5*60*1000;     // 정적 경로 폴링 (same-origin, 무비용)
@@ -539,21 +544,24 @@ function setRegistry(ps){
 }
 
 async function loadStatic(){
-  let d = null;
-  try {
-    const res = await fetch(DATA_URL, { cache: "no-store" });
-    if(!res.ok) throw new Error("HTTP "+res.status);
-    d = await res.json();
-  } catch(e){ return false; }
-  if(!d || !Array.isArray(d.projects) || !d.projects.length) return false;
-  try { localStorage.setItem(DATA_KEY, JSON.stringify(d)); } catch(e){}
-  setRegistry(d.projects);
-  if(Date.now() - new Date(d.generated_at).getTime() > STALE_MS) return false; // 파이프라인 이상 → 라이브 폴백
-  const p = registry[curIdx];
-  render(p.code_issues||[], p.mgmt_issues||[], { mode:"static", generated:d.generated_at });
-  renderReports(p, p.reports||[], p.research||[]);
-  scheduleRefresh(REFRESH_STATIC_MS);
-  return true;
+  for(const url of DATA_URLS){
+    let d = null;
+    try {
+      const res = await fetch(url, { cache: "no-store" });
+      if(!res.ok) continue;
+      d = await res.json();
+    } catch(e){ continue; }
+    if(!d || !Array.isArray(d.projects) || !d.projects.length) continue;
+    try { localStorage.setItem(DATA_KEY, JSON.stringify(d)); } catch(e){}
+    setRegistry(d.projects);
+    if(Date.now() - new Date(d.generated_at).getTime() > STALE_MS) continue; // 오래됨 → 다음 소스/라이브 폴백
+    const p = registry[curIdx];
+    render(p.code_issues||[], p.mgmt_issues||[], { mode:"static", generated:d.generated_at });
+    renderReports(p, p.reports||[], p.research||[]);
+    scheduleRefresh(REFRESH_STATIC_MS);
+    return true;
+  }
+  return false;
 }
 
 async function loadLive(){
