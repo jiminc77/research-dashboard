@@ -1,27 +1,120 @@
-# research-dashboard
+# Research Dashboard
 
-연구 프로젝트를 GitHub 이슈·라벨·Actions로 굴리는 **오케스트레이션 관리 레포(MGMT_REPO)**.
+A minimal, GitHub-native workspace for running research. It tracks research **state and decisions** — not implementation tasks. Code and experiments live in a separate repository; this repo is the management layer on top of them.
 
-> **Docs = 지식 · Issues = 상태 · 라벨 = 상태기계 · Code repo = 증거.**
+Reusable across projects. Currently hosting one project: **DGCC** (Deformation-Grounded Contact Critics).
 
-## 바로가기
+- **Live dashboard:** https://jiminc77.github.io/research-dashboard/dashboard/
+- **User guide:** https://jiminc77.github.io/research-dashboard/guide/
+- **DGCC research plan:** https://jiminc77.github.io/research-dashboard/projects/dgcc/research/DGCC_research_plan.html
 
-| | |
+---
+
+## Operating model
+
+```text
+Docs   = Knowledge      (plans, specs, reports — the "why" and "what")
+Issues = State          (one issue per milestone; labels are the state machine)
+Labels = Flow           (ready → running → verify → done)
+Code   = Evidence       (implementation + reproducible outputs, in the code repo)
+```
+
+The rule of thumb: **docs, issues, and code stay separate and never mix responsibilities.** An issue records *where a milestone is*, not how it was built.
+
+---
+
+## Repositories
+
+| Repo | Role |
 |---|---|
-| 📊 **라이브 대시보드** | https://jiminc77.github.io/research-dashboard/dashboard/ |
-| 📖 **사용 설명서** — 새 프로젝트 셋업 · 단계 세션 · 게이트 대응 · ntfy | https://jiminc77.github.io/research-dashboard/guide/ |
-| 📐 운영 계약 | [`research-ops/PROTOCOL.md`](research-ops/PROTOCOL.md) |
-| 🤖 세션 지시서 | [`research-ops/ORCHESTRATOR.md`](research-ops/ORCHESTRATOR.md) |
+| **research-dashboard** (this) | Management: research plans, specs, milestone & decision issues, phase reports, references, and the dashboard pipeline. |
+| **[DGCC](https://github.com/jiminc77/DGCC)** | Implementation: environment/RL code, configs, run outputs, metrics, plots, and evidence reports. |
 
-## 구조
+This repo contains no implementation code.
 
-- `research-ops/` — 재사용 키트 (계약 · 지시서 · 템플릿 · 스크립트). 프로젝트 독립.
-- `projects/{name}/` — 프로젝트별 문서 (연구계획서 · 명세 요약 · 게이트 리포트 · `status.json`). 예: `projects/dgcc/`. 설정은 `projects/{name}/project.yml` (`_template.yml` 참조).
-- `dashboard/` · `guide/` — GitHub Pages 정적 페이지. 상태는 Actions(`dashboard-data`)가 15분마다 굽는 `dashboard/data.json`으로 렌더(이슈 이벤트 시 `dashboard-ping`이 즉시 갱신) — 수동 갱신 없음.
-- 이슈 2종 — `[Milestone]` 단계 관리 · `[Decision]` 기준 변경 기록.
+---
 
-## 진행 중 프로젝트
+## Current status
 
-- **DGCC** — 구현 레포: https://github.com/jiminc77/DGCC (dev 이슈 · evidence · CI 검증은 그쪽)
+The live dashboard and `projects/dgcc/research/status.json` are the source of truth. At a glance:
 
-상태의 진실은 라벨과 대시보드다. **이 README에는 상태를 적지 않는다.**
+| Phase | Scope | Status |
+|---|---|---|
+| **P0** | Environment & pilot: two-simulator bring-up, δm pipeline, G1/G2 gates, constants lock | ✅ Done — GO, signed off 2026-07-03 |
+| **P1** | Baseline: HACMan-style black-box contact critic, T1/T2 training, latent-extraction API | 🔵 In progress |
+| **P2** | Probing gate: frozen-critic probe suite + Controls A–F, Go/Pivot decision | ⚪ Next |
+| **P3** | Structure-comparison gate: V1/V2/V3 variants vs. required controls | ⚪ Backlog |
+| **P4** | Main training of the selected variant across T1–T3 | ⚪ Backlog |
+| **P5** | Mechanism analysis: stationarity, probe transfer, reward-free adaptation | ⚪ Backlog |
+| **P6** | OOD (primary axis: length) and ablations; kill-criterion decision | ⚪ Backlog |
+| **P7** | Writing and submission (target: CoRL 2027) | ⚪ Backlog |
+
+Milestones are pre-registered: every gate threshold, prediction, and kill criterion is fixed in the research plan *before* results are seen. Thresholds are never changed to pass a gate; changing one requires a separate **Decision** issue.
+
+---
+
+## How it works
+
+**Phases and milestones.** Work is organised as phases `P0`–`P7`. Each phase is broken into milestones (`P{k}-M{n}`), and each milestone is one issue in the DGCC code repo. The implementing agent executes a milestone; a report/evidence commit closes it.
+
+**Label state machine.** Every development issue carries exactly one `state:` label:
+
+```text
+ready → running → verify → done
+             │
+             ├── blocked-human   (waiting on a HUMAN GATE verdict)
+             └── blocked-tech    (CI failure / 3-strike)
+```
+
+**Human gates.** At a gate, the agent posts a `GATE REQUEST` and the issue moves to `blocked-human`. Only the human owner resolves it, by posting a `GATE VERDICT` comment (with an explicit `choice:`) from their own account. Verdicts written by any non-human account are automatically rejected. A watcher daemon then signals the live agent session to fetch and re-verify the verdict — it never injects the verdict text itself.
+
+**Issue types.** Only three:
+
+| Type | Use for |
+|---|---|
+| Milestone | One research milestone |
+| Decision | A direction decision (GO / PIVOT / NO-GO, or a pre-registered value change) |
+| Experiment Result | A result that drives a decision |
+
+Weekly progress is a comment inside the active milestone issue, not a new item:
+
+```text
+State:
+Blocker:
+Next:
+```
+
+**Dashboard pipeline.** `.github/workflows/dashboard-data.yml` runs every 15 minutes (and on `projects/**` changes). It scans each `projects/*/project.yml`, pulls all issues from that project's management and code repos via the GitHub API, and bakes a snapshot to `dashboard/data.json` on the `data` branch. The static dashboard reads that snapshot instead of calling the GitHub API on every page load, falling back to a live API call only if the snapshot is missing or stale.
+
+---
+
+## Layout
+
+```text
+projects/
+  _template.yml                 # template for a new project
+  dgcc/
+    project.yml                 # registry: owner, repos, docs base, phase status
+    research/                   # research plan (.md/.html) + status.json overlay
+    reports/                    # phase reports and gate decisions
+    implementation/             # implementation & phase specs
+    references/                 # papers
+research-ops/                   # reusable kit
+  ORCHESTRATOR.md, PROTOCOL.md, SESSION_B.md
+  scripts/                      # bootstrap, phase setup, linters, safe-comment
+  templates/                    # issue / spec / report / plan templates
+  workflows/                    # gate-notify, evidence-verify, phase-transition, pr-verify
+  gate-watcher/                 # daemon that relays gate verdicts to the agent session
+dashboard/                      # static dashboard app (reads data.json)
+guide/                          # user guide
+```
+
+---
+
+## Starting a new project
+
+1. Copy `projects/_template.yml` to `projects/<slug>/project.yml` and fill in owner, management repo, and code repo.
+2. Add the project's research plan under `projects/<slug>/research/`.
+3. Copy the `research-ops/workflows/` kit into the code repo.
+
+The dashboard picks up the new project automatically on the next run.
