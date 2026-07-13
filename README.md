@@ -1,12 +1,9 @@
 # Research Dashboard
 
-A minimal, GitHub-native workspace for running research. It tracks research **state and decisions** — not implementation tasks. Code and experiments live in a separate repository; this repo is the management layer on top of them.
-
-Reusable across projects. Currently hosting one project: **DGCC** (Deformation-Grounded Contact Critics).
+A minimal, GitHub-native framework for managing research **state and decisions** — not implementation tasks. Each project keeps its code and experiments in its own repository; this repo is the management layer on top.
 
 - **Live dashboard:** https://jiminc77.github.io/research-dashboard/dashboard/
 - **User guide:** https://jiminc77.github.io/research-dashboard/guide/
-- **DGCC research plan:** https://jiminc77.github.io/research-dashboard/projects/dgcc/research/DGCC_research_plan.html
 
 ---
 
@@ -19,43 +16,26 @@ Labels = Flow           (ready → running → verify → done)
 Code   = Evidence       (implementation + reproducible outputs, in the code repo)
 ```
 
-The rule of thumb: **docs, issues, and code stay separate and never mix responsibilities.** An issue records *where a milestone is*, not how it was built.
+Rule of thumb: **docs, issues, and code stay separate.** An issue records *where a milestone is*, not how it was built.
 
 ---
 
-## Repositories
+## Repository split
+
+Each project uses two repositories:
 
 | Repo | Role |
 |---|---|
 | **research-dashboard** (this) | Management: research plans, specs, milestone & decision issues, phase reports, references, and the dashboard pipeline. |
-| **[DGCC](https://github.com/jiminc77/DGCC)** | Implementation: environment/RL code, configs, run outputs, metrics, plots, and evidence reports. |
+| **project code repo** | Implementation: code, configs, run outputs, metrics, plots, and evidence reports. |
 
 This repo contains no implementation code.
 
 ---
 
-## Current status
-
-The live dashboard and `projects/dgcc/research/status.json` are the source of truth. At a glance:
-
-| Phase | Scope | Status |
-|---|---|---|
-| **P0** | Environment & pilot: two-simulator bring-up, δm pipeline, G1/G2 gates, constants lock | ✅ Done — GO, signed off 2026-07-03 |
-| **P1** | Baseline: HACMan-style black-box contact critic, T1/T2 training, latent-extraction API | 🔵 In progress |
-| **P2** | Probing gate: frozen-critic probe suite + Controls A–F, Go/Pivot decision | ⚪ Next |
-| **P3** | Structure-comparison gate: V1/V2/V3 variants vs. required controls | ⚪ Backlog |
-| **P4** | Main training of the selected variant across T1–T3 | ⚪ Backlog |
-| **P5** | Mechanism analysis: stationarity, probe transfer, reward-free adaptation | ⚪ Backlog |
-| **P6** | OOD (primary axis: length) and ablations; kill-criterion decision | ⚪ Backlog |
-| **P7** | Writing and submission (target: CoRL 2027) | ⚪ Backlog |
-
-Milestones are pre-registered: every gate threshold, prediction, and kill criterion is fixed in the research plan *before* results are seen. Thresholds are never changed to pass a gate; changing one requires a separate **Decision** issue.
-
----
-
 ## How it works
 
-**Phases and milestones.** Work is organised as phases `P0`–`P7`. Each phase is broken into milestones (`P{k}-M{n}`), and each milestone is one issue in the DGCC code repo. The implementing agent executes a milestone; a report/evidence commit closes it.
+**Phases and milestones.** A project's work is organised as phases (`P0`, `P1`, …). Each phase is split into milestones (`P{k}-M{n}`), and each milestone is one issue in that project's code repo. An agent executes the milestone; a report/evidence commit closes it. Gate thresholds and predictions are fixed in the project's plan up front — changing one requires a separate **Decision** issue, not a quiet edit.
 
 **Label state machine.** Every development issue carries exactly one `state:` label:
 
@@ -66,7 +46,7 @@ ready → running → verify → done
              └── blocked-tech    (CI failure / 3-strike)
 ```
 
-**Human gates.** At a gate, the agent posts a `GATE REQUEST` and the issue moves to `blocked-human`. Only the human owner resolves it, by posting a `GATE VERDICT` comment (with an explicit `choice:`) from their own account. Verdicts written by any non-human account are automatically rejected. A watcher daemon then signals the live agent session to fetch and re-verify the verdict — it never injects the verdict text itself.
+**Human gates.** At a gate, the agent posts a `GATE REQUEST` and the issue moves to `blocked-human`. Only the human owner resolves it, by posting a `GATE VERDICT` comment (with an explicit `choice:`) from their own account; verdicts from any non-human account are automatically rejected. A watcher daemon then signals the live agent session to fetch and re-verify the verdict — it never injects the verdict text itself.
 
 **Issue types.** Only three:
 
@@ -76,7 +56,7 @@ ready → running → verify → done
 | Decision | A direction decision (GO / PIVOT / NO-GO, or a pre-registered value change) |
 | Experiment Result | A result that drives a decision |
 
-Weekly progress is a comment inside the active milestone issue, not a new item:
+Progress updates are comments inside the active milestone issue, not new items:
 
 ```text
 State:
@@ -93,7 +73,7 @@ Next:
 ```text
 projects/
   _template.yml                 # template for a new project
-  dgcc/
+  <slug>/
     project.yml                 # registry: owner, repos, docs base, phase status
     research/                   # research plan (.md/.html) + status.json overlay
     reports/                    # phase reports and gate decisions
@@ -111,10 +91,20 @@ guide/                          # user guide
 
 ---
 
-## Starting a new project
+## Projects
+
+Registered projects live under `projects/<slug>/`. See the live dashboard for current status.
+
+| Project | Description |
+|---|---|
+| [DGCC](projects/dgcc/) | Deformation-Grounded Contact Critics — how value functions should represent contact actions for deformable-object manipulation. [Research plan](https://jiminc77.github.io/research-dashboard/projects/dgcc/research/DGCC_research_plan.html) |
+
+---
+
+## Adding a project
 
 1. Copy `projects/_template.yml` to `projects/<slug>/project.yml` and fill in owner, management repo, and code repo.
 2. Add the project's research plan under `projects/<slug>/research/`.
-3. Copy the `research-ops/workflows/` kit into the code repo.
+3. Copy the `research-ops/workflows/` kit into the project's code repo.
 
-The dashboard picks up the new project automatically on the next run.
+The dashboard picks up the new project automatically on its next run.
