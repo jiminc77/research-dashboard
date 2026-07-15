@@ -102,7 +102,7 @@ follow-ups:
 
 ### 판정 전달 자동화 (gate-watcher)
 
-원격 데몬 `research-ops/gate-watcher/`가 실행 세션의 ledger(blocked)를 감시하다, `state:blocked-human` 라벨이 붙은 open 이슈에서 **GATE VERDICT 코멘트(author=사람 계정, 첫 줄 `### GATE VERDICT`, `choice:` 필드)**를 감지하면 실행 세션 tmux에 "가서 읽어라" 신호만 전달한다(본문 주입 없음 — 세션이 직접 fetch·재검증). 전달 확인 = 판정 코멘트의 👀 reaction. 판정 게시 시 `gate-notify`의 verdict-label job이 `blocked-human → ready`를 기계적으로 전환한다(집행 세션은 착수 시 `running`으로). **구 계약("## HUMAN 판정" + [RESUME])은 폐지 — 본 스키마가 유일한 판정 형식이다.**
+원격 데몬 `research-ops/gate-watcher/`가 실행 세션의 ledger(blocked)를 감시하다, `state:blocked-human` 라벨이 붙은 open 이슈에서 **GATE VERDICT 코멘트(author=사람 계정, 첫 줄 `### GATE VERDICT`, `choice:` 필드)**를 감지하면 실행 세션 tmux에 "가서 읽어라" 신호만 전달한다(본문 주입 없음 — 세션이 직접 fetch·재검증). 전달 확인 = 판정 코멘트의 👀 reaction. 판정 게시 시 `gate-notify`의 verdict-label job이 `blocked-human → ready`를 기계적으로 전환한다(집행 세션은 착수 시 `running`으로). watcher 는 게이트 사이클 동안 **active issue 를 고정 조회**하므로 이 라벨 전환 뒤에도 판정 감지가 끊기지 않는다(v3.2). **구 계약("## HUMAN 판정" + [RESUME])은 폐지 — 본 스키마가 유일한 판정 형식이다.**
 
 ---
 
