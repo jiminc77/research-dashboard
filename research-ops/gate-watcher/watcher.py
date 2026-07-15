@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
-"""research-ops gate-watcher (v3.1, 2026-07-07).
+"""research-ops gate-watcher (v3.2, 2026-07-15).
 
+v3.2: resolve_issue 가 진행 중 사이클의 active_issue 를 최우선 조회 — 사람이 판정을
+      게시하면 gate-notify 가 라벨을 blocked-human→ready 로 즉시 전환해 라벨 검색이
+      빈손이 되고 nudge 가 영영 막히던 경합 제거 (2026-07-15 실사고; issue_number
+      하드코딩 임시방편 불필요). WAIT_ACK 의 최종 escalation(2×ack_timeout)을 재전달
+      분기보다 먼저 검사해 도달 불가 버그 수정, 재전달은 성공/실패 무관 1회 제한.
 v2.1: 게이트 issue 자동 발견 — issue_labels(우선) → issue_number(fallback).
 v3.0: 판정 계약을 PROTOCOL.md §2 GATE VERDICT 스키마로 통합 (구 "## HUMAN 판정
       + [RESUME]" 계약 폐지). C2=첫 줄 "### GATE VERDICT", C3=choice: 필드 존재.
@@ -222,11 +227,19 @@ def choose_issue(items, cfg):
     return None
 
 
-def resolve_issue(cfg: dict, token: str, log: Log):
-    """게이트 issue 결정: (1) issue_labels 매치 (open, 최근 갱신순) → (2) issue_number fallback.
+def resolve_issue(cfg: dict, token: str, log: Log, active=None):
+    """게이트 issue 결정: (0) 진행 중 사이클의 active issue → (1) issue_labels 매치
+    (open, 최근 갱신순) → (2) issue_number fallback.
+
+    (0)이 최우선인 이유: 사람이 GATE VERDICT 를 게시하면 gate-notify 의 verdict-label
+    job 이 라벨을 blocked-human→ready 로 즉시 전환하므로, 라벨 검색만으로는 판정
+    직후의 게이트 이슈를 다시 찾지 못한다. 사이클 동안 이슈를 고정하고, 고정이 다음
+    게이트로 이월되지 않도록 새 사이클 진입(DISARMED→ARMED)에서 active 를 리셋한다.
 
     Returns (issue_number | None, source_str)
     """
+    if active:
+        return int(active), "active"
     labels = cfg.get("issue_labels") or []
     if labels:
         q = urllib.parse.quote(",".join(labels))
@@ -383,7 +396,8 @@ def run(cfg_path: str) -> None:
 
         if mode == "DISARMED":
             if blocked:
-                state.update(mode="ARMED", blocked_line=tail, redelivered=False)
+                # 새 게이트 사이클 — 직전 사이클의 active_issue 고정을 리셋 (라벨로 재발견)
+                state.update(mode="ARMED", blocked_line=tail, redelivered=False, active_issue=None)
                 save_json(cfg["state_path"], state)
                 log.write(f"ARMED (blocked ledger tail: {tail[:120]!r})")
                 continue
@@ -392,11 +406,11 @@ def run(cfg_path: str) -> None:
 
         if mode == "ARMED":
             if not blocked and tail != state.get("blocked_line"):
-                state.update(mode="DISARMED", blocked_line=None)
+                state.update(mode="DISARMED", blocked_line=None, active_issue=None)
                 save_json(cfg["state_path"], state)
                 log.write("DISARM (ledger resumed without delivery)")
                 continue
-            issue_no, issue_src = resolve_issue(cfg, token, log)
+            issue_no, issue_src = resolve_issue(cfg, token, log, active=state.get("active_issue"))
             if issue_no is None:
                 if state.get("armed_since") is None:
                     state.update(armed_since=time.time(), unresolved_notified=False)
@@ -448,7 +462,7 @@ def run(cfg_path: str) -> None:
         if mode == "WAIT_ACK":
             moved = tail != state.get("blocked_line")
             if moved and not blocked:
-                state.update(mode="DISARMED", blocked_line=None, delivered_id=None)
+                state.update(mode="DISARMED", blocked_line=None, delivered_id=None, active_issue=None)
                 save_json(cfg["state_path"], state)
                 log.write("ACK (ledger resumed) → DISARMED")
                 continue
@@ -457,25 +471,28 @@ def run(cfg_path: str) -> None:
                 save_json(cfg["state_path"], state)
                 log.write("WAIT_ACK: ledger moved but still blocked (baseline updated)")
             elapsed = time.time() - (state.get("delivered_at") or time.time())
-            if elapsed > cfg["ack_timeout_s"] and not state.get("redelivered"):
-                try:
-                    deliver_nudge(cfg, state.get("active_issue") or int(cfg.get("issue_number") or 0), state["delivered_id"])
-                    state.update(redelivered=True)
-                    save_json(cfg["state_path"], state)
-                    log.write(f"REDELIVERED nudge for comment {state['delivered_id']}")
-                except Exception as e:  # noqa: BLE001
-                    log.write(f"REDELIVERY FAILED: {e}")
-                    notify_human(cfg, log, f"gate-watcher redelivery failed: {e}")
-            elif elapsed > 2 * cfg["ack_timeout_s"]:
+            # 최종 escalation 을 먼저 검사한다 — 재전달 분기가 앞서면(구 elif 구조)
+            # 재전달이 계속 실패할 때 escalation 에 영영 도달하지 못한다.
+            if elapsed > 2 * cfg["ack_timeout_s"]:
                 notify_human(
                     cfg,
                     log,
                     f"gate-watcher: no ack {int(elapsed)}s after nudge "
                     f"(comment {state['delivered_id']}) — manual check needed",
                 )
-                state.update(mode="DISARMED", blocked_line=None, delivered_id=None)
+                state.update(mode="DISARMED", blocked_line=None, delivered_id=None, active_issue=None)
                 save_json(cfg["state_path"], state)
                 log.write("DISARM (no ack after redelivery — human notified)")
+            elif elapsed > cfg["ack_timeout_s"] and not state.get("redelivered"):
+                try:
+                    deliver_nudge(cfg, state.get("active_issue") or int(cfg.get("issue_number") or 0), state["delivered_id"])
+                    log.write(f"REDELIVERED nudge for comment {state['delivered_id']}")
+                except Exception as e:  # noqa: BLE001
+                    log.write(f"REDELIVERY FAILED: {e}")
+                    notify_human(cfg, log, f"gate-watcher redelivery failed: {e}")
+                # 성공/실패 무관 1회로 제한 — 실패 반복 스팸 방지, 종결은 2×timeout escalation 이 맡는다.
+                state.update(redelivered=True)
+                save_json(cfg["state_path"], state)
             time.sleep(cfg["disarmed_poll_s"])
             continue
 

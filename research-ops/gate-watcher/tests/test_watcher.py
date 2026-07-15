@@ -109,6 +109,42 @@ class TestHermeticOverrides(unittest.TestCase):
         self.assertEqual((n, src), (99, "fallback"))
 
 
+class TestResolveIssueActive(unittest.TestCase):
+    """v3.2 회귀 방지: 판정 게시 → gate-notify 가 blocked-human→ready 라벨 전환 →
+    라벨 검색이 빈손이 되어도, 진행 중 사이클의 active_issue 로 이슈를 고정 조회한다."""
+
+    def test_active_short_circuits_label_search(self):
+        # active 가 있으면 라벨이 설정돼 있어도 API 를 전혀 호출하지 않아야 한다.
+        # (gh_api 를 부르면 예외 발생하도록 패치해 무호출을 증명)
+        orig = watcher.gh_api
+        watcher.gh_api = lambda *a, **k: (_ for _ in ()).throw(AssertionError("gh_api must not be called"))
+        try:
+            n, src = watcher.resolve_issue(
+                {"issue_labels": ["state:blocked-human"], "repo": "x/y"}, "tok", None, active=12)
+        finally:
+            watcher.gh_api = orig
+        self.assertEqual((n, src), (12, "active"))
+
+    def test_no_active_label_flip_falls_to_none_without_fallback(self):
+        # 판정 직후 시나리오: 라벨 검색 결과 0건 + fallback 미설정 → (None, "none").
+        # (v3.2 이전에는 active_issue 를 안 쓰므로 이 경로에 갇혔다 — run() 은 active 를 넘겨 회피)
+        orig = watcher.gh_api
+        watcher.gh_api = lambda *a, **k: []
+        try:
+            n, src = watcher.resolve_issue(
+                {"issue_labels": ["state:blocked-human"], "repo": "x/y"}, "tok", None)
+        finally:
+            watcher.gh_api = orig
+        self.assertEqual((n, src), (None, "none"))
+
+    def test_active_zero_or_none_ignored(self):
+        # active 가 0/None 이면 고정하지 않고 기존 경로(fallback)로 내려간다.
+        class _NoNetLog:
+            def write(self, msg): pass
+        n, src = watcher.resolve_issue({"issue_labels": [], "issue_number": 7}, "tok", _NoNetLog(), active=None)
+        self.assertEqual((n, src), (7, "fallback"))
+
+
 # ---------------------------------------------------------------------------
 # v3.1 harness: gate binding (C5/C6), legacy mode, pagination, id parser.
 # ---------------------------------------------------------------------------
