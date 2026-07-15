@@ -698,6 +698,8 @@ K3 (보조 진단): partial correlation (Claim 3) 유의하지 않음
 
 ## 10. 일정과 산출물
 
+> ⚠️ **개정 안내 (2026-07-16):** 본 §의 투고 전략은 [Decision #35](https://github.com/jiminc77/research-dashboard/issues/35)로 대체되었다 — 현행은 문서 말미 **부록 AMD** 참조. 원문은 사전등록 역사 기록으로서 무수정 보존.
+
 | 단계 | 기간 | 산출물 (게이트) |
 |---|---|---|
 | P0 환경·파일럿 | 4주 (~8월 초) | 2-sim 실구동 비교 → primary 확정 · δm 파이프라인(재표본+DCT+이원 goal) · **G1·G2 게이트 통과** · reward/OOD split 수치 고정 |
@@ -883,3 +885,20 @@ predicts OOD performance within architectures.
 - [52] Lin et al., **SoftGym**, CoRL 2020. arXiv:2011.07215.
 - [53] Chen et al., **DaXBench**, ICLR 2023. arXiv:2210.13066 — differentiable rope 벤치마크.
 - [55] Agarwal et al., **Deep RL at the Edge of the Statistical Precipice (rliable)**, NeurIPS 2021 — IQM·stratified bootstrap CI 평가 표준.
+
+---
+
+## 부록 AMD — 실행 개정 기록 (2026-07)
+
+> **원칙:** 본 계획의 원문 문장은 무삭제·무개변 — §10 배너 1줄 **추가**와 말미 본 부록 **추가**만 허용된다. 사전등록 수치는 역사 기록으로서 불변이다. 실행상 개정은 본 부록과 [Decision] 이슈로만 누적되며, 충돌 시 **본 부록이 현행**이다.
+
+**AMD-1. 투고 전략 대체** [Decision #35, 2026-07-15]
+§10의 투고 전략(CoRL 2027 1순위·33주 일정)을 다음으로 대체한다: 단일 작업 스트림, **ICLR 2027 조준 → GNG-2(8/20, patching mediation 기준) 판정으로 ICRA 2027 강등 → ICML 2027은 분기 C에서만** (하드 피벗 9/1). 분기 판정 기준은 Decision #35에 verbatim 사전 등록. CoRL 2027은 science 완성형 후속 경로로 이동. 마감 3종은 패턴 추정치로, 공식 CFP 발표 시 Decision #35 코멘트로 확정.
+
+**AMD-2. paper-sprint의 phase-외 실행** [Decision #35]
+P2 probing 사양(§7.4)의 선행 슬라이스(frozen-latent probe + **activation patching**)와 P3(§7.5)의 부분 그리드({V1(seed 8), matched-dim(5), random-target(5)} + black-box(8, M4 재사용+보강) × {t1a(seed 5), T2} × **n_envs 1024** — M4 레짐 승계)를 **phase 체계 밖 paper-sprint(`type:paper-sprint` 라벨, 전용 마일스톤)로 실행**한다. P2 마일스톤·P2.md는 생성하지 않는다. 단, **§7.4 검증 게이트 1의 임계와 §7.5 게이트 2의 판정 체계는 불변** — paper 분기 기준(GNG-2)은 투고 층위의 판정이며 연구 Go/Pivot 게이트를 대체하지 않는다. **sprint의 probing/patching 산출물은 재실행·재선택 없이 §7.4 고정 임계의 판정 입력으로 그대로 승계된다.** M5(latent API)는 patching 선행물로 P1 내 선행화. **P1 이슈 close 순서: M6 sign-off는 GNG-2 판정 후에만**(phase-transition의 P2 킥오프 자동 생성 방지).
+
+**AMD-3. 설계 개정 패키지(12건, 번호 = Decision #36 항목 순서)** [Decision #36, 2026-07-16]
+(1) §7.5 필수 대조군에 random low-dim supervised-target 추가 (2) matched-dim에 동일 안정화(Huber+LayerNorm+TD clamp) 적용 (3) paper-sprint 그리드 seed 차등 상향 — primary(V1·BB) 8·대조군 5 (4) 통계 사전등록(CI 단독 게이트·효과크기 벤치마크·σ_goal 앵커, sprint_spec SHA 핀) (5) 그리드 전 raw 궤적 로깅 선행물 (6) A-2는 신규 task 채택·T1 재설계만 게이트(그리드 비대상) + 스파이크·Plan B (7) goal preflight 측정 즉시·투영 채택 기본 No (8) ε 재채점 절차(완화 정확·강화 censored) (9) G2 settle-10000 재검증 등재 (10) patching 4종+cross-arm 통제+게이트키핑 (11) **sprint 전용 held-out split**(`t2_sprint_heldout_v1`, 100 goals — M4 held-out은 P1 전용 보존) (12) **eval-wall guard**(sprint 한정, episode당 재시도 상한·초과=failure 계상, flag 기본 off). 상세는 Decision #36 본문. 근거: 적대 리뷰(07-14) + 3라운드 13회 검증(07-15) + 외부 실물 검증·4-관점 리뷰(07-16) + M3R/M4/O1 실측.
+
+**AMD-미결.** 다음 항목은 인지되었으나 미결정 상태로, 개별 [Decision] 상정 예정: ε_succ 재유도(A-2 결과 조건부) · reward–Φ 좌표 분리 · T3c 재설계 · DCT M-sweep · near-goal G2 재측정 · G2 settle-10000 재검증.
