@@ -739,6 +739,7 @@ but not the physical mechanism by which the action becomes valuable.</pre>
       <div class="toc-item"><span class="num">A</span><a href="#appendix-a">부록 A · 예상 반론과 대응</a></div>
       <div class="toc-item"><span class="num">B</span><a href="#appendix-b">부록 B · 확장 위험 목록</a></div>
       <div class="toc-item"><span class="num">12</span><a href="#s12">Related Works</a></div>
+      <div class="toc-item"><span class="num">AMD</span><a href="#appendix-amd">부록 AMD · 실행 개정 기록</a></div>
     </div>
   </div>
 </div>
@@ -1457,6 +1458,8 @@ per-task · per-OOD-axis 분해 보고 · 학습 곡선 AUC · 안정성 지표 
     <span class="eyebrow">Section 10 — 일정과 산출물</span>
     <h2 class="section-head">일정과 산출물</h2>
 
+    <div class="note" style="border-left-color: var(--accent-warning); margin-top:18px;">⚠️ <strong>개정 안내 (2026-07-16):</strong> 본 §의 투고 전략은 <a href="https://github.com/jiminc77/research-dashboard/issues/35">Decision #35</a>로 대체되었다 — 현행은 문서 말미 <strong>부록 AMD</strong> 참조. 원문은 사전등록 역사 기록으로서 무수정 보존.</div>
+
     <div class="table-scroll" style="margin-top:22px;">
       <table>
         <thead><tr><th style="width:20%;">단계</th><th style="width:16%;">기간</th><th>산출물 (게이트)</th></tr></thead>
@@ -1690,6 +1693,36 @@ predicts OOD performance within architectures.</pre>
       <div class="ref-row" id="ref-52"><div class="ref-num">[52]</div><div class="ref-body">Lin et al., <span class="ref-title">SoftGym</span>, <span class="ref-venue">CoRL 2020.</span> <span class="ref-arxiv"><a href="https://proceedings.mlr.press/v155/lin21a.html">↗ PMLR</a></span></div></div>
       <div class="ref-row" id="ref-53"><div class="ref-num">[53]</div><div class="ref-body">Chen et al., <span class="ref-title">DaXBench</span>, <span class="ref-venue">ICLR 2023.</span> <span class="ref-arxiv"><a href="https://openreview.net/forum?id=1NAzMofMnWl">↗ OpenReview</a></span><span class="ref-note">differentiable rope 벤치마크.</span></div></div>
       <div class="ref-row" id="ref-55"><div class="ref-num">[55]</div><div class="ref-body">Agarwal et al., <span class="ref-title">Deep RL at the Edge of the Statistical Precipice (rliable)</span>, <span class="ref-venue">NeurIPS 2021.</span> <span class="ref-arxiv"><a href="https://proceedings.neurips.cc/paper/2021/hash/f514cec81cb148559cf475e7426eed5e-Abstract.html">↗ NeurIPS Proceedings</a></span><span class="ref-note">IQM·stratified bootstrap CI 평가 표준.</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== APPENDIX AMD ==================== -->
+<section class="major appendix-section" id="appendix-amd">
+  <div class="wrap">
+    <span class="eyebrow appendix">부록 AMD</span>
+    <h2 class="section-head">실행 개정 기록 (2026-07)</h2>
+
+    <div class="note" style="border-left-color: var(--accent-warning); margin-top:18px;"><strong>원칙:</strong> 본 계획의 원문 문장은 무삭제·무개변 — §10 배너 1줄 <strong>추가</strong>와 말미 본 부록 <strong>추가</strong>만 허용된다. 사전등록 수치는 역사 기록으로서 불변이다. 실행상 개정은 본 부록과 [Decision] 이슈로만 누적되며, 충돌 시 <strong>본 부록이 현행</strong>이다.</div>
+
+    <div class="card-soft" style="margin-bottom:16px;">
+      <div class="card-title" style="font-size:16px;"><strong>AMD-1. 투고 전략 대체</strong> <span style="font-weight:400; color:var(--muted); font-size:13px;">[<a href="https://github.com/jiminc77/research-dashboard/issues/35">Decision #35</a>, 2026-07-15]</span></div>
+      <p style="margin-bottom:0;">§10의 투고 전략(CoRL 2027 1순위·33주 일정)을 다음으로 대체한다: 단일 작업 스트림, <strong>ICLR 2027 조준 → GNG-2(8/20, patching mediation 기준) 판정으로 ICRA 2027 강등 → ICML 2027은 분기 C에서만</strong> (하드 피벗 9/1). 분기 판정 기준은 Decision #35에 verbatim 사전 등록. CoRL 2027은 science 완성형 후속 경로로 이동. 마감 3종은 패턴 추정치로, 공식 CFP 발표 시 Decision #35 코멘트로 확정.</p>
+    </div>
+
+    <div class="card-soft" style="margin-bottom:16px;">
+      <div class="card-title" style="font-size:16px;"><strong>AMD-2. paper-sprint의 phase-외 실행</strong> <span style="font-weight:400; color:var(--muted); font-size:13px;">[<a href="https://github.com/jiminc77/research-dashboard/issues/35">Decision #35</a>]</span></div>
+      <p style="margin-bottom:0;">P2 probing 사양(§7.4)의 선행 슬라이스(frozen-latent probe + <strong>activation patching</strong>)와 P3(§7.5)의 부분 그리드({V1(seed 8), matched-dim(5), random-target(5)} + black-box(8, M4 재사용+보강) × {t1a(seed 5), T2} × <strong>n_envs 1024</strong> — M4 레짐 승계)를 <strong>phase 체계 밖 paper-sprint(<code class="inline">type:paper-sprint</code> 라벨, 전용 마일스톤)로 실행</strong>한다. P2 마일스톤·P2.md는 생성하지 않는다. 단, <strong>§7.4 검증 게이트 1의 임계와 §7.5 게이트 2의 판정 체계는 불변</strong> — paper 분기 기준(GNG-2)은 투고 층위의 판정이며 연구 Go/Pivot 게이트를 대체하지 않는다. <strong>sprint의 probing/patching 산출물은 재실행·재선택 없이 §7.4 고정 임계의 판정 입력으로 그대로 승계된다.</strong> M5(latent API)는 patching 선행물로 P1 내 선행화. <strong>P1 이슈 close 순서: M6 sign-off는 GNG-2 판정 후에만</strong>(phase-transition의 P2 킥오프 자동 생성 방지).</p>
+    </div>
+
+    <div class="card-soft" style="margin-bottom:16px;">
+      <div class="card-title" style="font-size:16px;"><strong>AMD-3. 설계 개정 패키지(12건, 번호 = Decision #36 항목 순서)</strong> <span style="font-weight:400; color:var(--muted); font-size:13px;">[<a href="https://github.com/jiminc77/research-dashboard/issues/36">Decision #36</a>, 2026-07-16]</span></div>
+      <p style="margin-bottom:0;">(1) §7.5 필수 대조군에 random low-dim supervised-target 추가 (2) matched-dim에 동일 안정화(Huber+LayerNorm+TD clamp) 적용 (3) paper-sprint 그리드 seed 차등 상향 — primary(V1·BB) 8·대조군 5 (4) 통계 사전등록(CI 단독 게이트·효과크기 벤치마크·σ_goal 앵커, sprint_spec SHA 핀) (5) 그리드 전 raw 궤적 로깅 선행물 (6) A-2는 신규 task 채택·T1 재설계만 게이트(그리드 비대상) + 스파이크·Plan B (7) goal preflight 측정 즉시·투영 채택 기본 No (8) ε 재채점 절차(완화 정확·강화 censored) (9) G2 settle-10000 재검증 등재 (10) patching 4종+cross-arm 통제+게이트키핑 (11) <strong>sprint 전용 held-out split</strong>(<code class="inline">t2_sprint_heldout_v1</code>, 100 goals — M4 held-out은 P1 전용 보존) (12) <strong>eval-wall guard</strong>(sprint 한정, episode당 재시도 상한·초과=failure 계상, flag 기본 off). 상세는 Decision #36 본문. 근거: 적대 리뷰(07-14) + 3라운드 13회 검증(07-15) + 외부 실물 검증·4-관점 리뷰(07-16) + M3R/M4/O1 실측.</p>
+    </div>
+
+    <div class="card-soft" style="margin-bottom:0;">
+      <div class="card-title" style="font-size:16px;"><strong>AMD-미결.</strong></div>
+      <p style="margin-bottom:0;">다음 항목은 인지되었으나 미결정 상태로, 개별 [Decision] 상정 예정: ε_succ 재유도(A-2 결과 조건부) · reward–Φ 좌표 분리 · T3c 재설계 · DCT M-sweep · near-goal G2 재측정 · G2 settle-10000 재검증.</p>
     </div>
   </div>
 </section>
