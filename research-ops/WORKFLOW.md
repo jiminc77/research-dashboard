@@ -71,6 +71,8 @@
 [사람] "P{k} 완료" → [세션 A] 완료검증 → status/milestone Done(PR) → 다음 STEP4
 ```
 
+> ⚠️ **phase-외 트랙 병행 시 예외:** phase의 마지막 open 이슈가 닫히면 다음 phase 킥오프가 **실제로 자동 생성**되므로, paper-sprint 등 phase-외 트랙이 진행 중일 때는 해당 phase의 마지막 이슈(M6 sign-off류) close를 **트랙 종료 게이트(GNG-2) 이후로 유예**한다. [AMD-2, Decision #35]
+
 ---
 
 ## 5. 사람 접점 (사람이 직접 하는 일만)

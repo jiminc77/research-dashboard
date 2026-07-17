@@ -46,6 +46,14 @@
 - `phase:P0` .. `phase:P7` — 소속 단계
 - `proj:<name>` — 공용 MGMT_REPO에서 프로젝트 구분 (CODE_REPO는 단일 프로젝트라 생략 가능; `[{PROJECT}]` 제목 접두사와 병행)
 
+### 보조 트랙: paper-sprint (phase 체계 밖 실행)
+
+phase 로드맵과 병행하는 시간-박스 트랙(예: 논문 스프린트)은 다음 규약으로 실행한다 [Decision #35/#36, 2026-07-16]:
+- 이슈는 `type:paper-sprint` 라벨만 사용 — **phase:* 라벨·[P#-M#] 제목 금지**(phase 회계 오염 방지). 전용 마일스톤(P숫자로 시작하지 않는 이름) + 에픽 추적 이슈 1개.
+- 실행 명세는 델타 스펙 파일(예: `sprint_spec.md`)로 CODE 레포에 커밋하고 **커밋 SHA를 Decision 이슈에 핀**(사전등록).
+- 트랙 진행 중 게이트 요청은 **class:hard만** 사용한다(auto-default cron의 슬롯당 2–3h 지연 실측 — 무인 default 집행 시점 통제 불능 회피).
+- 게이트 verdict 대기 폴링의 since 앵커는 **GATE REQUEST 게시 시각**으로 한다(폴링 시작 시각 앵커링 시 요청 직후 도착한 verdict 유실 — 2026-07-16 실사고 2회).
+
 ---
 
 ## 2. GATE REQUEST 스키마
