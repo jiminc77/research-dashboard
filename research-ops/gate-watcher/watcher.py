@@ -196,6 +196,29 @@ def is_blocked(tail: str, cfg: dict) -> bool:
     return any(s in tail for s in cfg["armed_substrings"])
 
 
+def has_blocked_issue(cfg: dict, token: str, log: Log) -> bool:
+    """gjc가 게이트를 ledger 핸드오프 없이 인라인 처리하면 ledger tail에 blocked 마커가
+    남지 않아 무장되지 않던 버그(2026-07-16 진단) 보완: issue_labels(=state:blocked-human)가
+    달린 open 이슈가 하나라도 있으면 무장 트리거로 본다. resolve_issue와 동일한 인증/요청
+    기계(gh_api)를 재사용하며, 어떤 예외에서도 fail-safe(False 반환 + 로그) — 라벨 조회
+    실패가 감시 루프를 죽이지 않도록 한다."""
+    labels = cfg.get("issue_labels") or ["state:blocked-human"]
+    q = urllib.parse.quote(",".join(labels))
+    url = (
+        f"https://api.github.com/repos/{cfg['repo']}/issues"
+        f"?state=open&labels={q}&per_page=1"
+    )
+    try:
+        for it in gh_api(url, token) or []:
+            if "pull_request" in it:
+                continue
+            return True
+        return False
+    except Exception as e:  # noqa: BLE001
+        log.write(f"has_blocked_issue API error (fail-safe False): {e}")
+        return False
+
+
 def evaluate_comment(comment: dict, cfg: dict, last_processed_id: int):
     """판정 계약 C1–C4 (author / 첫 줄 마커 / choice: 필드 / id > last_processed).
     C5(gate id 일치)·C6(created_at 순서)는 find_verdict()가 pending REQUEST 대비 강제.
@@ -395,11 +418,13 @@ def run(cfg_path: str) -> None:
         mode = state["mode"]
 
         if mode == "DISARMED":
-            if blocked:
+            # ledger tail(우선) 또는 state:blocked-human 라벨 이슈로 무장 (soft/inline 게이트 보완)
+            armed_by = "ledger" if blocked else ("label" if has_blocked_issue(cfg, token, log) else None)
+            if armed_by:
                 # 새 게이트 사이클 — 직전 사이클의 active_issue 고정을 리셋 (라벨로 재발견)
                 state.update(mode="ARMED", blocked_line=tail, redelivered=False, active_issue=None)
                 save_json(cfg["state_path"], state)
-                log.write(f"ARMED (blocked ledger tail: {tail[:120]!r})")
+                log.write(f"ARMED via {armed_by} (blocked ledger tail: {tail[:120]!r})")
                 continue
             time.sleep(cfg["disarmed_poll_s"])
             continue
