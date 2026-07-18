@@ -845,6 +845,9 @@ systemctl --user enable --now gate-watcher-liveness.timer</code></pre>
       <span class="sec-num">§3</span>
       <h2 class="sec-title">단계 루프 — 단계마다 반복</h2>
       <p>세션 A가 <code class="inl">P{k}.md</code>·dev 이슈를 만든다 → 내가 gjc를 1회 부팅 → gjc가 자율 실행하며 증거·게이트를 게시 → 게이트는 내가 판정 → 단계 끝나면 킥오프 이슈가 자동 생성돼 다음 단계로.</p>
+      <div class="callout note mt24 mb0">
+        <strong>⚠️ 보조 트랙 예외 (2026-07 신설, paper-sprint 등):</strong> phase 로드맵과 병행하는 시간-박스 트랙은 이 단계 루프를 따르지 <em>않는다</em> — <code class="inl">P{k}.md</code>를 만들지 않고, 실행 명세는 <strong>델타 스펙</strong>(예: <code class="inl">sprint_spec.md</code>)으로 CODE 레포에 커밋한 뒤 <strong>커밋 SHA를 Decision 이슈에 핀</strong>(사전등록)한다. 이슈는 <code class="inl">type:paper-sprint</code> 라벨만(phase 라벨 금지), 게이트는 class:hard만 사용하며, 트랙 진행 중에는 해당 phase의 마지막 이슈(M6 sign-off류) close를 트랙 종료 게이트 이후로 유예한다(자동 킥오프 방지). 정본: <code class="inl">research-ops/PROTOCOL.md</code> "보조 트랙" 절 · Decision #35/#36.
+      </div>
     </div>
 
     <h3 class="sub-title">1 · 흐름 한 눈에</h3>
