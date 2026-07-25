@@ -1,0 +1,22 @@
+# V2 Research Step Log
+
+- 2026-07-25 — Kickoff/brief read complete; estimated duration recorded as 2–4 hours.
+- 2026-07-25 — Mandatory preflight at DGCC HEAD `289c5434905257ddbdca8542a4ed41c9858e4403`: working tree is dirty (2 modified tracked output files and numerous untracked run artifacts); per `[V2-PRE]` hard constraint, repository code audit halted before opening audit targets. No source, heldout data, training, evaluation, or GPU job was touched.
+- 2026-07-25 — LIT A complete: actor-exposure primary-source review and verdict.
+- 2026-07-25 — LIT B complete: deployment-time response/lookahead primary-source review and verdict.
+- 2026-07-25 — LIT C complete: TD3 cadence, replay/budget, and few-run evaluation review.
+- 2026-07-25 — LIT D complete: hybrid selection-aligned objective review.
+- 2026-07-25 — LIT E complete: auxiliary gradient-routing review and activation gate.
+- 2026-07-25 — Audit resumed without touching dirty user state by cloning committed HEAD to a clean temporary checkout; clean status and SHA parity verified. Frozen source-bundle metadata/proof audited separately.
+- 2026-07-25 — WP-00 complete: no V2 charter/split, seed-5 repeated technical failure, missing fresh paired BB budget; confirmatory governance BLOCKED.
+- 2026-07-25 — WP-01 complete: full actor/critic tensor and gradient table; V1 indirect auxiliary exposure confirmed.
+- 2026-07-25 — WP-02 complete: sole training call graph, checkpoint lifecycle, seam ledger, and CPU B×32 vectorization test.
+- 2026-07-25 — WP-03 complete: actor/deployment mismatch and missing delayed actor/target updates confirmed.
+- 2026-07-25 — WP-04 complete: 300k/600k numeric semantics and exact-resume impossibility confirmed.
+- 2026-07-25 — WP-05 complete: exact reward/evaluation/selector paths plus 300-episode development-validation retrospective.
+- 2026-07-25 — WP-06 complete: RNG ledger, shared-stream risks, and current deterministic V1 pairing assessment.
+- 2026-07-25 — WP-07 complete: hard-coded arm inventory, checkpoint/source-bundle compatibility, and minimum-diff surface.
+- 2026-07-25 — WP-08 complete: 120-row long-format curve audit, predictor correlations, AUC/slopes, and false-reject analysis.
+- 2026-07-25 — WP-09 complete within no-GPU boundary: CPU synthetic module profile and >25% response-forward warning; GPU/robot latency remains OPEN.
+- 2026-07-25 — WP-10 complete: existing test coverage mapped, 20 fail-closed candidate contracts specified; focused CPU verification 6/6 passed.
+- 2026-07-25 — SUMMARY revised with all 12 definitive answers, D/B/C evidence balance, governance blocker, and ranked recommendation.
